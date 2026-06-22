@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Java File I/O: Text vs Binary Challenge</title>
+<style>
+  :root{
+    --bg:#0f1320; --panel:#171c2e; --panel2:#1f2740; --ink:#e7ecf6; --muted:#9aa6c4;
+    --acc:#19c3a6; --acc2:#2f7bff; --ok:#2fd07a; --bad:#ff5d6c; --warn:#ffce4a;
+    --text:#19c3a6; --bin:#ff8a3d; --code:#0b0f1a; --line:#2c3656;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 80% -10%,#10312c 0,transparent 60%),var(--bg);color:var(--ink);line-height:1.5}
+  .wrap{max-width:900px;margin:0 auto;padding:22px 20px 70px;position:relative;z-index:1}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{font-size:1.35rem;margin:0;letter-spacing:.2px}
+  .hud{margin-left:auto;display:flex;gap:12px;align-items:center;font-weight:700;font-size:.9rem}
+  .hud .chip{background:var(--panel);border:1px solid var(--line);padding:6px 12px;border-radius:20px}
+  .hud .chip b{color:var(--warn)}
+  .iconbtn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:.95rem}
+  .steps{display:flex;gap:8px;margin:16px 0 18px;flex-wrap:wrap}
+  .step{flex:1;min-width:84px;text-align:center;font-size:.72rem;color:var(--muted);font-weight:700;border-top:3px solid var(--line);padding-top:8px;transition:.2s}
+  .step.active{color:var(--ink);border-color:var(--acc)}
+  .step.done{color:var(--ok);border-color:var(--ok)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:18px}
+  h2{margin:.1rem 0 .4rem;font-size:1.3rem}
+  .lead{color:var(--muted);margin:.2rem 0 1rem}
+  .badge{display:inline-block;background:rgba(25,195,166,.15);color:#8ff0df;border:1px solid rgba(25,195,166,.4);padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:8px}
+  code,pre{font-family:"SF Mono",Menlo,Consolas,monospace}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow:auto;font-size:.83rem}
+  .kw{color:#9d86ff;font-weight:600}.cm{color:#6b7488}.ty{color:#5bd1ff}.st{color:#79e0a8}.nm{color:#ffce4a}
+  .q{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;background:var(--panel2)}
+  .q .qt{font-weight:700;margin-bottom:9px}
+  .q .qt .num{color:var(--acc);margin-right:6px}
+  .opts{display:flex;gap:6px;flex-wrap:wrap}
+  .opt{border:1px solid var(--line);background:var(--code);color:var(--ink);padding:8px 13px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;transition:.12s}
+  .opt:hover{border-color:var(--acc)}
+  .opt.sel{border-color:var(--acc);background:var(--panel2)}
+  .opt.correct{background:rgba(47,208,122,.2);border-color:var(--ok);color:#bff7d8}
+  .opt.wrong{background:rgba(255,93,108,.2);border-color:var(--bad);color:#ffd2d7}
+  .btn{background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;color:#fff;padding:12px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:.95rem;transition:.15s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .bar{display:flex;gap:10px;align-items:center;margin-top:18px;flex-wrap:wrap}
+  .fb{margin-top:14px;padding:13px 15px;border-radius:10px;font-size:.9rem;display:none}
+  .fb.show{display:block}
+  .fb.good{background:rgba(47,208,122,.12);border:1px solid rgba(47,208,122,.4)}
+  .fb.partial{background:rgba(255,206,74,.12);border:1px solid rgba(255,206,74,.4)}
+  .note{font-size:.84rem;color:var(--muted);margin-top:8px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0 12px;font-size:.82rem;color:var(--muted)}
+  .legend b.t{color:var(--text)}.legend b.b{color:var(--bin)}
+  .hidden{display:none}
+  .center{text-align:center}
+  .big{font-size:3rem;margin:6px 0}
+  .rankline{font-size:1.55rem;font-weight:800;margin:6px 0}
+  .scorebars{margin:18px 0;text-align:left}
+  .sbrow{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:.88rem}
+  .sbrow .lbl{width:150px;color:var(--muted);font-weight:600}
+  .track{flex:1;background:var(--code);border-radius:20px;height:14px;overflow:hidden;border:1px solid var(--line)}
+  .fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:20px;width:0;transition:width .8s ease}
+  .sbrow .val{width:50px;text-align:right;font-weight:700}
+  .vs{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+  .vscard{flex:1;min-width:230px;border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--panel2)}
+  .vscard h4{margin:.1rem 0 .4rem}
+  .vscard.t{border-color:rgba(25,195,166,.45)}.vscard.t h4{color:var(--text)}
+  .vscard.b{border-color:rgba(255,138,61,.45)}.vscard.b h4{color:var(--bin)}
+  .vscard ul{margin:.2rem 0 0;padding-left:18px;font-size:.86rem;color:var(--muted)}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+  .win-glow{text-shadow:0 0 22px rgba(25,195,166,.7)}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <header>
+    <h1>📁 Java File I/O — Text vs Binary</h1>
+    <div class="hud">
+      <span class="chip">⏱️ <span id="timer">0:00</span></span>
+      <span class="chip">⭐ <b id="scoreHud">0</b>/<span id="maxHud">0</span></span>
+      <button class="iconbtn" id="soundBtn" title="Toggle sound">🔊</button>
+    </div>
+  </header>
+
+  <div class="steps hidden" id="steps"></div>
+
+  <!-- HOME -->
+  <section class="screen" id="screen-home">
+    <div class="card center">
+      <div class="big">📄⚙️💾</div>
+      <h2>The File Format Trials</h2>
+      <p class="lead">Two ways to store data in Java — as human-readable <b style="color:var(--text)">text</b>, or as raw <b style="color:var(--bin)">binary</b>. Four levels, ~12 minutes. Score <b>60%+</b> to earn your I/O badge.</p>
+      <div class="vs">
+        <div class="vscard t">
+          <h4>📄 Text files</h4>
+          <ul>
+            <li>Characters, encoded (UTF-8)</li>
+            <li><b>Reader / Writer</b> classes</li>
+            <li>Readable in any editor</li>
+            <li>Number <code>1000</code> → 4 chars "1000"</li>
+          </ul>
+        </div>
+        <div class="vscard b">
+          <h4>💾 Binary files</h4>
+          <ul>
+            <li>Raw bytes, no encoding</li>
+            <li><b>InputStream / OutputStream</b> classes</li>
+            <li>Looks like garbage in an editor</li>
+            <li>An <code>int</code> → always 4 bytes</li>
+          </ul>
+        </div>
+      </div>
+      <div class="bar" style="justify-content:center">
+        <button class="btn" id="startBtn">Start the trials →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEVEL -->
+  <section class="screen hidden" id="screen-level">
+    <div class="card">
+      <span class="badge" id="lvlBadge"></span>
+      <h2 id="lvlTitle"></h2>
+      <p class="lead" id="lvlLead"></p>
+      <div id="lvlBody"></div>
+      <div class="bar" id="lvlBar"></div>
+      <div class="fb" id="lvlFb"></div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen hidden" id="screen-results">
+    <div class="card center">
+      <div class="big" id="resEmoji">🏆</div>
+      <div class="rankline win-glow" id="resRank"></div>
+      <p class="lead" id="resMsg"></p>
+      <div class="scorebars" id="scorebars"></div>
+      <div class="rankline" id="resTotal"></div>
+      <div class="bar" style="justify-content:center" id="resBar"></div>
+      <p class="note" id="resNote"></p>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ===================== CONTENT ===================== */
+const TB=['📄 Text (character) stream','💾 Binary (byte) stream'];
+const LEVELS=[
+  { step:'L1 · Streams', badge:'LEVEL 1', title:'🔀 Sort the Streams',
+    lead:'Java splits I/O into two families. Drop each class into the right one.',
+    preamble:`<div class="legend"><span><b class="t">Reader/Writer</b> = character (text)</span><span><b class="b">InputStream/OutputStream</b> = byte (binary)</span></div>`,
+    questions:[
+      {prompt:'<code>FileReader</code>',options:TB,answer:0,why:'A Reader → character/text stream.'},
+      {prompt:'<code>FileWriter</code>',options:TB,answer:0,why:'A Writer → character/text stream.'},
+      {prompt:'<code>BufferedReader</code>',options:TB,answer:0,why:'Wraps a Reader → still text. Gives you readLine().'},
+      {prompt:'<code>PrintWriter</code>',options:TB,answer:0,why:'A Writer → text. Gives print/println.'},
+      {prompt:'<code>FileInputStream</code>',options:TB,answer:1,why:'An InputStream → raw bytes (binary).'},
+      {prompt:'<code>FileOutputStream</code>',options:TB,answer:1,why:'An OutputStream → raw bytes (binary).'},
+      {prompt:'<code>DataOutputStream</code>',options:TB,answer:1,why:'Writes primitives as raw bytes → binary.'},
+      {prompt:'<code>ObjectOutputStream</code>',options:TB,answer:1,why:'Serializes objects to bytes → binary.'},
+    ]},
+  { step:'L2 · Concepts', badge:'LEVEL 2', title:'⚡ Lightning Round',
+    lead:'Five quick calls on how the two formats behave.',
+    questions:[
+      {prompt:'A <b>text</b> file stores the number <code>1000</code> as…',options:['the 4 characters "1000"','4 raw bytes of an int','8 bytes'],answer:0,why:'Text writes the digit characters, encoded (e.g. UTF-8).'},
+      {prompt:'Can you read a <b>binary</b> file meaningfully in a plain text editor?',options:['Yes, always','No — it looks like garbage'],answer:1,why:'Binary bytes don\'t map to readable characters.'},
+      {prompt:'Which writes an <code>int</code> as exactly <b>4 bytes</b>, whatever its value?',options:['PrintWriter.print(...)','DataOutputStream.writeInt(...)','FileWriter.write(...)'],answer:1,why:'writeInt always emits a fixed 4-byte int.'},
+      {prompt:'<code>BufferedReader.readLine()</code> at end of file returns…',options:['-1','null','an empty string','throws EOFException'],answer:1,why:'readLine() returns null at EOF — your loop condition.'},
+      {prompt:'To save a whole object (all its fields) to a file and restore it later, you use…',options:['FileWriter','ObjectOutputStream (serialization)','Scanner'],answer:1,why:'Serialization via ObjectOutputStream/ObjectInputStream.'},
+    ]},
+  { step:'L3 · Bytes', badge:'LEVEL 3', title:'📏 The Byte Showdown',
+    lead:'Same values, two formats. Predict how many bytes hit the file. (Assume ASCII/UTF-8, 1 byte per character.)',
+    questions:[
+      {prompt:'<code>PrintWriter.print(12345)</code> → bytes written?',options:['2','4','5','8'],answer:2,why:'Text = the 5 characters \'1\'\'2\'\'3\'\'4\'\'5\' = 5 bytes.'},
+      {prompt:'<code>DataOutputStream.writeInt(12345)</code> → bytes?',options:['2','4','5','8'],answer:1,why:'An int is always 4 bytes in binary, regardless of value.'},
+      {prompt:'<code>DataOutputStream.writeInt(7)</code> → bytes?',options:['1','4','7','8'],answer:1,why:'Still 4 bytes — binary size is fixed by the TYPE, not the value.'},
+      {prompt:'<code>DataOutputStream.writeDouble(3.14)</code> → bytes?',options:['4','6','8','10'],answer:2,why:'A double is always 8 bytes in binary.'},
+      {prompt:'<code>PrintWriter.print(3.14)</code> → bytes (text "3.14")?',options:['3','4','8','16'],answer:1,why:'Text = the 4 characters \'3\'\'.\'\'1\'\'4\' = 4 bytes.'},
+    ]},
+  { step:'L4 · Courtroom', badge:'LEVEL 4', title:'⚖️ The I/O Courtroom',
+    lead:'Read each case and rule on what really happens.',
+    questions:[
+      {prompt:'A classic gotcha:',code:'FileWriter fw = new FileWriter("a.txt");\nfw.write(65);',options:['the text "65" lands in the file','the character A lands in the file','4 raw bytes land in the file'],answer:1,why:'On a Writer, write(int) treats the int as a CHARACTER code — 65 is \'A\'.'},
+      {prompt:'You saved data with <code>writeInt</code>/<code>writeDouble</code>. To read it back correctly, use…',options:['BufferedReader.readLine()','DataInputStream readInt()/readDouble()','Scanner.nextInt()'],answer:1,why:'Binary written with Data streams must be read with Data streams, in the same order.'},
+      {prompt:'You open a serialized <code>.dat</code> file (from ObjectOutputStream) in Notepad. You see…',options:['clean, readable text','mostly unreadable bytes / garbage'],answer:1,why:'Serialized objects are binary, not human-readable.'},
+      {prompt:'Best way to read a <b>text</b> file line by line?',options:['BufferedReader.readLine() in a loop until null','DataInputStream.readInt()','count bytes manually'],answer:0,why:'readLine() until it returns null is the idiomatic text pattern.'},
+      {prompt:'<code>DataInputStream.readInt()</code> is called but the file has ended. What happens?',options:['returns -1','returns null','throws EOFException'],answer:2,why:'Data streams throw EOFException at end of file (unlike readLine → null).'},
+    ]},
+];
+const NOTE='Debrief: text trades size &amp; type-safety for readability; binary trades readability for compact, fixed-size, type-exact storage. Pick Reader/Writer for text, InputStream/OutputStream for binary — and never mix the families.';
+
+/* ===================== ENGINE ===================== */
+let lvlIdx=0, got=[], maxPts=0, locked=false, sel=[];
+let startTime=null, timerInt=null, soundOn=true;
+const $=id=>document.getElementById(id);
+maxPts=LEVELS.reduce((s,l)=>s+l.questions.length,0);
+$('maxHud').textContent=maxPts;
+
+/* sound */
+let actx=null;
+function beep(f,d,t='sine',v=.06){if(!soundOn)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();
+  const o=actx.createOscillator(),g=actx.createGain();o.type=t;o.frequency.value=f;o.connect(g);g.connect(actx.destination);
+  g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);
+  o.start();o.stop(actx.currentTime+d);}catch(e){}}
+const sGood=()=>{beep(660,.12);setTimeout(()=>beep(990,.14),90)};
+const sBad=()=>beep(160,.22,'sawtooth',.05);
+const sClick=()=>beep(420,.05,'square',.03);
+const sWin=()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.2),i*120));
+$('soundBtn').addEventListener('click',function(){soundOn=!soundOn;this.textContent=soundOn?'🔊':'🔇';if(soundOn)sClick();});
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('hidden',s.id!=='screen-'+id));window.scrollTo({top:0,behavior:'smooth'});}
+function updHud(){$('scoreHud').textContent=got.reduce((a,b)=>a+b,0);}
+function renderSteps(){const steps=$('steps');steps.classList.remove('hidden');steps.innerHTML='';
+  LEVELS.forEach((l,i)=>{const d=document.createElement('div');d.className='step'+(i===lvlIdx?' active':'')+(i<lvlIdx?' done':'');d.textContent=l.step;steps.appendChild(d);});
+  const r=document.createElement('div');r.className='step'+(lvlIdx>=LEVELS.length?' active':'');r.textContent='Result';steps.appendChild(r);}
+function mkBtn(label,fn,cls=''){const b=document.createElement('button');b.className='btn '+cls;b.textContent=label;b.onclick=fn;return b;}
+
+$('startBtn').addEventListener('click',()=>{
+  startTime=Date.now();clearInterval(timerInt);
+  timerInt=setInterval(()=>{const s=Math.floor((Date.now()-startTime)/1000);$('timer').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},1000);
+  lvlIdx=0;got=[];sClick();renderLevel();
+});
+
+function renderLevel(){
+  locked=false;const L=LEVELS[lvlIdx];sel=Array(L.questions.length).fill(null);
+  renderSteps();updHud();
+  $('lvlBadge').textContent=L.badge+' · '+L.questions.length+' pts';
+  $('lvlTitle').textContent=L.title;$('lvlLead').innerHTML=L.lead;
+  const fb=$('lvlFb');fb.className='fb';fb.innerHTML='';
+  const body=$('lvlBody');body.innerHTML=L.preamble||'';
+  L.questions.forEach((q,i)=>{const d=document.createElement('div');d.className='q';
+    d.innerHTML=`<div class="qt"><span class="num">${i+1}.</span>${q.prompt}</div>`+
+      (q.code?`<pre>${q.code}</pre>`:'')+
+      `<div class="opts">${q.options.map((o,j)=>`<button class="opt" data-i="${i}" data-j="${j}">${o}</button>`).join('')}</div>`;
+    body.appendChild(d);});
+  body.onclick=e=>{const b=e.target.closest('.opt');if(!b||locked)return;const i=+b.dataset.i;sel[i]=+b.dataset.j;sClick();
+    body.querySelectorAll(`[data-i="${i}"]`).forEach(x=>x.classList.toggle('sel',x===b));};
+  const bar=$('lvlBar');bar.innerHTML='';bar.appendChild(mkBtn('Lock in answers',()=>checkLevel(L)));
+  showScreen('level');
+}
+
+function checkLevel(L){
+  if(locked)return;locked=true;let c=0;
+  L.questions.forEach((q,i)=>{
+    const grp=$('lvlBody').querySelectorAll(`[data-i="${i}"]`);
+    grp.forEach(btn=>{btn.disabled=true;
+      if(+btn.dataset.j===q.answer)btn.classList.add('correct');
+      else if(+btn.dataset.j===sel[i])btn.classList.add('wrong');});
+    const wrap=grp[0].closest('.q');
+    if(!wrap.querySelector('.note')){const n=document.createElement('div');n.className='note';n.innerHTML=q.why;wrap.appendChild(n);}
+    if(sel[i]===q.answer)c++;
+  });
+  got[lvlIdx]=c;updHud();
+  const pts=L.questions.length,ok=c>=Math.ceil(pts*0.8);
+  const fb=$('lvlFb');fb.className='fb show '+(ok?'good':'partial');
+  fb.innerHTML=(c===pts?'🎉 Perfect! ':`You scored ${c}/${pts}. `)+(ok?'On to the next trial.':'Review the notes above, then continue.');
+  ok?sGood():sBad();
+  const bar=$('lvlBar');bar.querySelectorAll('.btn').forEach(b=>b.disabled=true);
+  const isLast=lvlIdx>=LEVELS.length-1;
+  bar.appendChild(mkBtn(isLast?'See results →':'Next level →',()=>{sClick();if(isLast)showResults();else{lvlIdx++;renderLevel();}},'ghost'));
+}
+
+function showResults(){
+  clearInterval(timerInt);
+  const total=got.reduce((a,b)=>a+b,0),pct=Math.round(total/maxPts*100);
+  let emoji,rank,msg,win;
+  if(pct>=90){emoji='🏆';rank='I/O Master';msg='Flawless — text and binary both bow to you.';win=true;}
+  else if(pct>=75){emoji='🥇';rank='Stream Engineer';msg='Strong — you rarely mix the families.';win=true;}
+  else if(pct>=60){emoji='🛠️';rank='File Handler — you win!';msg='You passed the trials and earned the badge.';win=true;}
+  else{emoji='🧱';rank='Apprentice — not yet';msg='A few streams crossed wires. Run it back!';win=false;}
+  $('resEmoji').textContent=emoji;const rr=$('resRank');rr.textContent=rank;rr.classList.toggle('win-glow',win);
+  $('resMsg').textContent=msg;$('resTotal').textContent=`${total} / ${maxPts}  ·  ${pct}%`;$('resNote').innerHTML=NOTE;
+  const sb=$('scorebars');sb.innerHTML='';
+  LEVELS.forEach((l,i)=>{const pts=l.questions.length,row=document.createElement('div');row.className='sbrow';
+    row.innerHTML=`<span class="lbl">${l.step}</span><div class="track"><div class="fill" data-w="${(got[i]||0)/pts*100}"></div></div><span class="val">${got[i]||0}/${pts}</span>`;
+    sb.appendChild(row);});
+  const bar=$('resBar');bar.innerHTML='';
+  bar.appendChild(mkBtn('Play again ↺',()=>{startTime=Date.now();clearInterval(timerInt);
+    timerInt=setInterval(()=>{const s=Math.floor((Date.now()-startTime)/1000);$('timer').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},1000);
+    lvlIdx=0;got=[];renderLevel();}));
+  showScreen('results');
+  setTimeout(()=>document.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'),120);
+  if(win){sWin();confettiBurst();}else sBad();
+}
+
+/* confetti */
+const cv=$('confetti'),cx=cv.getContext('2d');let parts=[],anim=null;
+function sz(){cv.width=innerWidth;cv.height=innerHeight;}addEventListener('resize',sz);sz();
+function confettiBurst(){const cols=['#19c3a6','#2f7bff','#2fd07a','#ffce4a','#ff5d6c','#ff8a3d','#5bd1ff'];
+  parts=[];for(let i=0;i<170;i++)parts.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,r:4+Math.random()*6,
+    c:cols[i%cols.length],vx:-2+Math.random()*4,vy:2+Math.random()*4,rot:Math.random()*6,vr:-.2+Math.random()*.4,life:0});
+  if(anim)cancelAnimationFrame(anim);run();}
+function run(){cx.clearRect(0,0,cv.width,cv.height);let alive=false;
+  parts.forEach(p=>{p.vy+=.04;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.life++;if(p.y<cv.height+30)alive=true;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot);cx.fillStyle=p.c;cx.globalAlpha=Math.max(0,1-p.life/260);
+    cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();});
+  if(alive)anim=requestAnimationFrame(run);else cx.clearRect(0,0,cv.width,cv.height);}
+</script>
+</body>
+</html>
