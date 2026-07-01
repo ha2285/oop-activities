@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UML Use Case Diagrams — The Challenge</title>
+<style>
+  :root{
+    --bg:#0d0f1a; --panel:#161a2b; --panel2:#1f2540; --ink:#eaeefb; --muted:#a2acce;
+    --acc:#7c8cff; --acc2:#b06bff; --ok:#3fd18a; --bad:#ff6b7d; --warn:#ffd15c;
+    --code:#0a0c16; --line:#2c3350;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 80% -10%,#231a44 0,transparent 60%),var(--bg);color:var(--ink);line-height:1.5}
+  .wrap{max-width:900px;margin:0 auto;padding:22px 20px 70px;position:relative;z-index:1}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{font-size:1.3rem;margin:0;letter-spacing:.2px}
+  .hud{margin-left:auto;display:flex;gap:12px;align-items:center;font-weight:700;font-size:.9rem}
+  .hud .chip{background:var(--panel);border:1px solid var(--line);padding:6px 12px;border-radius:20px}
+  .hud .chip b{color:var(--warn)}
+  .iconbtn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:.95rem}
+  .steps{display:flex;gap:8px;margin:16px 0 18px;flex-wrap:wrap}
+  .step{flex:1;min-width:84px;text-align:center;font-size:.72rem;color:var(--muted);font-weight:700;border-top:3px solid var(--line);padding-top:8px;transition:.2s}
+  .step.active{color:var(--ink);border-color:var(--acc)}
+  .step.done{color:var(--ok);border-color:var(--ok)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:18px}
+  h2{margin:.1rem 0 .4rem;font-size:1.3rem}
+  .lead{color:var(--muted);margin:.2rem 0 1rem}
+  .badge{display:inline-block;background:rgba(124,140,255,.15);color:#c3ccff;border:1px solid rgba(124,140,255,.4);padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:8px}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;background:var(--code);padding:1px 5px;border-radius:5px;font-size:.85em}
+  .q{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;background:var(--panel2)}
+  .q .qt{font-weight:700;margin-bottom:9px}
+  .q .qt .num{color:var(--acc);margin-right:6px}
+  .q .scen{font-size:.82rem;color:#c9b6ff;background:rgba(176,107,255,.1);border-left:3px solid var(--acc2);padding:6px 10px;border-radius:6px;margin-bottom:8px}
+  .opts{display:flex;gap:6px;flex-wrap:wrap}
+  .opt{border:1px solid var(--line);background:var(--code);color:var(--ink);padding:8px 13px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;transition:.12s}
+  .opt:hover{border-color:var(--acc)}
+  .opt.sel{border-color:var(--acc);background:var(--panel2)}
+  .opt.correct{background:rgba(63,209,138,.2);border-color:var(--ok);color:#c3f7dc}
+  .opt.wrong{background:rgba(255,107,125,.2);border-color:var(--bad);color:#ffd2d9}
+  .btn{background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;color:#fff;padding:12px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:.95rem;transition:.15s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .bar{display:flex;gap:10px;align-items:center;margin-top:18px;flex-wrap:wrap}
+  .fb{margin-top:14px;padding:13px 15px;border-radius:10px;font-size:.9rem;display:none}
+  .fb.show{display:block}
+  .fb.good{background:rgba(63,209,138,.12);border:1px solid rgba(63,209,138,.4)}
+  .fb.partial{background:rgba(255,209,92,.12);border:1px solid rgba(255,209,92,.4)}
+  .note{font-size:.84rem;color:var(--muted);margin-top:8px}
+  .hidden{display:none}
+  .center{text-align:center}
+  .big{font-size:2.6rem;margin:6px 0}
+  .rankline{font-size:1.55rem;font-weight:800;margin:6px 0}
+  .scorebars{margin:18px 0;text-align:left}
+  .sbrow{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:.88rem}
+  .sbrow .lbl{width:160px;color:var(--muted);font-weight:600}
+  .track{flex:1;background:var(--code);border-radius:20px;height:14px;overflow:hidden;border:1px solid var(--line)}
+  .fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:20px;width:0;transition:width .8s ease}
+  .sbrow .val{width:50px;text-align:right;font-weight:700}
+  .keybox{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}
+  .kb{flex:1;min-width:150px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--panel2);text-align:center}
+  .kb .sym{font-size:1.5rem}
+  .kb b{display:block;margin-top:4px}
+  .kb small{color:var(--muted);font-size:.76rem}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+  .win-glow{text-shadow:0 0 22px rgba(124,140,255,.75)}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <header>
+    <h1>🎭 UML Use Case Diagrams</h1>
+    <div class="hud">
+      <span class="chip">⏱️ <span id="timer">0:00</span></span>
+      <span class="chip">⭐ <b id="scoreHud">0</b>/<span id="maxHud">0</span></span>
+      <button class="iconbtn" id="soundBtn" title="Toggle sound">🔊</button>
+    </div>
+  </header>
+
+  <div class="steps hidden" id="steps"></div>
+
+  <!-- HOME -->
+  <section class="screen" id="screen-home">
+    <div class="card center">
+      <div class="big">🧍‍♂️➡️⬭</div>
+      <h2>The Use Case Trials</h2>
+      <p class="lead">Model what a system does for its users — with actors, use cases, and the right relationships. Real systems throughout: online shops, ATMs, food apps, libraries. Four levels, ~12 min. Score <b>60%+</b> to earn your Analyst badge.</p>
+      <div class="keybox">
+        <div class="kb"><div class="sym">🧍</div><b>Actor</b><small>stick figure — a role (user or system)</small></div>
+        <div class="kb"><div class="sym">⬭</div><b>Use Case</b><small>oval — a goal the system delivers</small></div>
+        <div class="kb"><div class="sym">▭</div><b>Boundary</b><small>rectangle — the system edge</small></div>
+        <div class="kb"><div class="sym">╌▷</div><b>Include / Extend</b><small>dashed dependency arrows</small></div>
+      </div>
+      <div class="bar" style="justify-content:center">
+        <button class="btn" id="startBtn">Start the trials →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEVEL -->
+  <section class="screen hidden" id="screen-level">
+    <div class="card">
+      <span class="badge" id="lvlBadge"></span>
+      <h2 id="lvlTitle"></h2>
+      <p class="lead" id="lvlLead"></p>
+      <div id="lvlBody"></div>
+      <div class="bar" id="lvlBar"></div>
+      <div class="fb" id="lvlFb"></div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen hidden" id="screen-results">
+    <div class="card center">
+      <div class="big" id="resEmoji">🏆</div>
+      <div class="rankline win-glow" id="resRank"></div>
+      <p class="lead" id="resMsg"></p>
+      <div class="scorebars" id="scorebars"></div>
+      <div class="rankline" id="resTotal"></div>
+      <div class="bar" style="justify-content:center" id="resBar"></div>
+      <p class="note" id="resNote"></p>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ===================== CONTENT ===================== */
+const LEVELS=[
+  { step:'L1 · Notation', badge:'LEVEL 1', title:'🧩 Read the Diagram',
+    lead:'The vocabulary first. Match each idea to how it is drawn.',
+    questions:[
+      {prompt:'A <b>stick figure</b> in the diagram represents…',options:['an Actor (a role that uses the system)','a Use Case','the database'],answer:0,why:'Actors are roles — a person or an external system — drawn as stick figures.'},
+      {prompt:'An <b>oval / ellipse</b> represents…',options:['an Actor','a Use Case (a goal the system performs)','a class'],answer:1,why:'Each oval is one use case: a unit of useful functionality.'},
+      {prompt:'The <b>rectangle</b> drawn around the ovals is…',options:['the System boundary','an actor group','a note'],answer:0,why:'The boundary box shows what is inside the system vs the actors outside it.'},
+      {prompt:'A plain <b>solid line</b> between an actor and an oval is…',options:['an include relationship','an association (the actor takes part in that use case)','a generalization'],answer:1,why:'Association = the actor participates in / triggers that use case.'},
+      {prompt:'An online store calls an external <b>Payment Gateway</b> to charge cards. In the diagram the gateway is…',options:['a use case','an Actor (an external system actor)','the system boundary'],answer:1,why:'External systems the software depends on are modeled as (secondary) actors.'},
+    ]},
+
+  { step:'L2 · Include/Extend', badge:'LEVEL 2', title:'🔗 Include vs Extend',
+    lead:'The relationship everyone mixes up. Include = always happens (mandatory, reusable). Extend = only sometimes (optional, conditional).',
+    questions:[
+      {prompt:'Online shop: every <code>Checkout</code> must <code>Verify Payment</code>. The relationship is…',scen:'🛒 Always required, no exceptions.',options:['«include»','«extend»','generalization'],answer:0,why:'Mandatory, always-executed behavior → «include».'},
+      {prompt:'ATM: <code>Withdraw Cash</code> can optionally <code>Print Receipt</code> if the user asks. The relationship is…',scen:'🏧 Optional, only under a condition.',options:['«include»','«extend»','association'],answer:1,why:'Optional / conditional behavior → «extend».'},
+      {prompt:'The dashed «include» arrow points FROM the base use case TO…',options:['the actor','the included use case','the system boundary'],answer:1,why:'Base ╌▷ included: the arrow points at the behavior being reused.'},
+      {prompt:'The dashed «extend» arrow points FROM the extending use case TO…',options:['the base use case','the actor','the included use case'],answer:0,why:'Extension ╌▷ base: the optional case points back at what it extends.'},
+      {prompt:'<code>Search Product</code> is reused by both <code>Browse Catalog</code> and <code>Add to Cart</code>. To avoid duplicating it, use…',scen:'🔁 Shared, always-needed sub-behavior.',options:['«include»','«extend»','a second actor'],answer:0,why:'«include» factors out common, always-needed behavior for reuse.'},
+    ]},
+
+  { step:'L3 · Actors', badge:'LEVEL 3', title:'👥 Actors & Real Systems',
+    lead:'A food-delivery app is on the table. Tell actors from use cases, and primary from supporting.',
+    questions:[
+      {prompt:'Which of these is an <b>actor</b> (not a use case)?',scen:'🍔 Food-delivery app',options:['Place Order','Customer','Track Delivery','Rate Restaurant'],answer:1,why:'Customer is a role (actor). The others are goals (use cases).'},
+      {prompt:'Which of these is a <b>use case</b> (not an actor)?',scen:'🍔 Food-delivery app',options:['Delivery Driver','Restaurant','Payment Gateway','Make Payment'],answer:3,why:'"Make Payment" is an action the system performs — a use case.'},
+      {prompt:'When a customer places an order, the <b>primary actor</b> (who initiates) is…',options:['the Customer','the Payment Gateway','the Kitchen'],answer:0,why:'The primary actor starts the interaction to reach a goal — here, the Customer.'},
+      {prompt:'The <code>Payment Gateway</code> the app calls to charge the card is a…',options:['primary actor','secondary / supporting actor','use case'],answer:1,why:'A supporting actor serves the system at a use case; it does not initiate.'},
+      {prompt:'Which item does NOT belong in a use case diagram?',scen:'🍔 Food-delivery app',options:['Login','Loop through the cart and sum each price','Cancel Order','View Menu'],answer:1,why:'That is an algorithm/implementation detail — belongs in an activity/sequence diagram, not use cases.'},
+    ]},
+
+  { step:'L4 · Modeling', badge:'LEVEL 4', title:'⚖️ The Modeling Courtroom',
+    lead:'Judgment calls and the classic mistakes.',
+    questions:[
+      {prompt:'<code>Registered User</code> is a special kind of <code>User</code>, inheriting all its use cases. This is…',options:['«include»','«extend»','generalization'],answer:2,why:'Actor (or use case) inheritance is shown as generalization — a hollow triangle, child → parent.'},
+      {prompt:'A use case diagram primarily shows…',options:['the step-by-step algorithm','what the system does, from the users’ goals','the database tables'],answer:1,why:'Use case diagrams capture functionality from the actor’s viewpoint — the "what", not the "how".'},
+      {prompt:'Arrows in a use case diagram tell you the <b>order</b> in which steps happen.',options:['True','False'],answer:1,why:'False — use case diagrams show no time sequence. Ordering belongs to activity/sequence diagrams.'},
+      {prompt:'<code>Pay by Credit Card</code> and <code>Pay by PayPal</code> are both kinds of <code>Make Payment</code>. Model them with…',scen:'💳 Variations of one goal',options:['generalization of the use case','«include»','«extend»'],answer:0,why:'Specialized variants of a use case → use-case generalization.'},
+      {prompt:'Library: <code>Return Book</code> triggers <code>Pay Late Fee</code> only when the book is overdue. Relationship?',scen:'📚 Only under a condition',options:['«include»','«extend»','association'],answer:1,why:'Conditional, only-sometimes behavior → «extend».'},
+    ]},
+];
+const NOTE='Debrief: actors (roles/systems) sit outside the boundary; ovals are goals inside it. «include» = mandatory reuse (base ╌▷ included); «extend» = optional/conditional (extension ╌▷ base); generalization = inheritance. And a use case diagram shows the WHAT, never the step-by-step HOW.';
+
+/* ===================== ENGINE ===================== */
+let lvlIdx=0, got=[], maxPts=0, locked=false, sel=[];
+let startTime=null, timerInt=null, soundOn=true;
+const $=id=>document.getElementById(id);
+maxPts=LEVELS.reduce((s,l)=>s+l.questions.length,0);
+$('maxHud').textContent=maxPts;
+
+let actx=null;
+function beep(f,d,t='sine',v=.06){if(!soundOn)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();
+  const o=actx.createOscillator(),g=actx.createGain();o.type=t;o.frequency.value=f;o.connect(g);g.connect(actx.destination);
+  g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);
+  o.start();o.stop(actx.currentTime+d);}catch(e){}}
+const sGood=()=>{beep(660,.12);setTimeout(()=>beep(990,.14),90)};
+const sBad=()=>beep(160,.22,'sawtooth',.05);
+const sClick=()=>beep(420,.05,'square',.03);
+const sWin=()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.2),i*120));
+$('soundBtn').addEventListener('click',function(){soundOn=!soundOn;this.textContent=soundOn?'🔊':'🔇';if(soundOn)sClick();});
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('hidden',s.id!=='screen-'+id));window.scrollTo({top:0,behavior:'smooth'});}
+function updHud(){$('scoreHud').textContent=got.reduce((a,b)=>a+b,0);}
+function renderSteps(){const steps=$('steps');steps.classList.remove('hidden');steps.innerHTML='';
+  LEVELS.forEach((l,i)=>{const d=document.createElement('div');d.className='step'+(i===lvlIdx?' active':'')+(i<lvlIdx?' done':'');d.textContent=l.step;steps.appendChild(d);});
+  const r=document.createElement('div');r.className='step'+(lvlIdx>=LEVELS.length?' active':'');r.textContent='Result';steps.appendChild(r);}
+function mkBtn(label,fn,cls=''){const b=document.createElement('button');b.className='btn '+cls;b.textContent=label;b.onclick=fn;return b;}
+function startTimer(){startTime=Date.now();clearInterval(timerInt);
+  timerInt=setInterval(()=>{const s=Math.floor((Date.now()-startTime)/1000);$('timer').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},1000);}
+
+$('startBtn').addEventListener('click',()=>{startTimer();lvlIdx=0;got=[];sClick();renderLevel();});
+
+function renderLevel(){
+  locked=false;const L=LEVELS[lvlIdx];sel=Array(L.questions.length).fill(null);
+  renderSteps();updHud();
+  $('lvlBadge').textContent=L.badge+' · '+L.questions.length+' pts';
+  $('lvlTitle').textContent=L.title;$('lvlLead').innerHTML=L.lead;
+  const fb=$('lvlFb');fb.className='fb';fb.innerHTML='';
+  const body=$('lvlBody');body.innerHTML='';
+  L.questions.forEach((q,i)=>{const d=document.createElement('div');d.className='q';
+    d.innerHTML=(q.scen?`<div class="scen">${q.scen}</div>`:'')+
+      `<div class="qt"><span class="num">${i+1}.</span>${q.prompt}</div>`+
+      `<div class="opts">${q.options.map((o,j)=>`<button class="opt" data-i="${i}" data-j="${j}">${o}</button>`).join('')}</div>`;
+    body.appendChild(d);});
+  body.onclick=e=>{const b=e.target.closest('.opt');if(!b||locked)return;const i=+b.dataset.i;sel[i]=+b.dataset.j;sClick();
+    body.querySelectorAll(`[data-i="${i}"]`).forEach(x=>x.classList.toggle('sel',x===b));};
+  const bar=$('lvlBar');bar.innerHTML='';bar.appendChild(mkBtn('Lock in answers',()=>checkLevel(L)));
+  showScreen('level');
+}
+
+function checkLevel(L){
+  if(locked)return;locked=true;let c=0;
+  L.questions.forEach((q,i)=>{const grp=$('lvlBody').querySelectorAll(`[data-i="${i}"]`);
+    grp.forEach(btn=>{btn.disabled=true;if(+btn.dataset.j===q.answer)btn.classList.add('correct');else if(+btn.dataset.j===sel[i])btn.classList.add('wrong');});
+    const wrap=grp[0].closest('.q');
+    if(!wrap.querySelector('.note')){const n=document.createElement('div');n.className='note';n.innerHTML=q.why;wrap.appendChild(n);}
+    if(sel[i]===q.answer)c++;});
+  got[lvlIdx]=c;updHud();
+  const pts=L.questions.length,ok=c>=Math.ceil(pts*0.8);
+  const fb=$('lvlFb');fb.className='fb show '+(ok?'good':'partial');
+  fb.innerHTML=(c===pts?'🎉 Perfect! ':`You scored ${c}/${pts}. `)+(ok?'On to the next trial.':'Review the notes above, then continue.');
+  ok?sGood():sBad();
+  const bar=$('lvlBar');bar.querySelectorAll('.btn').forEach(b=>b.disabled=true);
+  const isLast=lvlIdx>=LEVELS.length-1;
+  bar.appendChild(mkBtn(isLast?'See results →':'Next level →',()=>{sClick();if(isLast)showResults();else{lvlIdx++;renderLevel();}},'ghost'));
+}
+
+function showResults(){
+  clearInterval(timerInt);
+  const total=got.reduce((a,b)=>a+b,0),pct=Math.round(total/maxPts*100);
+  let emoji,rank,msg,win;
+  if(pct>=90){emoji='🏆';rank='Modeling Master';msg='Flawless — your diagrams would pass any design review.';win=true;}
+  else if(pct>=75){emoji='🥇';rank='Systems Analyst';msg='Strong — include vs extend holds no fear for you.';win=true;}
+  else if(pct>=60){emoji='🛠️';rank='Diagrammer — you win!';msg='You passed the trials and earned the badge.';win=true;}
+  else{emoji='🧱';rank='Apprentice — not yet';msg='A few arrows pointed the wrong way. Run it back!';win=false;}
+  $('resEmoji').textContent=emoji;const rr=$('resRank');rr.textContent=rank;rr.classList.toggle('win-glow',win);
+  $('resMsg').textContent=msg;$('resTotal').textContent=`${total} / ${maxPts}  ·  ${pct}%`;$('resNote').innerHTML=NOTE;
+  const sb=$('scorebars');sb.innerHTML='';
+  LEVELS.forEach((l,i)=>{const pts=l.questions.length,row=document.createElement('div');row.className='sbrow';
+    row.innerHTML=`<span class="lbl">${l.step}</span><div class="track"><div class="fill" data-w="${(got[i]||0)/pts*100}"></div></div><span class="val">${got[i]||0}/${pts}</span>`;
+    sb.appendChild(row);});
+  const bar=$('resBar');bar.innerHTML='';
+  bar.appendChild(mkBtn('Play again ↺',()=>{startTimer();lvlIdx=0;got=[];renderLevel();}));
+  showScreen('results');
+  setTimeout(()=>document.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'),120);
+  if(win){sWin();confettiBurst();}else sBad();
+}
+
+/* confetti */
+const cv=$('confetti'),cx=cv.getContext('2d');let parts=[],anim=null;
+function sz(){cv.width=innerWidth;cv.height=innerHeight;}addEventListener('resize',sz);sz();
+function confettiBurst(){const cols=['#7c8cff','#b06bff','#3fd18a','#ffd15c','#ff6b7d','#5bd1ff'];
+  parts=[];for(let i=0;i<170;i++)parts.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,r:4+Math.random()*6,
+    c:cols[i%cols.length],vx:-2+Math.random()*4,vy:2+Math.random()*4,rot:Math.random()*6,vr:-.2+Math.random()*.4,life:0});
+  if(anim)cancelAnimationFrame(anim);run();}
+function run(){cx.clearRect(0,0,cv.width,cv.height);let alive=false;
+  parts.forEach(p=>{p.vy+=.04;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.life++;if(p.y<cv.height+30)alive=true;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot);cx.fillStyle=p.c;cx.globalAlpha=Math.max(0,1-p.life/260);
+    cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();});
+  if(alive)anim=requestAnimationFrame(run);else cx.clearRect(0,0,cv.width,cv.height);}
+</script>
+</body>
+</html>
