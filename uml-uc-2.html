@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UML Use Case Diagrams — Interactive Challenge</title>
+<style>
+  :root{
+    --bg:#eef2fb; --panel:#ffffff; --panel2:#f5f7ff; --ink:#1e2440; --muted:#5c6690;
+    --acc:#4f5bff; --acc2:#8b5cf6; --ok:#16a34a; --bad:#e11d48; --warn:#d97706;
+    --line:#e2e7f5; --shadow:0 8px 24px rgba(40,52,120,.10);
+    --ucfill:#e9ecff; --ucstroke:#4f5bff; --actor:#33406b; --assoc:#8590b5; --bound:#c3cbea;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1100px 600px at 85% -10%,#dfe6ff 0,transparent 55%),var(--bg);color:var(--ink);line-height:1.5}
+  .wrap{max-width:900px;margin:0 auto;padding:22px 20px 70px}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{font-size:1.3rem;margin:0}
+  .hud{margin-left:auto;display:flex;gap:10px;align-items:center;font-weight:700;font-size:.9rem}
+  .hud .chip{background:var(--panel);border:1px solid var(--line);padding:6px 12px;border-radius:20px;box-shadow:var(--shadow)}
+  .hud .chip b{color:var(--acc)}
+  .iconbtn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:.95rem;box-shadow:var(--shadow)}
+  .steps{display:flex;gap:8px;margin:16px 0 18px;flex-wrap:wrap}
+  .step{flex:1;min-width:84px;text-align:center;font-size:.72rem;color:var(--muted);font-weight:700;border-top:3px solid var(--line);padding-top:8px;transition:.2s}
+  .step.active{color:var(--ink);border-color:var(--acc)}
+  .step.done{color:var(--ok);border-color:var(--ok)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:18px;box-shadow:var(--shadow)}
+  h2{margin:.1rem 0 .4rem;font-size:1.3rem}
+  .lead{color:var(--muted);margin:.2rem 0 1rem}
+  .badge{display:inline-block;background:#eef0ff;color:#4a51c9;border:1px solid #d9ddff;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:800;margin-bottom:8px}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;background:#eef1fb;padding:1px 6px;border-radius:5px;font-size:.85em;color:#3a3f6b}
+  /* prompt bar (hotspot) */
+  .pbar{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#eef0ff,#f3ecff);border:1px solid #dfe2ff;border-radius:14px;padding:12px 16px;margin-bottom:12px;flex-wrap:wrap}
+  .pbar .tap{font-size:1.4rem}
+  .pbar .txt{font-weight:700}
+  .pbar .prog{margin-left:auto;display:flex;gap:5px}
+  .pbar .dot{width:9px;height:9px;border-radius:50%;background:#cdd3f0}
+  .pbar .dot.on{background:var(--acc)}
+  .pbar .dot.ok{background:var(--ok)}
+  .pbar .dot.no{background:var(--bad)}
+  .stage{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:8px}
+  svg.scene-svg{width:100%;height:auto;display:block}
+  .scene-svg text{font-family:inherit;font-weight:600;fill:var(--ink)}
+  .scene-svg .btitle{font-size:14px;fill:#7581ad;font-weight:800;letter-spacing:.3px}
+  .scene-svg .bound{fill:#fbfcff;stroke:var(--bound);stroke-width:2}
+  .scene-svg .hs{cursor:pointer}
+  .scene-svg .hs .uc{fill:var(--ucfill);stroke:var(--ucstroke);stroke-width:2}
+  .scene-svg .hs text{font-size:13px}
+  .scene-svg .hs .fig{stroke:var(--actor);stroke-width:2.4;fill:none;stroke-linecap:round}
+  .scene-svg .hs .head{fill:#fff;stroke:var(--actor);stroke-width:2.4}
+  .scene-svg .assoc{stroke:var(--assoc);stroke-width:3.2;cursor:pointer}
+  .scene-svg .hs:hover .uc{filter:brightness(.96)}
+  .scene-svg .hs:hover .fig,.scene-svg .hs:hover .head{stroke:var(--acc)}
+  .scene-svg .assoc:hover{stroke:var(--acc)}
+  .scene-svg .hs.good .uc{fill:#dcfce7;stroke:var(--ok)}
+  .scene-svg .hs.good .fig,.scene-svg .hs.good .head{stroke:var(--ok)}
+  .scene-svg .hs.good text{fill:var(--ok)}
+  .scene-svg .assoc.good{stroke:var(--ok)}
+  .scene-svg .hs.bad .uc{fill:#ffe4e6;stroke:var(--bad)}
+  .scene-svg .hs.bad .fig,.scene-svg .hs.bad .head{stroke:var(--bad)}
+  .scene-svg .assoc.bad{stroke:var(--bad)}
+  .scene-svg .hs.hint .uc,.scene-svg .hs.hint .fig,.scene-svg .hs.hint .head{stroke:var(--warn);stroke-width:3.4}
+  .scene-svg .assoc.hint{stroke:var(--warn);stroke-width:4}
+  /* choice questions */
+  .q{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;background:var(--panel2)}
+  .q .qt{font-weight:700;margin-bottom:6px}
+  .q .qt .num{color:var(--acc);margin-right:6px}
+  .q .scen{font-size:.82rem;color:#7a52d0;background:#f4ecff;border-left:3px solid var(--acc2);padding:6px 10px;border-radius:8px;margin-bottom:10px}
+  .opts{display:flex;gap:10px;flex-wrap:wrap}
+  .opts.svgopts .opt{padding:6px}
+  .opt{border:1.5px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.85rem;font-weight:600;transition:.12s}
+  .opt:hover{border-color:var(--acc);box-shadow:0 4px 12px rgba(79,91,255,.14)}
+  .opt.sel{border-color:var(--acc);background:#eef0ff}
+  .opt.correct{border-color:var(--ok);background:#e9f9ef}
+  .opt.wrong{border-color:var(--bad);background:#fdeef1}
+  .opt svg.mini{display:block;width:230px;height:auto}
+  .mini .mo{fill:var(--ucfill);stroke:var(--ucstroke);stroke-width:1.8}
+  .mini .mot{font-size:11px;font-weight:700;fill:var(--ink)}
+  .mini .dep{stroke:#5a6699;stroke-width:1.8;stroke-dasharray:5 4}
+  .mini .depHead{fill:none;stroke:#5a6699;stroke-width:1.8}
+  .mini .gen{stroke:#5a6699;stroke-width:1.8}
+  .mini .tri{fill:#fff;stroke:#5a6699;stroke-width:1.8}
+  .mini .rellbl{font-size:11px;font-weight:800;fill:#4a51c9}
+  .btn{background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;color:#fff;padding:12px 22px;border-radius:12px;font-weight:700;cursor:pointer;font-size:.95rem;transition:.15s;box-shadow:0 6px 16px rgba(79,91,255,.28)}
+  .btn:hover{filter:brightness(1.05)}
+  .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink);box-shadow:var(--shadow)}
+  .bar{display:flex;gap:10px;align-items:center;margin-top:18px;flex-wrap:wrap}
+  .fb{margin-top:14px;padding:13px 15px;border-radius:12px;font-size:.9rem;display:none}
+  .fb.show{display:block}
+  .fb.good{background:#e9f9ef;border:1px solid #bfe8cd;color:#166534}
+  .fb.partial{background:#fff6e6;border:1px solid #f3dca6;color:#8a5a00}
+  .note{font-size:.84rem;color:var(--muted);margin-top:8px}
+  .hidden{display:none}
+  .center{text-align:center}
+  .big{font-size:2.4rem;margin:4px 0}
+  .rankline{font-size:1.5rem;font-weight:800;margin:6px 0}
+  .scorebars{margin:18px 0;text-align:left}
+  .sbrow{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:.88rem}
+  .sbrow .lbl{width:150px;color:var(--muted);font-weight:600}
+  .track{flex:1;background:#eef1fb;border-radius:20px;height:14px;overflow:hidden;border:1px solid var(--line)}
+  .fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:20px;width:0;transition:width .8s ease}
+  .sbrow .val{width:52px;text-align:right;font-weight:700}
+  .keybox{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+  .kb{flex:1;min-width:130px;border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--panel2);text-align:center}
+  .kb .sym{font-size:1.4rem}.kb b{display:block;margin-top:4px}.kb small{color:var(--muted);font-size:.74rem}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+  .win-glow{color:var(--acc)}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <header>
+    <h1>🎭 UML Use Case Diagrams</h1>
+    <div class="hud">
+      <span class="chip">⏱️ <span id="timer">0:00</span></span>
+      <span class="chip">⭐ <b id="scoreHud">0</b>/<span id="maxHud">0</span></span>
+      <button class="iconbtn" id="soundBtn" title="Toggle sound">🔊</button>
+    </div>
+  </header>
+
+  <div class="steps hidden" id="steps"></div>
+
+  <!-- HOME -->
+  <section class="screen" id="screen-home">
+    <div class="card center">
+      <h2>The Use Case Trials</h2>
+      <p class="lead">Tap real diagrams, wire up relationships, and model live systems — online shops, ATMs, food apps, libraries. Four interactive levels, ~12 min. Score <b>60%+</b> for your Analyst badge.</p>
+      <div class="stage" id="homeScene" style="max-width:560px;margin:0 auto"></div>
+      <div class="keybox">
+        <div class="kb"><div class="sym">🧍</div><b>Actor</b><small>a role — user or system</small></div>
+        <div class="kb"><div class="sym">⬭</div><b>Use Case</b><small>a goal the system delivers</small></div>
+        <div class="kb"><div class="sym">▭</div><b>Boundary</b><small>the system edge</small></div>
+        <div class="kb"><div class="sym">╌▷</div><b>Include / Extend</b><small>dashed dependency</small></div>
+      </div>
+      <div class="bar" style="justify-content:center">
+        <button class="btn" id="startBtn">Start the trials →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEVEL -->
+  <section class="screen hidden" id="screen-level">
+    <div class="card">
+      <span class="badge" id="lvlBadge"></span>
+      <h2 id="lvlTitle"></h2>
+      <p class="lead" id="lvlLead"></p>
+      <div id="lvlBody"></div>
+      <div class="bar" id="lvlBar"></div>
+      <div class="fb" id="lvlFb"></div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen hidden" id="screen-results">
+    <div class="card center">
+      <div class="big" id="resEmoji">🏆</div>
+      <div class="rankline win-glow" id="resRank"></div>
+      <p class="lead" id="resMsg"></p>
+      <div class="scorebars" id="scorebars"></div>
+      <div class="rankline" id="resTotal"></div>
+      <div class="bar" style="justify-content:center" id="resBar"></div>
+      <p class="note" id="resNote"></p>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ===================== SVG BUILDERS ===================== */
+function actor(x,y,label,key,kind){
+  return `<g class="hs" data-key="${key}" data-kind="${kind}">
+    <circle class="head" cx="${x}" cy="${y}" r="11"/>
+    <line class="fig" x1="${x}" y1="${y+11}" x2="${x}" y2="${y+40}"/>
+    <line class="fig" x1="${x-16}" y1="${y+22}" x2="${x+16}" y2="${y+22}"/>
+    <line class="fig" x1="${x}" y1="${y+40}" x2="${x-13}" y2="${y+60}"/>
+    <line class="fig" x1="${x}" y1="${y+40}" x2="${x+13}" y2="${y+60}"/>
+    <text x="${x}" y="${y+78}" text-anchor="middle">${label}</text>
+    <rect x="${x-30}" y="${y-14}" width="60" height="98" fill="transparent"/>
+  </g>`;
+}
+function useCase(cx,cy,w,label,key){
+  return `<g class="hs" data-key="${key}" data-kind="usecase">
+    <ellipse class="uc" cx="${cx}" cy="${cy}" rx="${w/2}" ry="26"/>
+    <text x="${cx}" y="${cy+4}" text-anchor="middle">${label}</text>
+  </g>`;
+}
+function boundary(x,y,w,h,label){
+  return `<g class="hs" data-key="boundary" data-kind="boundary">
+    <rect class="bound" x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/>
+    <text class="btitle" x="${x+w/2}" y="${y+22}" text-anchor="middle">${label}</text>
+  </g>`;
+}
+function assoc(x1,y1,x2,y2){return `<line class="assoc" data-key="assoc" data-kind="assoc" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;}
+
+function sceneStore(){
+  let s=`<svg viewBox="0 0 510 400" class="scene-svg">`;
+  s+=boundary(170,50,300,310,'Online Store');
+  s+=assoc(98,185,245,120);s+=assoc(98,185,245,205);s+=assoc(98,185,245,290);
+  s+=useCase(320,120,150,'Browse Products','usecase');
+  s+=useCase(320,205,150,'Checkout','usecase');
+  s+=useCase(320,290,150,'Track Order','usecase');
+  s+=actor(70,150,'Customer','actor-human','actor');
+  s+=`</svg>`;return s;
+}
+function sceneFood(){
+  let s=`<svg viewBox="0 0 510 400" class="scene-svg">`;
+  s+=boundary(170,50,300,310,'Food Delivery App');
+  s+=assoc(98,150,245,115);s+=assoc(98,150,245,200);
+  s+=assoc(98,300,245,290);
+  s+=useCase(320,115,150,'Place Order','uc-order');
+  s+=useCase(320,200,150,'Make Payment','uc-pay');
+  s+=useCase(320,290,150,'Track Delivery','uc-track');
+  s+=actor(70,120,'Customer','actor-customer','actor');
+  s+=actor(70,270,'Delivery Driver','actor-driver','actor');
+  s+=`</svg>`;return s;
+}
+
+/* mini diagrams for choice options */
+function miniOval(cx,cy,label){return `<ellipse cx="${cx}" cy="${cy}" rx="46" ry="23" class="mo"/><text x="${cx}" y="${cy+4}" text-anchor="middle" class="mot">${label}</text>`;}
+function miniRel(a,b,dir,rel){
+  const y=56;
+  const head = dir==='AtoB'
+    ? `<polyline class="depHead" points="132,50 140,56 132,62"/>`
+    : `<polyline class="depHead" points="108,50 100,56 108,62"/>`;
+  return `<svg viewBox="0 0 240 104" class="mini">
+    ${miniOval(52,y,a)}${miniOval(188,y,b)}
+    <line class="dep" x1="100" y1="56" x2="140" y2="56"/>${head}
+    <text x="120" y="30" text-anchor="middle" class="rellbl">${rel}</text></svg>`;
+}
+function miniGen(child,parent){
+  const y=56;
+  return `<svg viewBox="0 0 240 104" class="mini">
+    ${miniOval(52,y,child)}${miniOval(188,y,parent)}
+    <line class="gen" x1="98" y1="56" x2="128" y2="56"/>
+    <polygon class="tri" points="142,56 128,49 128,63"/>
+    <text x="120" y="30" text-anchor="middle" class="rellbl">generalizes ▷</text></svg>`;
+}
+
+/* ===================== CONTENT ===================== */
+const LEVELS=[
+  { step:'L1 · Notation', badge:'LEVEL 1', title:'🧩 Tap the Notation', type:'hotspot',
+    lead:'A live diagram of an online store. Read each prompt and tap the matching element.',
+    scene:sceneStore(),
+    questions:[
+      {prompt:'Tap the <b>Actor</b> that represents a person.',accept:['actor-human'],
+       why:'Actors are roles — a person or external system — drawn as stick figures.'},
+      {prompt:'Tap a <b>Use Case</b> (an oval).',accept:['usecase'],
+       why:'Each oval is one use case: a unit of useful functionality.'},
+      {prompt:'Tap the <b>System Boundary</b>.',accept:['boundary'],
+       why:'The boundary box separates what is inside the system from the actors outside.'},
+      {prompt:'Tap an <b>association</b> line (actor ↔ use case).',accept:['assoc'],
+       why:'A solid line = the actor participates in / triggers that use case.'},
+    ],
+    why:'Actors sit outside the boundary; ovals are goals inside it; solid lines are associations.'},
+
+  { step:'L2 · Include/Extend', badge:'LEVEL 2', title:'🔗 Wire the Relationship', type:'choice',
+    lead:'Include = always happens (mandatory, reusable). Extend = only sometimes (optional). Pick the diagram that models each scenario — mind the arrow direction!',
+    questions:[
+      {prompt:'Every <code>Checkout</code> must <code>Verify Payment</code>.',scen:'🛒 Always required',
+       options:[miniRel('Checkout','Verify Payment','AtoB','«include»'),miniRel('Verify Payment','Checkout','AtoB','«extend»'),miniRel('Checkout','Verify Payment','AtoB','«extend»'),miniRel('Verify Payment','Checkout','AtoB','«include»')],
+       answer:0,svg:true,why:'Mandatory behavior → «include», arrow from base (Checkout) ╌▷ the included case.'},
+      {prompt:'<code>Withdraw Cash</code> can optionally <code>Print Receipt</code>.',scen:'🏧 Optional / conditional',
+       options:[miniRel('Print Receipt','Withdraw Cash','AtoB','«extend»'),miniRel('Withdraw Cash','Print Receipt','AtoB','«include»'),miniRel('Withdraw Cash','Print Receipt','AtoB','«extend»'),miniRel('Print Receipt','Withdraw Cash','AtoB','«include»')],
+       answer:0,svg:true,why:'Optional behavior → «extend», arrow from the extension (Print Receipt) ╌▷ the base.'},
+      {prompt:'<code>Add to Cart</code> reuses the common <code>Search Product</code> behavior.',scen:'🔁 Shared, always-needed',
+       options:[miniRel('Add to Cart','Search Product','AtoB','«include»'),miniRel('Search Product','Add to Cart','AtoB','«include»'),miniRel('Add to Cart','Search Product','AtoB','«extend»')],
+       answer:0,svg:true,why:'«include» factors out common, always-needed behavior for reuse.'},
+      {prompt:'<code>Return Book</code> triggers <code>Pay Late Fee</code> only when overdue.',scen:'📚 Only under a condition',
+       options:[miniRel('Pay Late Fee','Return Book','AtoB','«extend»'),miniRel('Return Book','Pay Late Fee','AtoB','«extend»'),miniRel('Pay Late Fee','Return Book','AtoB','«include»')],
+       answer:0,svg:true,why:'Conditional behavior → «extend», from the extension (Pay Late Fee) ╌▷ the base.'},
+    ]},
+
+  { step:'L3 · Actors', badge:'LEVEL 3', title:'👥 Read a Live System', type:'hotspot',
+    lead:'A food-delivery app. Tap the element each prompt describes.',
+    scene:sceneFood(),
+    questions:[
+      {prompt:'Tap the <b>primary actor</b> who starts an order.',accept:['actor-customer'],
+       why:'The primary actor initiates the interaction — here, the Customer.'},
+      {prompt:'Tap any <b>Use Case</b>.',accept:['usecase'],
+       why:'Ovals are the goals the system delivers.'},
+      {prompt:'Tap the actor who <b>delivers the food</b>.',accept:['actor-driver'],
+       why:'The Delivery Driver is another human actor of this system.'},
+      {prompt:'Tap the use case where the app <b>charges the customer</b>.',accept:['uc-pay'],
+       why:'"Make Payment" is the goal that handles charging.'},
+    ],
+    why:'Different actors can attach to one system; ovals are its goals.'},
+
+  { step:'L4 · Modeling', badge:'LEVEL 4', title:'⚖️ Pick the Correct Model', type:'choice',
+    lead:'Judgment calls — choose the diagram (or answer) that follows UML correctly.',
+    questions:[
+      {prompt:'<code>Registered User</code> is a special kind of <code>User</code>, inheriting its use cases.',scen:'👤 Actor inheritance',
+       options:[miniGen('Registered User','User'),miniRel('Registered User','User','AtoB','«include»'),miniRel('Registered User','User','AtoB','«extend»')],
+       answer:0,svg:true,why:'Inheritance → generalization: a hollow triangle pointing from child to parent.'},
+      {prompt:'Which diagram shows <code>«extend»</code> the right way? (Print Receipt extends Withdraw Cash)',scen:'➡️ Direction check',
+       options:[miniRel('Print Receipt','Withdraw Cash','AtoB','«extend»'),miniRel('Withdraw Cash','Print Receipt','AtoB','«extend»')],
+       answer:0,svg:true,why:'«extend» points from the extension (Print Receipt) ╌▷ the base (Withdraw Cash).'},
+      {prompt:'Do the arrows in a use case diagram tell you the <b>order</b> steps happen in?',scen:'⏱️ Sequencing?',
+       options:['Yes, top to bottom','No — there is no time order'],answer:1,why:'Use case diagrams show no sequence; ordering belongs to activity/sequence diagrams.'},
+      {prompt:'<code>Pay by Card</code> and <code>Pay by PayPal</code> are both kinds of <code>Make Payment</code>.',scen:'💳 Variants of one goal',
+       options:[miniGen('Pay by Card','Make Payment'),miniRel('Pay by Card','Make Payment','AtoB','«include»'),miniRel('Make Payment','Pay by Card','AtoB','«extend»')],
+       answer:0,svg:true,why:'Specialized variants of a use case → use-case generalization.'},
+    ]},
+];
+const NOTE='Debrief: actors (roles/systems) sit outside the boundary; ovals are goals inside it. «include» = mandatory reuse (base ╌▷ included); «extend» = optional/conditional (extension ╌▷ base); generalization = inheritance (hollow triangle, child ▷ parent). A use case diagram shows the WHAT, never the step-by-step HOW.';
+
+/* ===================== ENGINE ===================== */
+let lvlIdx=0, got=[], maxPts=0, locked=false, sel=[];
+let hsIdx=0, hsScore=0, hsAnswered=false;
+let startTime=null, timerInt=null, soundOn=true;
+const $=id=>document.getElementById(id);
+maxPts=LEVELS.reduce((s,l)=>s+l.questions.length,0);
+$('maxHud').textContent=maxPts;
+$('homeScene').innerHTML=sceneStore();
+
+let actx=null;
+function beep(f,d,t='sine',v=.05){if(!soundOn)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();
+  const o=actx.createOscillator(),g=actx.createGain();o.type=t;o.frequency.value=f;o.connect(g);g.connect(actx.destination);
+  g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);
+  o.start();o.stop(actx.currentTime+d);}catch(e){}}
+const sGood=()=>{beep(660,.12);setTimeout(()=>beep(990,.14),90)};
+const sBad=()=>beep(150,.2,'sawtooth',.045);
+const sClick=()=>beep(440,.05,'square',.025);
+const sWin=()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.2),i*120));
+$('soundBtn').addEventListener('click',function(){soundOn=!soundOn;this.textContent=soundOn?'🔊':'🔇';if(soundOn)sClick();});
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('hidden',s.id!=='screen-'+id));window.scrollTo({top:0,behavior:'smooth'});}
+function updHud(){$('scoreHud').textContent=got.reduce((a,b)=>a+b,0);}
+function renderSteps(){const steps=$('steps');steps.classList.remove('hidden');steps.innerHTML='';
+  LEVELS.forEach((l,i)=>{const d=document.createElement('div');d.className='step'+(i===lvlIdx?' active':'')+(i<lvlIdx?' done':'');d.textContent=l.step;steps.appendChild(d);});
+  const r=document.createElement('div');r.className='step'+(lvlIdx>=LEVELS.length?' active':'');r.textContent='Result';steps.appendChild(r);}
+function mkBtn(label,fn,cls=''){const b=document.createElement('button');b.className='btn '+cls;b.innerHTML=label;b.onclick=fn;return b;}
+function startTimer(){startTime=Date.now();clearInterval(timerInt);
+  timerInt=setInterval(()=>{const s=Math.floor((Date.now()-startTime)/1000);$('timer').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},1000);}
+
+$('startBtn').addEventListener('click',()=>{startTimer();lvlIdx=0;got=[];sClick();renderLevel();});
+
+function renderLevel(){
+  locked=false;const L=LEVELS[lvlIdx];
+  renderSteps();updHud();
+  $('lvlBadge').textContent=L.badge+' · '+L.questions.length+' pts';
+  $('lvlTitle').innerHTML=L.title;$('lvlLead').innerHTML=L.lead;
+  const fb=$('lvlFb');fb.className='fb';fb.innerHTML='';
+  const bar=$('lvlBar');bar.innerHTML='';
+  const body=$('lvlBody');body.innerHTML='';
+  if(L.type==='hotspot') renderHotspot(L,body,bar);
+  else renderChoice(L,body,bar);
+  showScreen('level');
+}
+
+/* ---- hotspot level ---- */
+function renderHotspot(L,body,bar){
+  hsIdx=0;hsScore=0;hsAnswered=false;
+  body.innerHTML=`<div class="pbar" id="pbar"></div><div class="stage" id="stage">${L.scene}</div>`;
+  const stage=$('stage');
+  stage.addEventListener('click',e=>{
+    const el=e.target.closest('.hs, .assoc');if(!el||hsAnswered)return;
+    hsAnswered=true;
+    const key=el.dataset.key,kind=el.dataset.kind;
+    const acc=L.questions[hsIdx].accept;
+    const correct=acc.includes(key)||acc.includes(kind);
+    el.classList.add(correct?'good':'bad');
+    if(correct){hsScore++;sGood();}
+    else{sBad();const hint=[...stage.querySelectorAll('.hs, .assoc')].find(n=>acc.includes(n.dataset.key)||acc.includes(n.dataset.kind));if(hint)hint.classList.add('hint');}
+    markDot(hsIdx,correct);
+    setTimeout(()=>{
+      stage.querySelectorAll('.good,.bad,.hint').forEach(n=>n.classList.remove('good','bad','hint'));
+      hsIdx++;hsAnswered=false;
+      if(hsIdx>=L.questions.length)finishLevel(L,hsScore);else showPrompt(L);
+    },950);
+  });
+  showPrompt(L);
+}
+function showPrompt(L){
+  const dots=L.questions.map((q,i)=>`<span class="dot ${i===hsIdx?'on':''}" data-d="${i}"></span>`).join('');
+  $('pbar').innerHTML=`<span class="tap">👆</span><span class="txt">${L.questions[hsIdx].prompt}</span><span class="prog">${dots}</span>`;
+}
+function markDot(i,ok){const d=document.querySelector(`.dot[data-d="${i}"]`);if(d){d.classList.remove('on');d.classList.add(ok?'ok':'no');}}
+
+/* ---- choice level ---- */
+function renderChoice(L,body,bar){
+  sel=Array(L.questions.length).fill(null);
+  L.questions.forEach((q,i)=>{const d=document.createElement('div');d.className='q';
+    d.innerHTML=(q.scen?`<div class="scen">${q.scen}</div>`:'')+
+      `<div class="qt"><span class="num">${i+1}.</span>${q.prompt}</div>`+
+      `<div class="opts ${q.svg?'svgopts':''}">${q.options.map((o,j)=>`<button class="opt" data-i="${i}" data-j="${j}">${o}</button>`).join('')}</div>`;
+    body.appendChild(d);});
+  body.onclick=e=>{const b=e.target.closest('.opt');if(!b||locked)return;const i=+b.dataset.i;sel[i]=+b.dataset.j;sClick();
+    body.querySelectorAll(`[data-i="${i}"]`).forEach(x=>x.classList.toggle('sel',x===b));};
+  bar.appendChild(mkBtn('Lock in answers',()=>{
+    if(locked)return;locked=true;let c=0;
+    L.questions.forEach((q,i)=>{const grp=body.querySelectorAll(`[data-i="${i}"]`);
+      grp.forEach(btn=>{btn.disabled=true;if(+btn.dataset.j===q.answer)btn.classList.add('correct');else if(+btn.dataset.j===sel[i])btn.classList.add('wrong');});
+      const wrap=grp[0].closest('.q');
+      if(!wrap.querySelector('.note')){const n=document.createElement('div');n.className='note';n.innerHTML=q.why;wrap.appendChild(n);}
+      if(sel[i]===q.answer)c++;});
+    finishLevel(L,c);
+  }));
+}
+
+function finishLevel(L,score){
+  got[lvlIdx]=score;updHud();
+  const pts=L.questions.length,ok=score>=Math.ceil(pts*0.8);
+  const fb=$('lvlFb');fb.className='fb show '+(ok?'good':'partial');
+  fb.innerHTML=(score===pts?'🎉 Perfect! ':`You scored ${score}/${pts}. `)+(L.why||'');
+  ok?sGood():sBad();
+  const bar=$('lvlBar');bar.querySelectorAll('.btn').forEach(b=>b.disabled=true);
+  const isLast=lvlIdx>=LEVELS.length-1;
+  bar.appendChild(mkBtn(isLast?'See results →':'Next level →',()=>{sClick();if(isLast)showResults();else{lvlIdx++;renderLevel();}},'ghost'));
+}
+
+function showResults(){
+  clearInterval(timerInt);
+  const total=got.reduce((a,b)=>a+b,0),pct=Math.round(total/maxPts*100);
+  let emoji,rank,msg,win;
+  if(pct>=90){emoji='🏆';rank='Modeling Master';msg='Flawless — your diagrams would pass any design review.';win=true;}
+  else if(pct>=75){emoji='🥇';rank='Systems Analyst';msg='Strong — include vs extend holds no fear for you.';win=true;}
+  else if(pct>=60){emoji='🛠️';rank='Diagrammer — you win!';msg='You passed the trials and earned the badge.';win=true;}
+  else{emoji='🧱';rank='Apprentice — not yet';msg='A few arrows pointed the wrong way. Run it back!';win=false;}
+  $('resEmoji').textContent=emoji;$('resRank').textContent=rank;
+  $('resMsg').textContent=msg;$('resTotal').textContent=`${total} / ${maxPts}  ·  ${pct}%`;$('resNote').innerHTML=NOTE;
+  const sb=$('scorebars');sb.innerHTML='';
+  LEVELS.forEach((l,i)=>{const pts=l.questions.length,row=document.createElement('div');row.className='sbrow';
+    row.innerHTML=`<span class="lbl">${l.step}</span><div class="track"><div class="fill" data-w="${(got[i]||0)/pts*100}"></div></div><span class="val">${got[i]||0}/${pts}</span>`;
+    sb.appendChild(row);});
+  const bar=$('resBar');bar.innerHTML='';
+  bar.appendChild(mkBtn('Play again ↺',()=>{startTimer();lvlIdx=0;got=[];renderLevel();}));
+  showScreen('results');
+  setTimeout(()=>document.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'),120);
+  if(win){sWin();confettiBurst();}else sBad();
+}
+
+/* confetti */
+const cv=$('confetti'),cx=cv.getContext('2d');let parts=[],anim=null;
+function sz(){cv.width=innerWidth;cv.height=innerHeight;}addEventListener('resize',sz);sz();
+function confettiBurst(){const cols=['#4f5bff','#8b5cf6','#16a34a','#f59e0b','#e11d48','#38bdf8'];
+  parts=[];for(let i=0;i<170;i++)parts.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,r:4+Math.random()*6,
+    c:cols[i%cols.length],vx:-2+Math.random()*4,vy:2+Math.random()*4,rot:Math.random()*6,vr:-.2+Math.random()*.4,life:0});
+  if(anim)cancelAnimationFrame(anim);run();}
+function run(){cx.clearRect(0,0,cv.width,cv.height);let alive=false;
+  parts.forEach(p=>{p.vy+=.04;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.life++;if(p.y<cv.height+30)alive=true;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot);cx.fillStyle=p.c;cx.globalAlpha=Math.max(0,1-p.life/260);
+    cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();});
+  if(alive)anim=requestAnimationFrame(run);else cx.clearRect(0,0,cv.width,cv.height);}
+</script>
+</body>
+</html>
