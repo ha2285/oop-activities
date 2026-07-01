@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Inside the JVM — The Challenge</title>
+<style>
+  :root{
+    --bg:#12100c; --panel:#1c1913; --panel2:#26221a; --ink:#f2ece0; --muted:#b3a488;
+    --acc:#e0a44a; --acc2:#d9603a; --ok:#4bd48a; --bad:#ff6b5d; --warn:#ffd15c;
+    --code:#0e0c08; --line:#3a3225;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 80% -10%,#3a2a12 0,transparent 60%),var(--bg);color:var(--ink);line-height:1.5}
+  .wrap{max-width:900px;margin:0 auto;padding:22px 20px 70px;position:relative;z-index:1}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{font-size:1.35rem;margin:0;letter-spacing:.2px}
+  .hud{margin-left:auto;display:flex;gap:12px;align-items:center;font-weight:700;font-size:.9rem}
+  .hud .chip{background:var(--panel);border:1px solid var(--line);padding:6px 12px;border-radius:20px}
+  .hud .chip b{color:var(--warn)}
+  .iconbtn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:.95rem}
+  .steps{display:flex;gap:8px;margin:16px 0 18px;flex-wrap:wrap}
+  .step{flex:1;min-width:84px;text-align:center;font-size:.72rem;color:var(--muted);font-weight:700;border-top:3px solid var(--line);padding-top:8px;transition:.2s}
+  .step.active{color:var(--ink);border-color:var(--acc)}
+  .step.done{color:var(--ok);border-color:var(--ok)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:18px}
+  h2{margin:.1rem 0 .4rem;font-size:1.3rem}
+  .lead{color:var(--muted);margin:.2rem 0 1rem}
+  .badge{display:inline-block;background:rgba(224,164,74,.15);color:#f2cd90;border:1px solid rgba(224,164,74,.4);padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:8px}
+  code,pre{font-family:"SF Mono",Menlo,Consolas,monospace}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow:auto;font-size:.83rem}
+  .q{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;background:var(--panel2)}
+  .q .qt{font-weight:700;margin-bottom:9px}
+  .q .qt .num{color:var(--acc);margin-right:6px}
+  .opts{display:flex;gap:6px;flex-wrap:wrap}
+  .opt{border:1px solid var(--line);background:var(--code);color:var(--ink);padding:8px 13px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;transition:.12s}
+  .opt:hover{border-color:var(--acc)}
+  .opt.sel{border-color:var(--acc);background:var(--panel2)}
+  .opt.correct{background:rgba(75,212,138,.2);border-color:var(--ok);color:#bff7d8}
+  .opt.wrong{background:rgba(255,107,93,.2);border-color:var(--bad);color:#ffd2d7}
+  .btn{background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;color:#fff;padding:12px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:.95rem;transition:.15s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .bar{display:flex;gap:10px;align-items:center;margin-top:18px;flex-wrap:wrap}
+  .fb{margin-top:14px;padding:13px 15px;border-radius:10px;font-size:.9rem;display:none}
+  .fb.show{display:block}
+  .fb.good{background:rgba(75,212,138,.12);border:1px solid rgba(75,212,138,.4)}
+  .fb.partial{background:rgba(255,209,92,.12);border:1px solid rgba(255,209,92,.4)}
+  .note{font-size:.84rem;color:var(--muted);margin-top:8px}
+  .blocks{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+  .blk{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 14px;cursor:pointer;font-weight:700}
+  .blk small{display:block;font-weight:500;color:var(--muted);font-size:.7rem;margin-top:2px}
+  .blk:hover{border-color:var(--acc)}
+  .blk.placed{opacity:.32;pointer-events:none;border-style:dashed}
+  .stack{display:flex;flex-direction:column;margin:12px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .stack .row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:var(--code);border-bottom:1px solid var(--line);font-weight:700;animation:pop .2s ease}
+  .stack .row:last-child{border-bottom:none}
+  .stack .row.ok{background:linear-gradient(90deg,rgba(75,212,138,.16),transparent)}
+  .stack .row.no{background:linear-gradient(90deg,rgba(255,107,93,.16),transparent)}
+  .stack .row .tag{font-size:.68rem;color:var(--muted);font-weight:600}
+  .stack .row .ord{color:var(--acc);font-family:monospace;font-weight:800;margin-right:6px}
+  @keyframes pop{from{transform:translateY(-6px);opacity:0}to{transform:none;opacity:1}}
+  .slot{padding:14px 16px;color:var(--muted);font-style:italic;text-align:center}
+  .hidden{display:none}
+  .center{text-align:center}
+  .big{font-size:3rem;margin:6px 0}
+  .rankline{font-size:1.55rem;font-weight:800;margin:6px 0}
+  .scorebars{margin:18px 0;text-align:left}
+  .sbrow{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:.88rem}
+  .sbrow .lbl{width:150px;color:var(--muted);font-weight:600}
+  .track{flex:1;background:var(--code);border-radius:20px;height:14px;overflow:hidden;border:1px solid var(--line)}
+  .fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:20px;width:0;transition:width .8s ease}
+  .sbrow .val{width:50px;text-align:right;font-weight:700}
+  .map{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}
+  .mapcol{flex:1;min-width:220px;border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--panel2)}
+  .mapcol h4{margin:.1rem 0 .5rem;font-size:.98rem}
+  .mapcol.sh h4{color:var(--acc)}.mapcol.pt h4{color:#7fd0ff}
+  .mapcol ul{margin:.2rem 0 0;padding-left:18px;font-size:.85rem;color:var(--muted)}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+  .win-glow{text-shadow:0 0 22px rgba(224,164,74,.75)}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <header>
+    <h1>☕ Inside the JVM</h1>
+    <div class="hud">
+      <span class="chip">⏱️ <span id="timer">0:00</span></span>
+      <span class="chip">⭐ <b id="scoreHud">0</b>/<span id="maxHud">0</span></span>
+      <button class="iconbtn" id="soundBtn" title="Toggle sound">🔊</button>
+    </div>
+  </header>
+
+  <div class="steps hidden" id="steps"></div>
+
+  <!-- HOME -->
+  <section class="screen" id="screen-home">
+    <div class="card center">
+      <div class="big">☕⚙️🧠</div>
+      <h2>The Virtual Machine Trials</h2>
+      <p class="lead">How does <code>java Hello</code> actually run? Trace the pipeline, map the memory, and survive the crash cases. Four levels, ~12 minutes. Score <b>60%+</b> to earn your JVM badge.</p>
+      <div class="map">
+        <div class="mapcol sh"><h4>🌐 Shared (all threads)</h4><ul><li>Heap — objects &amp; instance fields</li><li>Method Area / Metaspace — class metadata</li></ul></div>
+        <div class="mapcol pt"><h4>🧵 Per-thread</h4><ul><li>JVM Stack — frames, locals</li><li>PC Register — current instruction</li><li>Native Method Stack</li></ul></div>
+      </div>
+      <div class="bar" style="justify-content:center">
+        <button class="btn" id="startBtn">Start the trials →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEVEL -->
+  <section class="screen hidden" id="screen-level">
+    <div class="card">
+      <span class="badge" id="lvlBadge"></span>
+      <h2 id="lvlTitle"></h2>
+      <p class="lead" id="lvlLead"></p>
+      <div id="lvlBody"></div>
+      <div class="bar" id="lvlBar"></div>
+      <div class="fb" id="lvlFb"></div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen hidden" id="screen-results">
+    <div class="card center">
+      <div class="big" id="resEmoji">🏆</div>
+      <div class="rankline win-glow" id="resRank"></div>
+      <p class="lead" id="resMsg"></p>
+      <div class="scorebars" id="scorebars"></div>
+      <div class="rankline" id="resTotal"></div>
+      <div class="bar" style="justify-content:center" id="resBar"></div>
+      <p class="note" id="resNote"></p>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ===================== CONTENT ===================== */
+const SHPT=['🌐 Shared across all threads','🧵 One per thread'];
+const LEVELS=[
+  { step:'L1 · Pipeline', badge:'LEVEL 1', title:'🚀 Journey of a Java Program', type:'order',
+    lead:'From source to running code. Click the stages in order — first at the top.',
+    blocks:[
+      {id:'src', label:'Hello.java', sub:'you write source code', tag:'source'},
+      {id:'javac', label:'javac compiles', sub:'the Java compiler', tag:'compile time'},
+      {id:'class', label:'Hello.class', sub:'platform-independent bytecode', tag:'artifact'},
+      {id:'load', label:'Class Loader loads it', sub:'brings the .class into the JVM', tag:'run time'},
+      {id:'verify', label:'Bytecode Verifier checks it', sub:'safety & correctness', tag:'run time'},
+      {id:'exec', label:'Execution Engine runs it', sub:'interpreter + JIT', tag:'run time'},
+    ],
+    order:['src','javac','class','load','verify','exec'],
+    scramble:['exec','class','src','verify','javac','load'],
+    why:'Source → <b>javac</b> → <b>.class</b> bytecode → Class Loader loads → Verifier checks → Execution Engine (interpreter + JIT) runs it. Compile once, run on any JVM.'},
+
+  { step:'L2 · Memory', badge:'LEVEL 2', title:'🗺️ Map the Runtime Data Areas', type:'quiz',
+    lead:'The JVM splits memory into areas. Which are shared by all threads, and which get one copy per thread?',
+    questions:[
+      {prompt:'The <b>Heap</b> (where objects live)',options:SHPT,answer:0,why:'One heap, shared by every thread — that\'s why GC and thread-safety matter.'},
+      {prompt:'The <b>JVM Stack</b> (frames, local variables)',options:SHPT,answer:1,why:'Each thread gets its own stack of method frames.'},
+      {prompt:'The <b>PC Register</b> (address of current instruction)',options:SHPT,answer:1,why:'Per-thread — each thread tracks its own current bytecode.'},
+      {prompt:'The <b>Method Area / Metaspace</b> (class metadata)',options:SHPT,answer:0,why:'Shared — loaded class structures are common to all threads.'},
+      {prompt:'Where are all <b>objects and instance fields</b> allocated?',options:['The Heap','The JVM Stack','The PC Register'],answer:0,why:'Always the heap; the stack only holds references and primitive locals.'},
+    ]},
+
+  { step:'L3 · Concepts', badge:'LEVEL 3', title:'⚡ Lightning Round', type:'quiz',
+    lead:'Five rapid calls on how the JVM does its job.',
+    questions:[
+      {prompt:'What does <code>javac</code> produce?',options:['native machine code','Java bytecode (.class)','a Windows .exe'],answer:1,why:'javac emits portable bytecode, not native code.'},
+      {prompt:'"Write once, run anywhere" works because…',options:['bytecode runs on any platform\'s JVM','Java is never compiled','you ship the source everywhere'],answer:0,why:'The same bytecode runs on any OS that has a JVM.'},
+      {prompt:'Which part compiles frequently-used ("hot") methods to native code <em>at runtime</em>?',options:['the Interpreter','the JIT compiler','the Class Loader'],answer:1,why:'The JIT (Just-In-Time) compiler optimizes hot paths to native code.'},
+      {prompt:'The Garbage Collector reclaims memory in the…',options:['Heap','JVM Stack','PC Register'],answer:0,why:'GC frees unreachable objects on the heap.'},
+      {prompt:'Which package includes the compiler <code>javac</code>?',options:['the JRE','the JDK','the JVM'],answer:1,why:'JDK = JRE + dev tools (javac, etc.). JRE = JVM + libraries.'},
+    ]},
+
+  { step:'L4 · Crashes', badge:'LEVEL 4', title:'⚖️ The Crash Courtroom', type:'quiz',
+    lead:'Diagnose what the JVM throws — or where things live.',
+    questions:[
+      {prompt:'A method calls itself forever (unbounded recursion). The JVM throws…',options:['StackOverflowError','OutOfMemoryError','NullPointerException'],answer:0,why:'Each call adds a frame to the per-thread stack until it overflows.'},
+      {prompt:'You keep allocating objects until memory runs out. The JVM throws…',options:['StackOverflowError','OutOfMemoryError: Java heap space','EOFException'],answer:1,why:'A full heap → OutOfMemoryError.'},
+      {prompt:'A brand-new object is first allocated in which heap region?',options:['Old / Tenured generation','Eden (Young generation)','Metaspace'],answer:1,why:'New objects start in Eden; survivors get promoted toward the Old gen.'},
+      {prompt:'Since Java 8, loaded class metadata lives in…',options:['PermGen','Metaspace (native memory)','the JVM Stack'],answer:1,why:'Metaspace replaced PermGen in Java 8 and lives in native memory.'},
+      {prompt:'The class-loader delegation model checks…',options:['child loaders first','parent loaders first (parent-first)','a random loader'],answer:1,why:'Parent-first: Bootstrap → Platform → Application, preventing core-class spoofing.'},
+    ]},
+];
+const NOTE='Debrief: Java source becomes portable bytecode; the JVM loads, verifies, and runs it — interpreting then JIT-compiling hot code. Heap &amp; Metaspace are shared; stacks &amp; PC registers are per-thread. Overflow the stack → StackOverflowError; exhaust the heap → OutOfMemoryError.';
+
+/* ===================== ENGINE ===================== */
+let lvlIdx=0, got=[], maxPts=0, locked=false, sel=[], placed=[], orderDone=false;
+let startTime=null, timerInt=null, soundOn=true;
+const $=id=>document.getElementById(id);
+function lvlPts(l){return l.type==='order'?l.blocks.length:l.questions.length;}
+maxPts=LEVELS.reduce((s,l)=>s+lvlPts(l),0);
+$('maxHud').textContent=maxPts;
+
+/* sound */
+let actx=null;
+function beep(f,d,t='sine',v=.06){if(!soundOn)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();
+  const o=actx.createOscillator(),g=actx.createGain();o.type=t;o.frequency.value=f;o.connect(g);g.connect(actx.destination);
+  g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);
+  o.start();o.stop(actx.currentTime+d);}catch(e){}}
+const sGood=()=>{beep(660,.12);setTimeout(()=>beep(990,.14),90)};
+const sBad=()=>beep(160,.22,'sawtooth',.05);
+const sClick=()=>beep(420,.05,'square',.03);
+const sWin=()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.2),i*120));
+$('soundBtn').addEventListener('click',function(){soundOn=!soundOn;this.textContent=soundOn?'🔊':'🔇';if(soundOn)sClick();});
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('hidden',s.id!=='screen-'+id));window.scrollTo({top:0,behavior:'smooth'});}
+function updHud(){$('scoreHud').textContent=got.reduce((a,b)=>a+b,0);}
+function renderSteps(){const steps=$('steps');steps.classList.remove('hidden');steps.innerHTML='';
+  LEVELS.forEach((l,i)=>{const d=document.createElement('div');d.className='step'+(i===lvlIdx?' active':'')+(i<lvlIdx?' done':'');d.textContent=l.step;steps.appendChild(d);});
+  const r=document.createElement('div');r.className='step'+(lvlIdx>=LEVELS.length?' active':'');r.textContent='Result';steps.appendChild(r);}
+function mkBtn(label,fn,cls=''){const b=document.createElement('button');b.className='btn '+cls;b.textContent=label;b.onclick=fn;return b;}
+function startTimer(){startTime=Date.now();clearInterval(timerInt);
+  timerInt=setInterval(()=>{const s=Math.floor((Date.now()-startTime)/1000);$('timer').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},1000);}
+
+$('startBtn').addEventListener('click',()=>{startTimer();lvlIdx=0;got=[];sClick();renderLevel();});
+
+function renderLevel(){
+  locked=false;sel=[];placed=[];orderDone=false;
+  const L=LEVELS[lvlIdx];
+  renderSteps();updHud();
+  $('lvlBadge').textContent=L.badge+' · '+lvlPts(L)+' pts';
+  $('lvlTitle').textContent=L.title;$('lvlLead').innerHTML=L.lead;
+  const fb=$('lvlFb');fb.className='fb';fb.innerHTML='';
+  const body=$('lvlBody');body.innerHTML=L.preamble||'';
+  const bar=$('lvlBar');bar.innerHTML='';
+  if(L.type==='quiz'){
+    sel=Array(L.questions.length).fill(null);
+    L.questions.forEach((q,i)=>{const d=document.createElement('div');d.className='q';
+      d.innerHTML=`<div class="qt"><span class="num">${i+1}.</span>${q.prompt}</div>`+
+        (q.code?`<pre>${q.code}</pre>`:'')+
+        `<div class="opts">${q.options.map((o,j)=>`<button class="opt" data-i="${i}" data-j="${j}">${o}</button>`).join('')}</div>`;
+      body.appendChild(d);});
+    body.onclick=e=>{const b=e.target.closest('.opt');if(!b||locked)return;const i=+b.dataset.i;sel[i]=+b.dataset.j;sClick();
+      body.querySelectorAll(`[data-i="${i}"]`).forEach(x=>x.classList.toggle('sel',x===b));};
+    bar.appendChild(mkBtn('Lock in answers',()=>checkQuiz(L)));
+  } else { renderOrder(L,body,bar); }
+  showScreen('level');
+}
+
+function checkQuiz(L){
+  if(locked)return;locked=true;let c=0;
+  L.questions.forEach((q,i)=>{const grp=$('lvlBody').querySelectorAll(`[data-i="${i}"]`);
+    grp.forEach(btn=>{btn.disabled=true;if(+btn.dataset.j===q.answer)btn.classList.add('correct');else if(+btn.dataset.j===sel[i])btn.classList.add('wrong');});
+    const wrap=grp[0].closest('.q');
+    if(!wrap.querySelector('.note')){const n=document.createElement('div');n.className='note';n.innerHTML=q.why;wrap.appendChild(n);}
+    if(sel[i]===q.answer)c++;});
+  finishLevel(L,c);
+}
+
+function renderOrder(L,body,bar){
+  const trayLbl=document.createElement('p');trayLbl.className='lead';trayLbl.innerHTML='<b>Stages (scrambled):</b>';
+  const tray=document.createElement('div');tray.className='blocks';
+  const stackLbl=document.createElement('p');stackLbl.className='lead';stackLbl.innerHTML='<b>Your pipeline</b> — first step at top:';
+  const stackWrap=document.createElement('div');stackWrap.className='stack';
+  body.appendChild(trayLbl);body.appendChild(tray);body.appendChild(stackLbl);body.appendChild(stackWrap);
+  function drawTray(){tray.innerHTML='';L.scramble.forEach(id=>{const m=L.blocks.find(x=>x.id===id);
+    const d=document.createElement('div');d.className='blk'+(placed.includes(id)?' placed':'');d.dataset.id=id;
+    d.innerHTML=`${m.label}<small>${m.sub}</small>`;tray.appendChild(d);});}
+  function drawStack(){if(!placed.length){stackWrap.innerHTML='<div class="slot">Click a stage to place it…</div>';return;}
+    stackWrap.innerHTML='';placed.forEach((id,i)=>{const m=L.blocks.find(x=>x.id===id);
+      const row=document.createElement('div');row.className='row';if(orderDone)row.className+=L.order[i]===id?' ok':' no';
+      row.innerHTML=`<span><span class="ord">${i+1}.</span>${m.label} <span class="tag">${m.tag}</span></span>`;
+      stackWrap.appendChild(row);});}
+  drawTray();drawStack();
+  tray.onclick=e=>{const b=e.target.closest('.blk');if(!b||b.classList.contains('placed')||orderDone)return;placed.push(b.dataset.id);sClick();drawTray();drawStack();sync();};
+  const undo=mkBtn('Undo',()=>{if(orderDone)return;placed.pop();sClick();drawTray();drawStack();sync();},'ghost');
+  const reset=mkBtn('Reset',()=>{if(orderDone)return;placed=[];sClick();drawTray();drawStack();sync();},'ghost');
+  const chk=mkBtn('Score pipeline',()=>{if(orderDone)return;orderDone=true;locked=true;let c=0;placed.forEach((id,i)=>{if(L.order[i]===id)c++;});drawStack();finishLevel(L,c);});
+  chk.style.display='none';
+  bar.appendChild(undo);bar.appendChild(reset);bar.appendChild(chk);
+  function sync(){chk.style.display=placed.length===L.blocks.length?'':'none';}
+}
+
+function finishLevel(L,score){
+  got[lvlIdx]=score;updHud();
+  const pts=lvlPts(L),ok=score>=Math.ceil(pts*0.8);
+  const fb=$('lvlFb');fb.className='fb show '+(ok?'good':'partial');
+  fb.innerHTML=(score===pts?'🎉 Perfect! ':`You scored ${score}/${pts}. `)+(L.why||(ok?'On to the next trial.':'Review the notes above, then continue.'));
+  ok?sGood():sBad();
+  const bar=$('lvlBar');bar.querySelectorAll('.btn').forEach(b=>b.disabled=true);
+  const isLast=lvlIdx>=LEVELS.length-1;
+  bar.appendChild(mkBtn(isLast?'See results →':'Next level →',()=>{sClick();if(isLast)showResults();else{lvlIdx++;renderLevel();}},'ghost'));
+}
+
+function showResults(){
+  clearInterval(timerInt);
+  const total=got.reduce((a,b)=>a+b,0),pct=Math.round(total/maxPts*100);
+  let emoji,rank,msg,win;
+  if(pct>=90){emoji='🏆';rank='JVM Whisperer';msg='Flawless — bytecode has no secrets from you.';win=true;}
+  else if(pct>=75){emoji='🥇';rank='Runtime Engineer';msg='Strong — you know where every byte lives.';win=true;}
+  else if(pct>=60){emoji='🛠️';rank='Bytecode Handler — you win!';msg='You passed the trials and earned the badge.';win=true;}
+  else{emoji='🧱';rank='Apprentice — not yet';msg='A few areas got crossed. Run it back!';win=false;}
+  $('resEmoji').textContent=emoji;const rr=$('resRank');rr.textContent=rank;rr.classList.toggle('win-glow',win);
+  $('resMsg').textContent=msg;$('resTotal').textContent=`${total} / ${maxPts}  ·  ${pct}%`;$('resNote').innerHTML=NOTE;
+  const sb=$('scorebars');sb.innerHTML='';
+  LEVELS.forEach((l,i)=>{const pts=lvlPts(l),row=document.createElement('div');row.className='sbrow';
+    row.innerHTML=`<span class="lbl">${l.step}</span><div class="track"><div class="fill" data-w="${(got[i]||0)/pts*100}"></div></div><span class="val">${got[i]||0}/${pts}</span>`;
+    sb.appendChild(row);});
+  const bar=$('resBar');bar.innerHTML='';
+  bar.appendChild(mkBtn('Play again ↺',()=>{startTimer();lvlIdx=0;got=[];renderLevel();}));
+  showScreen('results');
+  setTimeout(()=>document.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'),120);
+  if(win){sWin();confettiBurst();}else sBad();
+}
+
+/* confetti */
+const cv=$('confetti'),cx=cv.getContext('2d');let parts=[],anim=null;
+function sz(){cv.width=innerWidth;cv.height=innerHeight;}addEventListener('resize',sz);sz();
+function confettiBurst(){const cols=['#e0a44a','#d9603a','#4bd48a','#ffd15c','#ff6b5d','#7fd0ff'];
+  parts=[];for(let i=0;i<170;i++)parts.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,r:4+Math.random()*6,
+    c:cols[i%cols.length],vx:-2+Math.random()*4,vy:2+Math.random()*4,rot:Math.random()*6,vr:-.2+Math.random()*.4,life:0});
+  if(anim)cancelAnimationFrame(anim);run();}
+function run(){cx.clearRect(0,0,cv.width,cv.height);let alive=false;
+  parts.forEach(p=>{p.vy+=.04;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.life++;if(p.y<cv.height+30)alive=true;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot);cx.fillStyle=p.c;cx.globalAlpha=Math.max(0,1-p.life/260);
+    cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();});
+  if(alive)anim=requestAnimationFrame(run);else cx.clearRect(0,0,cv.width,cv.height);}
+</script>
+</body>
+</html>
