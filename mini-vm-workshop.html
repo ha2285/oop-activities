@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mini JVM — The Life of a Java Program</title>
+<style>
+  :root{
+    --bg:#eef2fb; --panel:#fff; --panel2:#f5f7ff; --ink:#1e2440; --muted:#5c6690;
+    --acc:#3b4cca; --acc2:#8b5cf6; --ok:#16a34a; --bad:#e11d48; --warn:#d97706;
+    --orange:#e08a2b; --orange-bg:#fff7ec; --line:#e2e7f5; --code:#0e1226; --shadow:0 8px 24px rgba(40,52,120,.10);
+    --heap:#2563eb; --heapbg:#eaf1ff; --method:#7c3aed; --methodbg:#f2ecff; --boot:#64748b; --bootbg:#eef1f6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1100px 600px at 85% -10%,#dfe6ff 0,transparent 55%),var(--bg);color:var(--ink);line-height:1.55}
+  .wrap{max-width:1020px;margin:0 auto;padding:26px 20px 70px}
+  h1{font-size:1.55rem;margin:0 0 2px}
+  .sub{color:var(--muted);margin:0 0 16px}
+  h2{font-size:1.15rem;margin:20px 0 8px}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;background:#eef1fb;padding:1px 6px;border-radius:5px;font-size:.85em;color:#3a3f6b}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:var(--shadow)}
+  .lead{color:var(--muted)}
+  .badge{display:inline-block;background:#eef0ff;color:#3a3f8f;border:1px solid #d9ddff;border-radius:20px;padding:2px 10px;font-size:.72rem;font-weight:700}
+  table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.9rem}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{background:#eef0ff;color:#3a3f8f;font-size:.78rem;text-transform:uppercase;letter-spacing:.4px}
+  .mono,td.mono{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.86em}
+  /* narration */
+  .phasebar{display:flex;align-items:flex-start;gap:12px;background:linear-gradient(135deg,#eef0ff,#f3ecff);border:1px solid #dfe2ff;border-radius:14px;padding:14px 16px;margin-bottom:12px}
+  .phasebar .n{font-size:1.6rem;line-height:1}
+  .phasebar .t{font-weight:800;color:#2e3a9e;margin-bottom:2px}
+  .phasebar .d{font-size:.9rem;color:#414a77}
+  .dots{display:flex;gap:5px;flex-wrap:wrap;margin:10px 0 4px}
+  .dots .dot{width:22px;height:6px;border-radius:4px;background:#d3d9f2}
+  .dots .dot.on{background:var(--acc)}.dots .dot.past{background:#a7b0e6}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 4px}
+  .btn{background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;color:#fff;padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer;font-size:.92rem;box-shadow:0 6px 16px rgba(59,76,202,.25)}
+  .btn:hover{filter:brightness(1.06)}.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink);box-shadow:var(--shadow)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  /* code panels */
+  .codegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  @media(max-width:720px){.codegrid{grid-template-columns:1fr}}
+  .codepanel{background:var(--code);border-radius:12px;overflow:hidden;opacity:.35;transition:.3s;filter:grayscale(.4)}
+  .codepanel.on{opacity:1;filter:none}
+  .codepanel .hd{background:#161c33;color:#aab6e0;font-size:.72rem;font-weight:700;padding:7px 12px;letter-spacing:.4px;display:flex;justify-content:space-between}
+  .codepanel pre{margin:0;padding:12px 14px;color:#e7ecfb;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.76rem;line-height:1.55;overflow:auto;max-height:250px}
+  .kw{color:#c58bff}.ty{color:#7fd0ff}.cm{color:#7f8bb5}.nm{color:#ffcf7a}.op{color:#8ea2c9}
+  pre .hlline{background:rgba(224,138,43,.22);display:block;border-left:3px solid var(--orange);margin-left:-14px;padding-left:11px}
+  /* architecture (same as diagram) */
+  .jvm{border:2px solid #1f2440;border-radius:14px;padding:12px;background:#fbfcfe}
+  .runtime{border:2px solid var(--orange);border-radius:12px;background:var(--orange-bg);padding:10px;position:relative;margin-bottom:12px}
+  .rt-label{position:absolute;top:-11px;left:14px;background:var(--orange);color:#fff;font-size:.68rem;font-weight:800;letter-spacing:.5px;padding:2px 10px;border-radius:20px}
+  .rt-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}.rt-row:first-of-type{margin-top:6px}
+  .area{flex:1;min-width:150px;background:#fff;border:1.5px solid #c7d0ea;border-radius:10px;padding:10px;transition:.18s}
+  .area h4{margin:0 0 8px;font-size:.82rem;color:#2b3566}.area h4 small{display:block;font-weight:500;color:#8a93b8;font-size:.7rem}
+  .area.dim{opacity:.5;background:#f4f5fa}
+  .area.pulse{border-color:var(--warn);box-shadow:0 0 0 3px rgba(217,151,6,.20);transform:translateY(-2px)}
+  .dimnote{font-size:.72rem;color:#9aa4c8;font-style:italic}
+  .stackwrap{display:flex;flex-direction:column-reverse;gap:4px;min-height:56px;justify-content:flex-start}
+  .cell{background:linear-gradient(135deg,#eaf0ff,#efe9ff);border:1.5px solid var(--acc);color:#22307a;font-family:"SF Mono",Menlo,Consolas,monospace;font-weight:700;text-align:center;padding:5px;border-radius:7px;font-size:.82rem;animation:pop .22s ease}
+  .cell.ref{background:linear-gradient(135deg,#e6f7ee,#d7f0e2);border-color:var(--ok);color:#12603a}
+  .emptynote{color:#9aa4c8;font-style:italic;font-size:.76rem;text-align:center;padding:8px}
+  .pcbox{font-family:"SF Mono",Menlo,Consolas,monospace;font-weight:800;color:var(--acc);background:#eef1ff;border-radius:8px;padding:10px;text-align:center;font-size:.95rem}
+  .heapwrap,.methodwrap{display:flex;gap:8px;flex-wrap:wrap;min-height:56px}
+  .obj{background:var(--heapbg);border:1.5px solid var(--heap);border-radius:12px;padding:8px 10px;min-width:118px;animation:pop .26s ease;transition:.3s}
+  .obj .ref{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.68rem;color:#5c6690;font-weight:700}
+  .obj .oname{font-weight:800;color:#1e3a8a}.obj .ofields{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.78rem;color:#334155;margin-top:2px}
+  .obj.flash{box-shadow:0 0 0 3px rgba(37,99,235,.22)}
+  .obj.garbage{border-color:var(--bad);border-style:dashed;background:#fdeef1;opacity:.6}
+  .obj.garbage .oname{color:#b91c1c;text-decoration:line-through}
+  .gctag{font-size:.62rem;font-weight:800;color:#b91c1c;letter-spacing:.4px}
+  .cls{background:var(--methodbg);border:1.5px solid var(--method);border-radius:10px;padding:7px 10px;min-width:100px}
+  .cls.boot{background:var(--bootbg);border-color:var(--boot)}
+  .cls b{color:#5b21b6;font-size:.88rem}.cls.boot b{color:#475569}
+  .cls small{display:block;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.72rem;color:#6b7280;margin-top:2px}
+  .cls .ldr{font-size:.6rem;font-weight:800;letter-spacing:.3px;color:#7c3aed}.cls.boot .ldr{color:#64748b}
+  @keyframes pop{from{transform:translateY(8px) scale(.92);opacity:0}to{transform:none;opacity:1}}
+  .engines{display:flex;gap:10px;flex-wrap:wrap}
+  .egroup{flex:1;min-width:150px;border:1.5px dashed #c7d0ea;border-radius:10px;padding:8px 10px;text-align:center;background:#fff}
+  .egroup .etitle{font-size:.72rem;font-weight:800;color:#5c6690;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+  .eitems{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  .eitems span{font-size:.75rem;font-weight:600;color:#42506e;background:#f1f4fb;border:1px solid var(--line);border-radius:16px;padding:3px 9px;transition:.15s}
+  .eitems span.active{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 0 0 3px rgba(59,76,202,.18)}
+  .eitems span.hot{background:var(--warn);color:#fff;border-color:var(--warn);box-shadow:0 0 0 3px rgba(217,151,6,.2)}
+  .jitbox{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:6px;font-size:.72rem;color:#6b7280}
+  .jitbox b{font-family:"SF Mono",Menlo,Consolas,monospace;color:#b4530a}
+  .console{margin-top:12px;background:var(--code);color:#d7f5e3;border-radius:12px;padding:12px 14px;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.82rem;min-height:60px;max-height:200px;overflow:auto;white-space:pre-wrap}
+  .console .sys{color:#8ea2c9}.console .out{color:#7dffb0;font-weight:700}.console .cl{color:#ffd98a}.console .hp{color:#8ec1ff}.console .gc{color:#ff9db0}.console .jit{color:#ffc06b}.console .jni{color:#c7a6ff}
+  .callout{background:#eef0ff;border-left:4px solid var(--acc);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.92rem}
+  ol,ul{margin:6px 0;padding-left:22px}li{margin:5px 0}
+  pre.codeblk{background:var(--code);color:#e7ecfb;border-radius:12px;padding:14px 16px;overflow:auto;font-size:.82rem;font-family:"SF Mono",Menlo,Consolas,monospace;line-height:1.5}
+  /* tabs */
+  .tabs{display:flex;gap:8px;margin:6px 0 18px;flex-wrap:wrap}
+  .tab{background:#fff;border:1px solid var(--line);color:var(--ink);padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:700;font-size:.92rem;box-shadow:var(--shadow)}
+  .tab:hover{border-color:var(--acc)}
+  .tab.active{background:linear-gradient(135deg,var(--acc),var(--acc2));border-color:transparent;color:#fff}
+  .tabpanel.hidden{display:none}
+  /* downloads */
+  .dlgrid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:8px}
+  .dlcard{display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--panel2);transition:.15s}
+  .dlcard:hover{border-color:var(--acc);box-shadow:0 6px 16px rgba(59,76,202,.14);transform:translateY(-1px)}
+  .dlicon{font-size:1.7rem;line-height:1}
+  .dlname{font-weight:800;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.9rem;color:#2e3a9e}
+  .dldesc{font-size:.82rem;color:var(--muted)}
+  .dlbtn{margin-left:auto;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;font-weight:700;font-size:.82rem;padding:8px 14px;border-radius:9px;white-space:nowrap}
+  .tag-fac{font-size:.62rem;font-weight:800;color:#b4530a;background:#fff2e0;border:1px solid #f3d6a8;border-radius:20px;padding:1px 7px;margin-left:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">WORKSHOP COMPANION · THE LIFE OF A JAVA PROGRAM</span>
+  <h1>☕→⚙️ From <code>.java</code> to running on the JVM</h1>
+  <p class="sub">One tiny class, followed all the way through: compile, load, execute, JNI, JIT, and garbage collection.</p>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="sim">🎬 Live Simulation</button>
+    <button class="tab" data-tab="howto">📋 Instructions &amp; Downloads</button>
+  </div>
+
+  <div class="tabpanel" id="tab-sim">
+  <!-- ===== GUIDED SIMULATION ===== -->
+  <div class="card">
+    <div class="phasebar">
+      <div class="n" id="phEmoji">📝</div>
+      <div><div class="t" id="phTitle"></div><div class="d" id="phNote"></div></div>
+    </div>
+    <div class="controls">
+      <button class="btn ghost" id="backBtn">◀ Back</button>
+      <button class="btn" id="nextBtn">Next ▶</button>
+      <button class="btn ghost" id="autoBtn">Auto ⏩</button>
+      <button class="btn ghost" id="resetBtn">Reset ↺</button>
+      <span class="lead" style="font-size:.82rem" id="stepLbl"></span>
+    </div>
+    <div class="dots" id="dots"></div>
+
+    <!-- code -->
+    <div class="codegrid">
+      <div class="codepanel" id="srcPanel">
+        <div class="hd"><span>Point.java · Demo.java</span><span>the source you write</span></div>
+        <pre id="srcCode"></pre>
+      </div>
+      <div class="codepanel" id="bcPanel">
+        <div class="hd"><span>javac → bytecode (javap view)</span><span>portable, not native</span></div>
+        <pre id="bcCode"></pre>
+      </div>
+    </div>
+
+    <!-- architecture -->
+    <div class="jvm">
+      <div class="runtime">
+        <div class="rt-label">RUNTIME DATA AREA</div>
+        <div class="rt-row">
+          <div class="area" id="areaStack"><h4>Stack Area <small>operand stack (per thread)</small></h4><div class="stackwrap" id="opstack"></div></div>
+          <div class="area" id="areaPC"><h4>PC Register <small>current instruction</small></h4><div class="pcbox" id="pcbox">idle</div></div>
+          <div class="area dim" id="areaNative"><h4>Native Method Area <small>native code</small></h4><div class="dimnote">used by JNI calls</div></div>
+        </div>
+        <div class="rt-row">
+          <div class="area" id="areaHeap" style="flex:1.5"><h4>Heap Area <small>data about objects (instances)</small></h4><div class="heapwrap" id="heap"></div></div>
+          <div class="area" id="areaMethod"><h4>Method Area <small>info about class</small></h4><div class="methodwrap" id="method"></div></div>
+        </div>
+      </div>
+      <div class="engines">
+        <div class="egroup"><div class="etitle">Class Loaders</div><div class="eitems"><span id="ldBoot">Bootstrap</span><span id="ldExt">Extension</span><span id="ldApp">Application</span></div></div>
+        <div class="egroup"><div class="etitle">Execution Engine</div><div class="eitems"><span id="enInterp">Interpreter</span><span id="enJit">JIT</span><span id="enGc">GC</span></div>
+          <div class="jitbox"><code>Point.sum()</code> calls: <b id="jitCalls">0</b></div></div>
+        <div class="egroup"><div class="etitle">JNI → Native Libs</div><div class="eitems"><span id="enJni">JNI</span><span>.dll / .so</span></div></div>
+      </div>
+    </div>
+
+    <div class="console" id="console"></div>
+  </div>
+
+  <!-- ===== REFERENCE: what each phase means ===== -->
+  <div class="card">
+    <h2 style="margin-top:4px">What you just watched — the seven stages</h2>
+    <table>
+      <thead><tr><th>Stage</th><th>Who acts</th><th>What happens</th></tr></thead>
+      <tbody>
+        <tr><td><b>Compile</b></td><td class="mono">javac</td><td>Your <code>.java</code> becomes portable <b>bytecode</b> (<code>.class</code>), not native machine code.</td></tr>
+        <tr><td><b>Load</b></td><td class="mono">Class Loaders</td><td>Delegation: the request goes up to <b>Bootstrap</b> (core <code>java.*</code>), and your own classes fall to the <b>Application</b> loader. Loaded metadata lands in the <b>Method Area</b>.</td></tr>
+        <tr><td><b>Verify</b></td><td class="mono">Verifier</td><td>Bytecode is checked for safety before it may run.</td></tr>
+        <tr><td><b>Execute</b></td><td class="mono">Interpreter</td><td>Fetch–decode–execute. <code>new</code> asks the Method Area for the blueprint and the <b>Heap</b> allocates the object; fields are written.</td></tr>
+        <tr><td><b>Native call</b></td><td class="mono">JNI</td><td><code>println</code> is ultimately native — the call crosses the <b>Java Native Interface</b> to a native library that writes to the console.</td></tr>
+        <tr><td><b>Optimize</b></td><td class="mono">JIT</td><td>A method that runs often (“hot”) is <b>compiled to native code</b> so later calls skip interpretation and run faster.</td></tr>
+        <tr><td><b>Reclaim</b></td><td class="mono">GC</td><td>When an object is no longer reachable, the <b>Garbage Collector</b> marks live objects from the roots and <b>sweeps</b> the dead one off the Heap.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><b>The teaching bytecode vs. real bytecode:</b> our C++ engine uses friendly opcodes (<code>NEW</code>, <code>STORE</code>, <code>DESCRIBE</code>). Real <code>javac</code> emits mnemonics like <code>new</code>, <code>dup</code>, <code>invokespecial</code>, <code>putfield</code>, <code>iadd</code>, <code>invokevirtual</code> — shown in the right-hand panel above so students can compare.</div>
+  </div>
+
+  <!-- ===== MAPPING to the C++ classes ===== -->
+  <div class="card">
+    <h2 style="margin-top:4px">Your C++ classes ↔ the real JVM</h2>
+    <table>
+      <thead><tr><th>C++ class</th><th>JVM region</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">Heap</td><td>Heap Area — objects/instances</td></tr>
+        <tr><td class="mono">MethodArea</td><td>Method Area — class metadata</td></tr>
+        <tr><td class="mono">OperandStack</td><td>Stack Area — a thread’s frame</td></tr>
+        <tr><td class="mono">PCRegister</td><td>PC Register</td></tr>
+        <tr><td class="mono">ClassLoader</td><td>Class Loaders (Bootstrap / Ext / App)</td></tr>
+        <tr><td class="mono">ExecutionEngine</td><td>Execution Engine (Interpreter, + JIT, GC)</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><b>Extend the C++ model:</b> add a <code>GarbageCollector</code> class (mark objects reachable from the stack, sweep the rest), a hot-call counter in <code>ExecutionEngine</code> to stand in for the <b>JIT</b>, and a <code>NativeInterface</code> stub for <b>JNI</b> — each maps directly to a box you saw light up.</div>
+  </div>
+  </div><!-- /tab-sim -->
+
+  <!-- ===== INSTRUCTIONS & DOWNLOADS TAB ===== -->
+  <div class="tabpanel hidden" id="tab-howto">
+    <div class="card">
+      <h2 style="margin-top:4px">📥 Download the workshop files</h2>
+      <p class="lead">Grab the templates below, then follow the steps. (These links point to files in the <b>same folder</b> as this page — keep them together.)</p>
+      <div class="dlgrid">
+        <a class="dlcard" href="mini_vm_starter.cpp" download>
+          <div class="dlicon">📄</div>
+          <div><div class="dlname">mini_vm_starter.cpp</div><div class="dldesc">Student template — the class skeleton with TODOs to fill in.</div></div>
+          <div class="dlbtn">Download ↓</div>
+        </a>
+        <a class="dlcard" href="mini_vm_solution.cpp" download>
+          <div class="dlicon">✅</div>
+          <div><div class="dlname">mini_vm_solution.cpp<span class="tag-fac">FACILITATOR</span></div><div class="dldesc">Complete reference solution — creates a Point on the heap.</div></div>
+          <div class="dlbtn">Download ↓</div>
+        </a>
+        <a class="dlcard" href="mini-vm-workshop-guide.docx" download>
+          <div class="dlicon">📘</div>
+          <div><div class="dlname">mini-vm-workshop-guide.docx</div><div class="dldesc">Printable Word guide — objectives, timeline, tables, checkpoints.</div></div>
+          <div class="dlbtn">Download ↓</div>
+        </a>
+      </div>
+      <p class="note" style="font-size:.82rem;color:var(--muted);margin-top:10px">If a link opens the file in the browser instead of downloading, right-click it and choose “Save link as…”. When you deploy this page, upload all files into the same directory.</p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:4px">🧭 What to do</h2>
+      <p class="lead">You are building an object-oriented model of the JVM: each region of the diagram is a C++ class. Your job is to finish the parts that make objects real.</p>
+
+      <h3 style="font-size:1rem;margin:14px 0 4px">1 · Set up</h3>
+      <ul>
+        <li>Open <code>mini_vm_starter.cpp</code> in any editor.</li>
+        <li>You need a C++ compiler — <code>g++</code> or <code>clang++</code> — and a terminal.</li>
+      </ul>
+
+      <h3 style="font-size:1rem;margin:14px 0 4px">2 · Fill in the TODOs</h3>
+      <ol>
+        <li><b><code>Heap::allocate</code></b> — push a new <code>ObjectData</code> and return its index (the object’s reference).</li>
+        <li><b><code>OperandStack::push</code> / <code>pop</code></b> — the working stack of a frame.</li>
+        <li><b>Arithmetic opcodes</b> — <code>ADD</code>, <code>SUB</code>, <code>MUL</code>, <code>DIV</code> (guard divide-by-zero) and <code>PRINT</code>.</li>
+        <li><b>Object opcodes</b> — <code>NEW</code> (ask the Method Area, allocate on the Heap, push the reference), <code>STORE</code> (write a field), <code>DESCRIBE</code> (print the object).</li>
+      </ol>
+      <p class="lead">The heart of it — <code>NEW</code>, where the Method Area and Heap cooperate:</p>
+<pre class="codeblk"><span class="kw">case</span> NEW: {
+    <span class="kw">int</span> classId = pc.fetch(code);
+    <span class="kw">const</span> ClassInfo&amp; cls = methodArea.get(classId);  <span class="cm">// blueprint</span>
+    <span class="kw">int</span> ref = heap.allocate(classId, cls.name);      <span class="cm">// allocate</span>
+    stack.push(ref);                                <span class="cm">// push reference</span>
+    <span class="kw">break</span>;
+}</pre>
+
+      <h3 style="font-size:1rem;margin:14px 0 4px">3 · Build &amp; run</h3>
+<pre class="codeblk">g++ -std=c++17 -O2 -o minijvm mini_vm_starter.cpp
+./minijvm</pre>
+      <p class="lead"><b>Expected output</b> when everything is correct:</p>
+<pre class="codeblk">--- Program A: create an object ---
+[Heap] new Point  ->  ref#0
+[Heap] ref#0.x = 3
+[Heap] ref#0.y = 4
+[out] Point{x=3, y=4}
+Objects now in the Heap: 1
+
+--- Program B: (2 + 3) * 4 ---
+[out] 20</pre>
+
+      <h3 style="font-size:1rem;margin:14px 0 4px">4 · Checkpoints</h3>
+      <ul>
+        <li>Program A prints <code>Point{x=3, y=4}</code> — objects are being built on the heap.</li>
+        <li>Program B prints <code>20</code> — the arithmetic opcodes work.</li>
+      </ul>
+
+      <div class="callout"><b>Stuck?</b> Watch the <b>Live Simulation</b> tab — it steps through exactly this program and shows the Method Area, Heap, and operand stack changing. Then compare with <code>mini_vm_solution.cpp</code>.</div>
+
+      <h3 style="font-size:1rem;margin:14px 0 4px">5 · Stretch goals</h3>
+      <ul>
+        <li>Add a <code>GarbageCollector</code> class: mark objects reachable from the stack, sweep the rest.</li>
+        <li>Add a hot-call counter to <code>ExecutionEngine</code> to stand in for the <b>JIT</b>.</li>
+        <li>Add a <code>NativeInterface</code> stub for a <b>JNI</b>-style native call.</li>
+        <li>Add <code>NEW</code> for a second class and put two objects on the heap.</li>
+      </ul>
+    </div>
+  </div><!-- /tab-howto -->
+</div>
+
+<script>
+/* ---------- source + bytecode text ---------- */
+const SRC =
+`<span class="kw">class</span> <span class="ty">Point</span> {
+    <span class="kw">int</span> x, y;
+    <span class="kw">int</span> <span class="nm">sum</span>(){ <span class="kw">return</span> x + y; }  <span class="cm">// the hot method</span>
+}
+
+<span class="kw">public class</span> <span class="ty">Demo</span> {
+  <span class="kw">public static void</span> <span class="nm">main</span>(String[] a){
+    <span class="ty">Point</span> p = <span class="kw">new</span> <span class="ty">Point</span>();   <span class="cm">// object</span>
+    p.x = 3;
+    p.y = 4;
+    <span class="kw">int</span> t = 0;
+    <span class="kw">for</span>(<span class="kw">int</span> i=0;i&lt;100000;i++)      <span class="cm">// calls sum() a lot</span>
+        t += p.<span class="nm">sum</span>();            <span class="cm">// → JIT compiles sum()</span>
+    System.out.<span class="nm">println</span>(p.<span class="nm">sum</span>()); <span class="cm">// 7</span>
+    p = <span class="kw">null</span>;                <span class="cm">// now garbage</span>
+  }
+}`;
+const BC =
+[`<span class="cm">// Demo.main — real javac (javap) mnemonics</span>`,
+`<span class="op">new</span>           #2   <span class="cm">// class Point</span>`,
+`<span class="op">dup</span>`,
+`<span class="op">invokespecial</span> #1   <span class="cm">// Point.&lt;init&gt;</span>`,
+`<span class="op">astore_1</span>            <span class="cm">// p = ref</span>`,
+`<span class="op">aload_1</span>  <span class="op">iconst_3</span>  <span class="op">putfield</span> #7  <span class="cm">// p.x=3</span>`,
+`<span class="op">aload_1</span>  <span class="op">iconst_4</span>  <span class="op">putfield</span> #8  <span class="cm">// p.y=4</span>`,
+`<span class="cm">// loop 100000×:  t += p.sum()</span>`,
+`<span class="op">invokevirtual</span> #14  <span class="cm">// Point.sum():I  ← hot → JIT</span>`,
+`<span class="op">getstatic</span>     #12  <span class="cm">// System.out</span>`,
+`<span class="op">invokevirtual</span> #18  <span class="cm">// println(int)  -> JNI</span>`,
+`<span class="op">aconst_null</span>  <span class="op">astore_1</span>   <span class="cm">// p = null</span>`,
+`<span class="op">return</span>`];
+
+/* ---------- state + steps ---------- */
+function fresh(){return{emoji:'📝',title:'',note:'',showSrc:false,showBc:false,bcHL:-1,
+  classes:[],heap:[],stack:[],pc:'idle',jit:0,jitHot:false,hl:new Set(),log:[]};}
+
+const STEPS=[
+ {f:s=>{s.emoji='📝';s.title='1 · The Java you write';s.showSrc=true;
+   s.note='A tiny class Point (fields x, y) and a Demo program that creates a Point, uses it, prints, then drops the reference. This is the human-readable source.';}},
+ {f:s=>{s.emoji='🛠️';s.title='2 · javac compiles it to bytecode';s.showSrc=true;s.showBc=true;
+   s.note='javac turns the source into a .class file of portable BYTECODE — not native machine code. That is why one .class runs on any platform’s JVM.';
+   s.log.push(['sys','$ javac Point.java Demo.java']);s.log.push(['cl','→ produced Point.class, Demo.class (bytecode)']);}},
+ {f:s=>{s.emoji='📦';s.title='3 · Class loading — the Bootstrap loader';s.showSrc=true;s.showBc=true;s.hl=new Set(['ldBoot','areaMethod']);
+   s.classes.push({name:'Object',fields:'—',ldr:'BOOT',boot:true});s.classes.push({name:'System',fields:'out',ldr:'BOOT',boot:true});
+   s.note='Loading uses delegation: a request goes UP to the parent first. The Bootstrap loader owns the core java.* classes (Object, System), so it loads those into the Method Area.';
+   s.log.push(['cl','[Bootstrap] loaded java.lang.Object, java.lang.System']);}},
+ {f:s=>{s.emoji='📦';s.title='4 · Class loading — the Application loader';s.showSrc=true;s.showBc=true;s.hl=new Set(['ldApp','areaMethod']);
+   s.classes.push({name:'Object',fields:'—',ldr:'BOOT',boot:true});s.classes.push({name:'System',fields:'out',ldr:'BOOT',boot:true});
+   s.classes.push({name:'Point',fields:'x, y',ldr:'APP'});s.classes.push({name:'Demo',fields:'main()',ldr:'APP'});
+   s.note='Your own classes are not core, so delegation falls back to the Application loader. It loads Point and Demo — their metadata (names, fields) now lives in the Method Area.';
+   s.log.push(['cl','[Application] loaded Point { x, y }, Demo']);}},
+ {f:s=>{s.emoji='🔎';s.title='5 · Verify & prepare';s.showBc=true;s.hl=new Set(['areaMethod']);
+   s.classes=bootAndApp();s.note='Before running, the bytecode verifier checks it is safe (valid types, no stack tricks). Static fields are prepared with defaults. Only verified code runs.';
+   s.log.push(['cl','[Verify] bytecode passed safety checks']);}},
+ {f:s=>{s.emoji='▶️';s.title='6 · Execute — new Point()';s.showBc=true;s.bcHL=1;s.hl=new Set(['enInterp','areaHeap','areaPC']);
+   s.classes=bootAndApp();s.pc='running';s.stack=[{v:0,ref:true}];
+   s.heap=[{ref:0,name:'Point',fields:{}}];
+   s.note='The Interpreter runs the bytecode. new asks the Method Area for the Point blueprint, then the HEAP allocates the object and returns a reference (ref#0) onto the operand stack.';
+   s.log.push(['hp','[Heap] new Point → ref#0']);}},
+ {f:s=>{s.emoji='▶️';s.title='7 · Execute — write the fields';s.showBc=true;s.bcHL=5;s.hl=new Set(['enInterp','areaHeap']);
+   s.classes=bootAndApp();s.pc='running';s.stack=[{v:0,ref:true}];
+   s.heap=[{ref:0,name:'Point',fields:{x:3,y:4}}];
+   s.note='putfield writes into the object on the heap: p.x = 3, then p.y = 4. The object now holds real data. Local variable p keeps the reference alive.';
+   s.log.push(['hp','[Heap] ref#0.x = 3']);s.log.push(['hp','[Heap] ref#0.y = 4']);}},
+ {f:s=>{s.emoji='🔌';s.title='8 · println → the Java Native Interface (JNI)';s.showBc=true;s.bcHL=10;s.hl=new Set(['enJni','areaNative','enInterp']);
+   s.classes=bootAndApp();s.pc='running';s.stack=[];s.heap=[{ref:0,name:'Point',fields:{x:3,y:4}}];
+   s.note='System.out.println(p.sum()) computes 3 + 4 = 7, then must actually write to the console — which is native OS code. The call crosses the JNI bridge into a native library (.dll / .so).';
+   s.log.push(['out','7']);s.log.push(['jni','[JNI] println(7) → native write() in libjava']);}},
+ {f:s=>{s.emoji='🔥';s.title='9 · The JIT compiles the hot method';s.hl=new Set(['enJit']);s.showBc=true;s.bcHL=8;
+   s.classes=bootAndApp();s.heap=[{ref:0,name:'Point',fields:{x:3,y:4}}];s.jit=100000;s.jitHot=true;s.pc='running';
+   s.note='The loop calls p.sum() 100,000 times. At first each call is interpreted; once the method is “hot”, the JIT compiler translates Point.sum() from bytecode to native code once, so every later call runs at native speed.';
+   s.log.push(['jit','[JIT] Point.sum() ran 100,000× → compiled to native code (faster now)']);}},
+ {f:s=>{s.emoji='🧹';s.title='10 · p = null → the object becomes garbage';s.hl=new Set(['enGc','areaHeap']);
+   s.classes=bootAndApp();s.jit=100000;s.jitHot=true;s.pc='running';
+   s.heap=[{ref:0,name:'Point',fields:{x:3,y:4},dead:true}];
+   s.note='Setting p = null removes the only reference to the object. The Garbage Collector MARKS everything reachable from the roots (stack/locals) — ref#0 is reachable by nothing, so it is marked as garbage.';
+   s.log.push(['gc','[GC] mark: scanning roots… ref#0 is unreachable']);}},
+ {f:s=>{s.emoji='🧹';s.title='11 · GC sweeps the heap';s.hl=new Set(['enGc','areaHeap']);
+   s.classes=bootAndApp();s.jit=100000;s.jitHot=true;s.pc='running';s.heap=[];
+   s.note='The SWEEP phase frees every unmarked object and returns that memory to the heap. The Point is gone — no destructor call needed, the JVM reclaimed it automatically.';
+   s.log.push(['gc','[GC] sweep: freed Point ref#0 · heap memory reclaimed']);}},
+ {f:s=>{s.emoji='🏁';s.title='12 · The full lifecycle';s.hl=new Set();
+   s.classes=bootAndApp();s.jit=100000;s.jitHot=true;s.pc='done';
+   s.note='Source → bytecode → loaded by class loaders → executed by the interpreter (objects on the heap) → native work via JNI → hot code sped up by the JIT → dead objects reclaimed by GC. That is the JVM.';
+   s.log.push(['sys','— program complete —']);}},
+];
+function bootAndApp(){return [
+  {name:'Object',fields:'—',ldr:'BOOT',boot:true},{name:'System',fields:'out',ldr:'BOOT',boot:true},
+  {name:'Point',fields:'x, y',ldr:'APP'},{name:'Demo',fields:'main()',ldr:'APP'}];}
+
+/* ---------- engine ---------- */
+let idx=0, autoT=null;
+const $=id=>document.getElementById(id);
+function buildState(i){const s=fresh();for(let k=0;k<=i;k++)STEPS[k].f(s);return s;}
+
+function hl(id,on,cls='active'){const e=$(id);if(e)e.classList.toggle(cls,on);}
+function render(){
+  const s=buildState(idx);
+  $('phEmoji').textContent=s.emoji;$('phTitle').textContent=s.title;$('phNote').textContent=s.note;
+  $('stepLbl').textContent=`step ${idx+1} of ${STEPS.length}`;
+  // dots
+  $('dots').innerHTML=STEPS.map((_,i)=>`<span class="dot ${i===idx?'on':i<idx?'past':''}"></span>`).join('');
+  // code
+  $('srcPanel').classList.toggle('on',s.showSrc); if(s.showSrc)$('srcCode').innerHTML=SRC;
+  $('bcPanel').classList.toggle('on',s.showBc);
+  $('bcCode').innerHTML=BC.map((ln,i)=>i===s.bcHL?`<span class="hlline">${ln}</span>`:ln).join('\n');
+  // areas
+  ['areaStack','areaPC','areaHeap','areaMethod','areaNative'].forEach(a=>$(a).classList.toggle('pulse',s.hl.has(a)));
+  ['ldBoot','ldExt','ldApp','enInterp','enJit','enGc','enJni'].forEach(e=>hl(e,s.hl.has(e)));
+  hl('enJit',s.jitHot,'hot');
+  // stack
+  const st=$('opstack');st.innerHTML=s.stack.length?'':'<div class="emptynote">empty</div>';
+  s.stack.forEach(c=>{const d=document.createElement('div');d.className='cell'+(c.ref?' ref':'');d.textContent=c.ref?('ref#'+c.v):c.v;st.appendChild(d);});
+  $('pcbox').textContent=s.pc;
+  // heap
+  const hp=$('heap');hp.innerHTML=s.heap.length?'':'<div class="emptynote">no objects</div>';
+  s.heap.forEach(o=>{const d=document.createElement('div');d.className='obj'+(o.dead?' garbage':'');
+    const f=Object.keys(o.fields).length?Object.entries(o.fields).map(([k,v])=>`${k}=${v}`).join(', '):' ';
+    d.innerHTML=`<div class="ref">ref#${o.ref}</div><div class="oname">${o.name}</div><div class="ofields">{ ${f} }</div>${o.dead?'<div class="gctag">◦ UNREACHABLE</div>':''}`;
+    hp.appendChild(d);});
+  // method area
+  const ma=$('method');ma.innerHTML='';
+  s.classes.forEach(c=>{const d=document.createElement('div');d.className='cls'+(c.boot?' boot':'');
+    d.innerHTML=`<b>${c.name}</b><small>${c.fields}</small><span class="ldr">${c.ldr} loader</span>`;ma.appendChild(d);});
+  // jit
+  $('jitCalls').textContent=s.jit.toLocaleString();
+  // console
+  $('console').innerHTML=s.log.length?s.log.map(([c,t])=>`<span class="${c}">${t}</span>`).join('\n'):'<span class="sys">// console output appears here</span>';
+  $('console').scrollTop=$('console').scrollHeight;
+  $('backBtn').disabled=idx===0;$('nextBtn').disabled=idx===STEPS.length-1;
+}
+function next(){if(idx<STEPS.length-1){idx++;render();}else stopAuto();}
+function back(){if(idx>0){idx--;render();}}
+function reset(){stopAuto();idx=0;render();}
+function auto(){if(autoT){stopAuto();return;}$('autoBtn').textContent='Pause ⏸';
+  autoT=setInterval(()=>{if(idx>=STEPS.length-1){stopAuto();return;}idx++;render();},2100);}
+function stopAuto(){if(autoT){clearInterval(autoT);autoT=null;}$('autoBtn').textContent='Auto ⏩';}
+$('nextBtn').onclick=next;$('backBtn').onclick=back;$('resetBtn').onclick=reset;$('autoBtn').onclick=auto;
+render();
+
+/* tabs */
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
+  document.getElementById('tab-sim').classList.toggle('hidden',t.dataset.tab!=='sim');
+  document.getElementById('tab-howto').classList.toggle('hidden',t.dataset.tab!=='howto');
+  window.scrollTo({top:0,behavior:'smooth'});
+}));
+</script>
+</body>
+</html>
