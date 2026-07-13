@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UML Modeling Activity — QuickBite Food Ordering</title>
+<style>
+  :root{
+    --bg:#eef2fb; --panel:#fff; --panel2:#f5f7ff; --ink:#1e2440; --muted:#5c6690;
+    --acc:#4f5bff; --acc2:#8b5cf6; --ok:#16a34a; --bad:#e11d48; --warn:#d97706;
+    --line:#e2e7f5; --shadow:0 8px 24px rgba(40,52,120,.10);
+    --ucfill:#e9ecff; --ucstroke:#4f5bff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1100px 600px at 85% -10%,#dfe6ff 0,transparent 55%),var(--bg);color:var(--ink);line-height:1.55}
+  .wrap{max-width:940px;margin:0 auto;padding:24px 20px 70px}
+  header h1{font-size:1.5rem;margin:0 0 2px}
+  .sub{color:var(--muted);margin:0 0 12px}
+  .prog{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .track{flex:1;background:#e6eafc;border-radius:20px;height:12px;overflow:hidden;border:1px solid var(--line)}
+  .fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));width:0;transition:width .35s ease}
+  .prog .lbl{font-size:.82rem;font-weight:700;color:var(--muted);white-space:nowrap}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .tab{background:#fff;border:1px solid var(--line);color:var(--ink);padding:9px 14px;border-radius:10px;cursor:pointer;font-weight:700;font-size:.86rem;box-shadow:var(--shadow)}
+  .tab:hover{border-color:var(--acc)}
+  .tab.active{background:linear-gradient(135deg,var(--acc),var(--acc2));border-color:transparent;color:#fff}
+  .tabpanel.hidden{display:none}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow)}
+  h2{font-size:1.22rem;margin:2px 0 8px}
+  h3{font-size:1rem;margin:16px 0 6px;color:#2e3a9e}
+  .lead{color:var(--muted)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;background:#eef1fb;padding:1px 6px;border-radius:5px;font-size:.85em;color:#3a3f6b}
+  .badge{display:inline-block;background:#eef0ff;color:#3a3f8f;border:1px solid #d9ddff;border-radius:20px;padding:2px 10px;font-size:.72rem;font-weight:800;margin-bottom:6px}
+  ul,ol{margin:6px 0;padding-left:22px}li{margin:5px 0}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.9rem}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{background:#eef0ff;color:#3a3f8f;font-size:.76rem;text-transform:uppercase;letter-spacing:.4px}
+  .callout{background:#eef0ff;border-left:4px solid var(--acc);border-radius:8px;padding:10px 14px;margin:12px 0;font-size:.92rem}
+  .warn{background:#fff6e6;border-left-color:var(--warn)}
+  .warn b{color:#8a5a00}
+  .pill{display:inline-block;font-size:.72rem;font-weight:700;border-radius:20px;padding:2px 9px;margin:2px 4px 2px 0}
+  .pill.a{background:#e9f9ef;color:#166534;border:1px solid #bfe8cd}
+  .pill.u{background:#eef0ff;color:#3a3f8f;border:1px solid #d9ddff}
+  /* checklist */
+  .chk{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);margin:6px 0;cursor:pointer;transition:.12s}
+  .chk:hover{border-color:var(--acc)}
+  .chk .box{width:20px;height:20px;border:2px solid #c3cbea;border-radius:6px;flex:0 0 auto;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#fff}
+  .chk.done{background:#e9f9ef;border-color:#bfe8cd}
+  .chk.done .box{background:var(--ok);border-color:var(--ok)}
+  .chk.done .txt{color:#166534}
+  .chk .txt{font-size:.9rem}
+  /* diagrams */
+  .diagram{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+  .diagram .cap{font-size:.78rem;color:var(--muted);font-weight:700;margin-bottom:6px}
+  svg.uml{width:100%;height:auto;display:block}
+  .uml text{font-family:-apple-system,Arial,sans-serif;font-size:12px;fill:var(--ink)}
+  .uml .ttl{font-weight:800;font-size:13px}
+  .uml .fig{stroke:#33406b;stroke-width:2;fill:none;stroke-linecap:round}
+  .uml .head{fill:#fff;stroke:#33406b;stroke-width:2}
+  .uml .uc{fill:var(--ucfill);stroke:var(--ucstroke);stroke-width:1.8}
+  .uml .bound{fill:#fbfcff;stroke:#c3cbea;stroke-width:1.6}
+  .uml .btitle{fill:#7581ad;font-weight:800;font-size:12px}
+  .uml .assoc{stroke:#8590b5;stroke-width:1.8}
+  .uml .dep{stroke:#5a6699;stroke-width:1.6;stroke-dasharray:5 4;fill:none}
+  .uml .life{stroke:#9aa4c8;stroke-width:1.4;stroke-dasharray:4 4}
+  .uml .llbox{fill:#eef0ff;stroke:var(--acc);stroke-width:1.6}
+  .uml .act{fill:#dfe4ff;stroke:var(--acc);stroke-width:1.2}
+  .uml .msg{stroke:#33406b;stroke-width:1.7;fill:none}
+  .uml .ret{stroke:#8590b5;stroke-width:1.4;stroke-dasharray:5 4;fill:none}
+  .uml .ah{fill:#33406b}
+  .uml .frag{fill:none;stroke:#b9a6e6;stroke-width:1.3}
+  .uml .fraglbl{fill:#7c3aed;font-weight:800;font-size:10px}
+  .uml .clsbox{fill:#fff;stroke:var(--acc);stroke-width:1.6}
+  .uml .clst{fill:#eef0ff;stroke:var(--acc);stroke-width:1.6}
+  .uml .mono{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:11px}
+  .uml .lbl{font-size:11px;fill:#3a3f8f;font-weight:700}
+  .uml .dia{fill:#33406b;stroke:#33406b}
+  .uml .tri{fill:#fff;stroke:#33406b;stroke-width:1.6}
+  .foot{font-size:.82rem;color:var(--muted);margin-top:8px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:680px){.grid2{grid-template-columns:1fr}}
+  /* wireframe mockups */
+  .screens{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 4px}
+  .phone{width:130px}
+  .phone svg{width:100%;height:auto;display:block;filter:drop-shadow(0 5px 12px rgba(40,52,120,.12))}
+  .pcap{text-align:center;font-size:.73rem;color:var(--muted);font-weight:700;margin-top:4px}
+  .pm-title{font-family:Arial,sans-serif;font-size:9px;fill:#fff;font-weight:700}
+  .pm-t{font-family:Arial,sans-serif;font-size:9px;fill:#1e2440;font-weight:600}
+  .pm-mut{font-family:Arial,sans-serif;font-size:8.5px;fill:#8890b5}
+  .pm-acc{font-family:Arial,sans-serif;font-size:8.5px;fill:#4f5bff;font-weight:700}
+  .pm-btnp{font-family:Arial,sans-serif;font-size:9px;fill:#fff;font-weight:700}
+  .pm-star{font-size:11px;fill:#f5a623}
+  .pm-ok{font-family:Arial,sans-serif;font-size:8.5px;fill:#166534;font-weight:700}
+  .uml .pm-mut2{font-size:9px;fill:#8890b5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🍔 UML Modeling Activity — “QuickBite” Food Ordering</h1>
+    <p class="sub">Model one system three ways: a use case diagram, a sequence diagram for each use case, and a class diagram.</p>
+    <div class="prog"><span class="lbl">Progress</span><div class="track"><div class="fill" id="fill"></div></div><span class="lbl" id="pcount">0 / 0</span></div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="over">Overview</button>
+    <button class="tab" data-tab="scen">Scenario</button>
+    <button class="tab" data-tab="p1">1 · Use Case</button>
+    <button class="tab" data-tab="p2">2 · Sequence</button>
+    <button class="tab" data-tab="p3">3 · Class</button>
+    <button class="tab" data-tab="rub">Rubric &amp; Submit</button>
+  </div>
+
+  <!-- ============ OVERVIEW ============ -->
+  <div class="tabpanel" id="tab-over">
+    <div class="card">
+      <span class="badge">GOAL</span>
+      <h2 style="margin-top:2px">Turn a plain-English system into three connected UML views</h2>
+      <p class="lead">You will be given a short description of an online food-ordering system, <b>QuickBite</b>. Working from that description, you will produce three deliverables that must stay consistent with one another:</p>
+      <ol>
+        <li><b>One use case diagram</b> — who uses the system and what they can do.</li>
+        <li><b>A sequence diagram for <u>each</u> use case</b> — the step-by-step message flow that realises it.</li>
+        <li><b>One class diagram</b> — the classes, attributes, methods, and relationships behind it all.</li>
+      </ol>
+      <h3>Learning objectives</h3>
+      <ul>
+        <li>Extract actors and use cases from a requirements description.</li>
+        <li>Model dynamic behaviour with sequence diagrams (lifelines, messages, returns, fragments).</li>
+        <li>Derive a static class model from behaviour and check the three views agree.</li>
+      </ul>
+      <h3>The workflow</h3>
+      <div class="diagram">
+        <div class="cap">How the three views connect</div>
+        <svg class="uml" viewBox="0 0 720 90">
+          <g class="flow">
+            <rect x="4" y="26" width="130" height="40" rx="8" class="clsbox"/><text x="69" y="51" text-anchor="middle" class="ttl">Scenario</text>
+            <rect x="170" y="26" width="140" height="40" rx="8" class="clst"/><text x="240" y="51" text-anchor="middle" class="ttl">Use Case dia.</text>
+            <rect x="346" y="26" width="180" height="40" rx="8" class="clst"/><text x="436" y="46" text-anchor="middle" class="ttl">Sequence dia.</text><text x="436" y="60" text-anchor="middle" class="lbl">one per use case</text>
+            <rect x="562" y="26" width="150" height="40" rx="8" class="clst"/><text x="637" y="51" text-anchor="middle" class="ttl">Class diagram</text>
+            <line x1="134" y1="46" x2="168" y2="46" class="msg"/><polygon class="ah" points="168,46 160,42 160,50"/>
+            <line x1="310" y1="46" x2="344" y2="46" class="msg"/><polygon class="ah" points="344,46 336,42 336,50"/>
+            <line x1="526" y1="46" x2="560" y2="46" class="msg"/><polygon class="ah" points="560,46 552,42 552,50"/>
+          </g>
+        </svg>
+        <div class="foot">Each arrow is also a consistency check: every use case needs a sequence diagram, and every lifeline/message in your sequence diagrams should map to a class/method in your class diagram.</div>
+      </div>
+      <h3>Suggested timeline (≈ 90 minutes, teams of 2–3)</h3>
+      <table>
+        <thead><tr><th>Time</th><th>Activity</th></tr></thead>
+        <tbody>
+          <tr><td>0–10 min</td><td>Read the scenario; list candidate actors and use cases.</td></tr>
+          <tr><td>10–25 min</td><td>Draw the use case diagram (Part 1).</td></tr>
+          <tr><td>25–55 min</td><td>Draw one sequence diagram per use case (Part 2).</td></tr>
+          <tr><td>55–75 min</td><td>Derive the class diagram; run the consistency check (Part 3).</td></tr>
+          <tr><td>75–90 min</td><td>Peer review against the rubric; fix and submit.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">Tools: draw by hand and photograph, or use <b>draw.io / diagrams.net</b>, <b>PlantUML</b>, <b>Mermaid</b>, or Lucidchart. Any tool is fine — the modeling is what’s graded.</div>
+    </div>
+  </div>
+
+  <!-- ============ SCENARIO ============ -->
+  <div class="tabpanel hidden" id="tab-scen">
+    <div class="card">
+      <span class="badge">THE SYSTEM</span>
+      <h2 style="margin-top:2px">QuickBite — requirements brief</h2>
+      <p>QuickBite is an online food-ordering service. Read it carefully; every actor and use case you need is hiding in this text.</p>
+      <div class="callout" style="background:#fbfcff;border-left-color:#c3cbea">
+        A <b>Customer</b> creates an account and logs in. They browse restaurants and view a restaurant’s menu, then place an order by adding menu items to a cart and checking out. During checkout the system takes payment through an external <b>Payment Gateway</b>. After ordering, the customer can track the order’s status and, once it is delivered, rate the order.<br><br>
+        A <b>Restaurant</b> receives new orders, confirms (or rejects) them, and updates the order status as the food is prepared. A <b>Delivery Driver</b> sees available deliveries, accepts one, and marks it as delivered. The system notifies the customer whenever the order status changes.
+      </div>
+      <h3>Candidate actors (to get you started — decide which are primary vs supporting)</h3>
+      <div><span class="pill a">Customer</span><span class="pill a">Restaurant</span><span class="pill a">Delivery Driver</span><span class="pill a">Payment Gateway (external)</span></div>
+      <h3>Some candidate use cases (find the rest, and trim any that don’t belong)</h3>
+      <div>
+        <span class="pill u">Register / Login</span><span class="pill u">Browse Restaurants</span><span class="pill u">View Menu</span>
+        <span class="pill u">Place Order</span><span class="pill u">Make Payment</span><span class="pill u">Track Order</span>
+        <span class="pill u">Rate Order</span><span class="pill u">Confirm Order</span><span class="pill u">Update Order Status</span>
+        <span class="pill u">Accept Delivery</span><span class="pill u">Mark Delivered</span>
+      </div>
+      <div class="callout warn"><b>Scope it:</b> pick <b>4–6 core use cases</b> to model fully (you must draw a sequence diagram for each one you keep). Quality over quantity — a coherent, consistent set beats a huge messy one.</div>
+    </div>
+
+    <div class="card">
+      <span class="badge">DRAFT UI</span>
+      <h2 style="margin-top:2px">What the app looks like (draft screens &amp; flow)</h2>
+      <p class="lead">These low-fidelity wireframes are a <b>rough idea</b> of QuickBite — not a spec. Use them to picture the actors, screens, and the order of steps. Your diagrams should capture this <em>behaviour</em>, not these exact pixels.</p>
+
+      <h3>Customer app</h3>
+      <div class="screens" id="galCust"></div>
+
+      <h3>Restaurant &amp; Driver</h3>
+      <div class="screens" id="galStaff"></div>
+
+      <h3>Screen flow — how you move between screens</h3>
+      <div class="diagram">
+        <div class="cap">Customer navigation (Restaurant &amp; Driver act on the same order behind the scenes)</div>
+        <svg class="uml" viewBox="0 0 620 206">
+          <!-- Row 1 -->
+          <rect class="clst" x="16" y="18" width="120" height="40" rx="8"/><text x="76" y="42" text-anchor="middle" class="lbl">Login</text>
+          <rect class="clst" x="166" y="18" width="120" height="40" rx="8"/><text x="226" y="42" text-anchor="middle" class="lbl">Restaurants</text>
+          <rect class="clst" x="316" y="18" width="120" height="40" rx="8"/><text x="376" y="42" text-anchor="middle" class="lbl">Menu</text>
+          <rect class="clst" x="466" y="18" width="120" height="40" rx="8"/><text x="526" y="42" text-anchor="middle" class="lbl">Cart</text>
+          <line class="msg" x1="136" y1="38" x2="164" y2="38"/><polygon class="ah" points="164,38 156,34 156,42"/>
+          <line class="msg" x1="286" y1="38" x2="314" y2="38"/><polygon class="ah" points="314,38 306,34 306,42"/>
+          <line class="msg" x1="436" y1="38" x2="464" y2="38"/><polygon class="ah" points="464,38 456,34 456,42"/>
+          <!-- connector: Cart -> Payment -->
+          <line class="msg" x1="526" y1="58" x2="526" y2="116"/><polygon class="ah" points="526,116 522,108 530,108"/>
+          <text x="540" y="90" class="fraglbl">checkout</text>
+          <!-- Row 2 (right to left) -->
+          <rect class="clst" x="466" y="116" width="120" height="40" rx="8"/><text x="526" y="140" text-anchor="middle" class="lbl">Payment</text>
+          <rect class="clst" x="316" y="116" width="120" height="40" rx="8"/><text x="376" y="140" text-anchor="middle" class="lbl">Track Order</text>
+          <rect class="clst" x="166" y="116" width="120" height="40" rx="8"/><text x="226" y="140" text-anchor="middle" class="lbl">Rate Order</text>
+          <line class="msg" x1="466" y1="136" x2="438" y2="136"/><polygon class="ah" points="438,136 446,132 446,140"/>
+          <line class="msg" x1="316" y1="136" x2="288" y2="136"/><polygon class="ah" points="288,136 296,132 296,140"/>
+          <!-- caption bar -->
+          <rect class="bound" x="16" y="172" width="570" height="26" rx="8" style="fill:#fbfcff"/>
+          <text x="301" y="189" text-anchor="middle" class="pm-mut2">Restaurant confirms &amp; updates status · Driver accepts &amp; marks delivered — both act on Order #1042 while the customer tracks it.</text>
+        </svg>
+      </div>
+
+      <div class="callout warn"><b>Reading the sketch for modeling:</b> each screen hints at a use case (Login, Browse Restaurants, View Menu, Place Order, Make Payment, Track Order, Rate Order) and at classes (Restaurant, MenuItem, Cart/Order, Payment, Delivery). The arrows show navigation — that maps to the <em>order of steps</em> you’ll draw in your sequence diagrams.</div>
+    </div>
+  </div>
+
+  <!-- ============ PART 1 : USE CASE ============ -->
+  <div class="tabpanel hidden" id="tab-p1">
+    <div class="card">
+      <span class="badge">PART 1 · USE CASE DIAGRAM</span>
+      <h2 style="margin-top:2px">Who uses QuickBite, and what can they do?</h2>
+      <p class="lead">Show the actors, the use cases inside the system boundary, and the relationships between them.</p>
+
+      <div class="grid2">
+        <div>
+          <h3>Notation you’ll use</h3>
+          <div class="diagram">
+            <div class="cap">Elements &amp; relationships</div>
+            <svg class="uml" viewBox="0 0 320 210">
+              <!-- actor -->
+              <g><circle class="head" cx="34" cy="30" r="9"/><line class="fig" x1="34" y1="39" x2="34" y2="60"/><line class="fig" x1="22" y1="47" x2="46" y2="47"/><line class="fig" x1="34" y1="60" x2="24" y2="76"/><line class="fig" x1="34" y1="60" x2="44" y2="76"/><text x="34" y="92" text-anchor="middle">Actor</text></g>
+              <!-- use case -->
+              <ellipse class="uc" cx="150" cy="34" rx="66" ry="24"/><text x="150" y="38" text-anchor="middle">Use Case</text>
+              <text x="150" y="82" text-anchor="middle" class="lbl">an oval = a goal</text>
+              <!-- boundary -->
+              <rect class="bound" x="250" y="12" width="62" height="66" rx="6"/><text x="281" y="95" text-anchor="middle" class="lbl">System boundary</text>
+              <!-- association -->
+              <line class="assoc" x1="20" y1="130" x2="120" y2="130"/><text x="70" y="120" text-anchor="middle" class="lbl">association</text>
+              <!-- include -->
+              <line class="dep" x1="150" y1="150" x2="250" y2="150"/><polygon class="ah" points="250,150 242,146 242,154"/><text x="200" y="142" text-anchor="middle" class="fraglbl">«include»</text>
+              <!-- extend -->
+              <line class="dep" x1="150" y1="182" x2="250" y2="182"/><polygon class="ah" points="250,182 242,178 242,186"/><text x="200" y="174" text-anchor="middle" class="fraglbl">«extend»</text>
+              <text x="20" y="168" class="lbl">base ──▷ included (always)</text>
+              <text x="20" y="200" class="lbl">extension ──▷ base (sometimes)</text>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <h3>Worked mini-example (different domain)</h3>
+          <div class="diagram">
+            <div class="cap">A coffee shop — so you see the shape, not the answer</div>
+            <svg class="uml" viewBox="0 0 340 210">
+              <rect class="bound" x="110" y="24" width="150" height="150" rx="10"/><text x="185" y="44" text-anchor="middle" class="btitle">Coffee Shop</text>
+              <!-- customer -->
+              <g><circle class="head" cx="34" cy="86" r="10"/><line class="fig" x1="34" y1="96" x2="34" y2="120"/><line class="fig" x1="20" y1="106" x2="48" y2="106"/><line class="fig" x1="34" y1="120" x2="24" y2="138"/><line class="fig" x1="34" y1="120" x2="44" y2="138"/><text x="34" y="156" text-anchor="middle">Customer</text></g>
+              <!-- barista -->
+              <g><circle class="head" cx="306" cy="86" r="10"/><line class="fig" x1="306" y1="96" x2="306" y2="120"/><line class="fig" x1="292" y1="106" x2="320" y2="106"/><line class="fig" x1="306" y1="120" x2="296" y2="138"/><line class="fig" x1="306" y1="120" x2="316" y2="138"/><text x="306" y="156" text-anchor="middle">Barista</text></g>
+              <ellipse class="uc" cx="185" cy="74" rx="66" ry="24"/><text x="185" y="78" text-anchor="middle">Order Coffee</text>
+              <ellipse class="uc" cx="185" cy="140" rx="46" ry="20"/><text x="185" y="144" text-anchor="middle">Pay</text>
+              <line class="assoc" x1="50" y1="98" x2="122" y2="80"/>
+              <line class="assoc" x1="290" y1="98" x2="248" y2="80"/>
+              <line class="dep" x1="185" y1="98" x2="185" y2="120"/><polygon class="ah" points="185,120 181,112 189,112"/><text x="222" y="112" text-anchor="middle" class="fraglbl">«include»</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <h3>Your checklist</h3>
+      <div class="chk"><div class="box">✓</div><div class="txt">Every actor from the scenario appears (human <em>and</em> external systems like the Payment Gateway).</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">You marked which actor is <b>primary</b> (initiates) vs <b>supporting</b> for each use case.</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">4–6 use cases, each a <b>goal</b> (a verb phrase), all inside the system boundary.</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">At least one <b>«include»</b> (e.g. Place Order includes Make Payment) with the arrow pointing to the included case.</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">At least one <b>«extend»</b> (e.g. Rate Order extends after delivery) with the arrow pointing to the base case.</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">No implementation detail (no “loop through cart”, no database tables) — only user-visible goals.</div></div>
+
+      <div class="callout warn"><b>Common mistakes:</b> making use cases too tiny (each button click is <em>not</em> a use case); drawing arrows to imply order (use case diagrams have no sequence); forgetting the external Payment Gateway is an actor.</div>
+    </div>
+  </div>
+
+  <!-- ============ PART 2 : SEQUENCE ============ -->
+  <div class="tabpanel hidden" id="tab-p2">
+    <div class="card">
+      <span class="badge">PART 2 · SEQUENCE DIAGRAMS</span>
+      <h2 style="margin-top:2px">One sequence diagram for <u>each</u> use case</h2>
+      <p class="lead">A sequence diagram shows the objects that collaborate to carry out a use case and the messages they exchange, top to bottom in time.</p>
+
+      <div class="grid2">
+        <div>
+          <h3>Notation you’ll use</h3>
+          <ul style="font-size:.9rem">
+            <li><b>Lifelines</b> — a box at the top (an actor or an <code>:Object</code>) with a dashed line down.</li>
+            <li><b>Activation bar</b> — the thin rectangle while an object is doing work.</li>
+            <li><b>Message</b> — solid arrow with a filled head (a method call).</li>
+            <li><b>Return</b> — dashed arrow back (the result).</li>
+            <li><b>Fragments</b> — <code>alt</code> (choice), <code>opt</code> (optional), <code>loop</code> (repeat) in a labelled box.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Worked mini-example: “Order Coffee”</h3>
+          <div class="diagram">
+            <div class="cap">Lifelines · messages · a return · an alt fragment</div>
+            <svg class="uml" viewBox="0 0 460 320">
+              <!-- lifelines heads -->
+              <rect class="llbox" x="20" y="14" width="90" height="30" rx="6"/><text x="65" y="34" text-anchor="middle" class="mono">Customer</text>
+              <rect class="llbox" x="150" y="14" width="110" height="30" rx="6"/><text x="205" y="34" text-anchor="middle" class="mono">:OrderService</text>
+              <rect class="llbox" x="300" y="14" width="60" height="30" rx="6"/><text x="330" y="34" text-anchor="middle" class="mono">:Order</text>
+              <rect class="llbox" x="380" y="14" width="70" height="30" rx="6"/><text x="415" y="34" text-anchor="middle" class="mono">:Payment</text>
+              <!-- lifelines -->
+              <line class="life" x1="65" y1="44" x2="65" y2="304"/>
+              <line class="life" x1="205" y1="44" x2="205" y2="304"/>
+              <line class="life" x1="330" y1="44" x2="330" y2="304"/>
+              <line class="life" x1="415" y1="44" x2="415" y2="304"/>
+              <!-- activations -->
+              <rect class="act" x="199" y="66" width="12" height="180"/>
+              <rect class="act" x="324" y="92" width="12" height="26"/>
+              <rect class="act" x="409" y="150" width="12" height="40"/>
+              <!-- messages -->
+              <line class="msg" x1="65" y1="66" x2="199" y2="66"/><polygon class="ah" points="199,66 191,62 191,70"/><text x="130" y="60" text-anchor="middle" class="mono">orderCoffee(items)</text>
+              <line class="msg" x1="211" y1="92" x2="324" y2="92"/><polygon class="ah" points="324,92 316,88 316,96"/><text x="268" y="86" text-anchor="middle" class="mono">create()</text>
+              <line class="msg" x1="211" y1="150" x2="409" y2="150"/><polygon class="ah" points="409,150 401,146 401,154"/><text x="300" y="144" text-anchor="middle" class="mono">charge(total)</text>
+              <line class="ret" x1="409" y1="190" x2="213" y2="190"/><polygon class="ah" points="213,190 221,186 221,194"/><text x="300" y="184" text-anchor="middle" class="mono">paid / declined</text>
+              <!-- alt fragment -->
+              <rect class="frag" x="150" y="206" width="290" height="70" rx="4"/>
+              <path class="frag" d="M150 206 h44 v14 l-10 8 h-34 z"/><text x="168" y="220" class="fraglbl">alt</text>
+              <text x="205" y="234" class="mono" fill="#4a5578">[paid]  confirm order</text>
+              <line class="frag" x1="150" y1="244" x2="440" y2="244"/>
+              <text x="205" y="262" class="mono" fill="#4a5578">[declined]  ask again</text>
+              <!-- return to customer -->
+              <line class="ret" x1="199" y1="292" x2="67" y2="292"/><polygon class="ah" points="67,292 75,288 75,296"/><text x="132" y="286" text-anchor="middle" class="mono">confirmation</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <h3>Do this for every use case you kept</h3>
+      <div class="chk"><div class="box">✓</div><div class="txt">There is <b>exactly one sequence diagram per use case</b> in your set.</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">The <b>primary actor</b> is the leftmost lifeline; supporting actors/systems (e.g. Payment Gateway) appear as lifelines too.</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">Messages are labelled like method calls (<code>placeOrder(cart)</code>, <code>charge(total)</code>) with at least one <b>return</b>.</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">You used a fragment (<code>alt</code>/<code>opt</code>/<code>loop</code>) wherever the flow branches or repeats (e.g. payment success vs failure).</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">You noted the objects that appear here — they will become <b>classes</b> in Part 3.</div></div>
+      <div class="callout"><b>Tip:</b> keep a <code>:Controller</code>/<code>:Service</code> object between the actor and the domain objects — it keeps each diagram clean and mirrors real designs.</div>
+    </div>
+  </div>
+
+  <!-- ============ PART 3 : CLASS ============ -->
+  <div class="tabpanel hidden" id="tab-p3">
+    <div class="card">
+      <span class="badge">PART 3 · CLASS DIAGRAM</span>
+      <h2 style="margin-top:2px">The classes behind the behaviour</h2>
+      <p class="lead">Derive the static structure from your scenario and sequence diagrams, then connect the classes with relationships.</p>
+
+      <h3>How to derive it</h3>
+      <ul>
+        <li><b>Nouns → classes/attributes.</b> “Customer places an <u>order</u> of menu <u>items</u>” ⇒ classes <code>Order</code>, <code>MenuItem</code>; data like price/quantity ⇒ attributes.</li>
+        <li><b>Messages → methods.</b> Every message arriving at a lifeline in Part 2 is a method on that class (e.g. <code>Order.addItem()</code>, <code>Payment.charge()</code>).</li>
+        <li><b>Relationships → associations.</b> Add multiplicities (1, 0..1, *, 1..*) and use aggregation/composition or inheritance where they fit.</li>
+      </ul>
+
+      <div class="grid2">
+        <div>
+          <h3>Notation you’ll use</h3>
+          <div class="diagram">
+            <div class="cap">Class box, association, multiplicity, composition, inheritance</div>
+            <svg class="uml" viewBox="0 0 320 200">
+              <!-- class box with 3 compartments -->
+              <rect class="clsbox" x="16" y="16" width="150" height="96"/>
+              <rect class="clst" x="16" y="16" width="150" height="22"/>
+              <text x="91" y="31" text-anchor="middle" class="ttl">ClassName</text>
+              <line x1="16" y1="66" x2="166" y2="66" stroke="#4f5bff" stroke-width="1.2"/>
+              <text x="24" y="52" class="mono">- attribute: Type</text>
+              <text x="24" y="82" class="mono">+ method(): Type</text>
+              <text x="24" y="98" class="mono">+ method2()</text>
+              <text x="16" y="132" class="lbl">3 compartments: name · attributes · methods</text>
+              <!-- inheritance triangle -->
+              <line class="assoc" x1="250" y1="150" x2="250" y2="60"/><polygon class="tri" points="250,44 242,60 258,60"/>
+              <text x="256" y="52" class="lbl">▲ inheritance</text>
+              <text x="200" y="176" class="lbl">◆ composition   ◇ aggregation</text>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <h3>Worked mini-example (coffee shop)</h3>
+          <div class="diagram">
+            <div class="cap">Association + multiplicity + composition</div>
+            <svg class="uml" viewBox="0 0 340 220">
+              <!-- Order -->
+              <rect class="clsbox" x="12" y="20" width="140" height="92"/><rect class="clst" x="12" y="20" width="140" height="22"/>
+              <text x="82" y="35" text-anchor="middle" class="ttl">Order</text>
+              <line x1="12" y1="70" x2="152" y2="70" stroke="#4f5bff" stroke-width="1.2"/>
+              <text x="20" y="56" class="mono">- total: double</text>
+              <text x="20" y="86" class="mono">+ addItem()</text>
+              <text x="20" y="102" class="mono">+ total()</text>
+              <!-- OrderLine -->
+              <rect class="clsbox" x="200" y="20" width="128" height="76"/><rect class="clst" x="200" y="20" width="128" height="22"/>
+              <text x="264" y="35" text-anchor="middle" class="ttl">OrderLine</text>
+              <line x1="200" y1="70" x2="328" y2="70" stroke="#4f5bff" stroke-width="1.2"/>
+              <text x="208" y="56" class="mono">- qty: int</text>
+              <text x="208" y="86" class="mono">+ subtotal()</text>
+              <!-- MenuItem -->
+              <rect class="clsbox" x="200" y="140" width="128" height="66"/><rect class="clst" x="200" y="140" width="128" height="22"/>
+              <text x="264" y="155" text-anchor="middle" class="ttl">MenuItem</text>
+              <line x1="200" y1="190" x2="328" y2="190" stroke="#4f5bff" stroke-width="1.2"/>
+              <text x="208" y="176" class="mono">- name  - price</text>
+              <!-- composition Order <>-- OrderLine -->
+              <line class="assoc" x1="152" y1="60" x2="200" y2="60"/>
+              <polygon class="dia" points="152,60 160,55 168,60 160,65"/>
+              <text x="158" y="50" class="lbl">1</text><text x="192" y="50" class="lbl">*</text>
+              <!-- OrderLine -- MenuItem -->
+              <line class="assoc" x1="264" y1="96" x2="264" y2="140"/>
+              <text x="272" y="112" class="lbl">*</text><text x="272" y="136" class="lbl">1</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <h3>Your checklist</h3>
+      <div class="chk"><div class="box">✓</div><div class="txt">Every lifeline object from your sequence diagrams is a <b>class</b> here (and vice-versa — no orphan classes).</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">Each class has meaningful <b>attributes</b> (data) and <b>methods</b> (from the messages in Part 2).</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">Associations have <b>multiplicities</b> (e.g. a Customer has <code>*</code> Orders; an Order has <code>1..*</code> OrderLines).</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">You used <b>composition/aggregation</b> where a whole owns its parts, and <b>inheritance</b> only if a real “is-a” exists.</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt"><b>Consistency check passed:</b> every use case → a sequence diagram → classes &amp; methods that all appear here.</div></div>
+    </div>
+  </div>
+
+  <!-- ============ RUBRIC ============ -->
+  <div class="tabpanel hidden" id="tab-rub">
+    <div class="card">
+      <span class="badge">ASSESSMENT</span>
+      <h2 style="margin-top:2px">Rubric (100 points)</h2>
+      <table>
+        <thead><tr><th>Criterion</th><th>Excellent</th><th>Adequate</th><th>Needs work</th><th>Pts</th></tr></thead>
+        <tbody>
+          <tr><td><b>Use case diagram</b></td><td>All actors incl. external; correct «include»/«extend»; clean boundary; goal-level use cases.</td><td>Most actors/use cases; minor relationship or scope slips.</td><td>Missing actors; wrong/absent relationships; button-level use cases.</td><td>25</td></tr>
+          <tr><td><b>Sequence diagrams</b></td><td>One per use case; correct lifelines, messages, returns, and fragments; realistic flow.</td><td>Most use cases covered; some missing returns/fragments.</td><td>Missing diagrams; vague messages; no returns/fragments.</td><td>30</td></tr>
+          <tr><td><b>Class diagram</b></td><td>Complete classes with attributes/methods; correct associations &amp; multiplicities; sound composition/inheritance.</td><td>Core classes present; some multiplicities or methods missing.</td><td>Sparse/incorrect classes; no multiplicities.</td><td>25</td></tr>
+          <tr><td><b>Consistency</b></td><td>The three views fully agree (use case ↔ sequence ↔ class).</td><td>Mostly consistent; a few mismatches.</td><td>Views contradict each other.</td><td>15</td></tr>
+          <tr><td><b>Presentation</b></td><td>Clear, legible, standard UML notation; labelled.</td><td>Readable with minor notation errors.</td><td>Hard to read; non-standard symbols.</td><td>5</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Submission checklist</h3>
+      <div class="chk"><div class="box">✓</div><div class="txt">Use case diagram (1).</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">Sequence diagrams — one per use case in your set.</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">Class diagram (1).</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">A short note (3–4 sentences) listing the actors and use cases you chose and why.</div></div>
+      <div class="chk"><div class="box">✓</div><div class="txt">Team members’ names; export as a single PDF (or clear photos).</div></div>
+
+      <div class="callout">Reset your ticks any time by reloading the page. Progress is tracked in the bar at the top — aim to finish every box before you submit.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* tabs */
+const panels=['over','scen','p1','p2','p3','rub'];
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
+  panels.forEach(p=>document.getElementById('tab-'+p).classList.toggle('hidden',p!==t.dataset.tab));
+  window.scrollTo({top:0,behavior:'smooth'});
+}));
+/* checklist progress */
+const items=[...document.querySelectorAll('.chk')];
+function upd(){const done=items.filter(i=>i.classList.contains('done')).length;
+  document.getElementById('fill').style.width=(items.length?done/items.length*100:0)+'%';
+  document.getElementById('pcount').textContent=done+' / '+items.length;}
+items.forEach(i=>i.addEventListener('click',()=>{i.classList.toggle('done');upd();}));
+upd();
+
+/* ---- wireframe mockups ---- */
+const H={logo:44,field:28,search:28,row:28,btn:32,stars:28,status:40,text:20};
+function box(x,y,w,h,f,s,rx){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx||6}" fill="${f}" stroke="${s}" stroke-width="1.3"/>`;}
+function ui(e,x,y,w){
+  switch(e.t){
+    case 'logo':   return `<circle cx="${x+w/2}" cy="${y+13}" r="11" fill="#eef0ff" stroke="#4f5bff" stroke-width="1.4"/><text x="${x+w/2}" y="${y+37}" text-anchor="middle" class="pm-t">${e.txt}</text>`;
+    case 'field':  return box(x,y,w,20,'#fff','#c7d0ea')+`<text x="${x+7}" y="${y+14}" class="pm-mut">${e.txt}</text>`;
+    case 'search': return box(x,y,w,20,'#f2f4fd','#c7d0ea',10)+`<text x="${x+7}" y="${y+14}" class="pm-mut">🔍 ${e.txt}</text>`;
+    case 'row':    return box(x,y,w,20,'#f7f8fe','#e6eafc')+`<text x="${x+7}" y="${y+14}" class="pm-t">${e.txt}</text>`+(e.r?`<text x="${x+w-7}" y="${y+14}" text-anchor="end" class="pm-acc">${e.r}</text>`:'');
+    case 'btn':    return box(x,y,w,24,e.p?'#4f5bff':'#fff',e.p?'#4f5bff':'#c7d0ea',8)+`<text x="${x+w/2}" y="${y+16}" text-anchor="middle" class="${e.p?'pm-btnp':'pm-t'}">${e.txt}</text>`;
+    case 'stars':  return `<text x="${x}" y="${y+18}" class="pm-star">★ ★ ★ ★ ★</text>`;
+    case 'status': return box(x,y,w,32,'#eef9f0','#bfe8cd',8)+`<text x="${x+7}" y="${y+14}" class="pm-ok">${e.txt}</text>`+(e.txt2?`<text x="${x+7}" y="${y+27}" class="pm-mut">${e.txt2}</text>`:'');
+    case 'text':   return `<text x="${x}" y="${y+12}" class="pm-t">${e.txt}</text>`;
+  }
+  return '';
+}
+function phone(scr){
+  let s=`<svg viewBox="0 0 150 250">`;
+  s+=box(2,2,146,246,'#fff','#cfd6ee',18);
+  s+=box(10,10,130,24,'#4f5bff','#4f5bff',8)+`<text x="75" y="26" text-anchor="middle" class="pm-title">${scr.title}</text>`;
+  let y=46;const x=14,w=122;
+  scr.el.forEach(e=>{ s+=ui(e,x,y,w); y+=H[e.t]; });
+  s+=`</svg>`;
+  return `<div class="phone">${s}<div class="pcap">${scr.name}</div></div>`;
+}
+const CUST=[
+  {name:'1 · Login',title:'QuickBite',el:[{t:'logo',txt:'QuickBite'},{t:'field',txt:'Email'},{t:'field',txt:'Password'},{t:'btn',p:1,txt:'Log In'}]},
+  {name:'2 · Restaurants',title:'Restaurants',el:[{t:'search',txt:'Search…'},{t:'row',txt:'🍕 Pizza Palace',r:'★4.7'},{t:'row',txt:'🍔 Burger Barn',r:'★4.5'},{t:'row',txt:'🥗 Green Bowl',r:'★4.8'}]},
+  {name:'3 · Menu',title:'Pizza Palace',el:[{t:'text',txt:'Menu'},{t:'row',txt:'Margherita',r:'＋ $9'},{t:'row',txt:'Pepperoni',r:'＋ $11'},{t:'row',txt:'Garlic Bread',r:'＋ $4'}]},
+  {name:'4 · Cart',title:'Your Cart',el:[{t:'row',txt:'Margherita ×1',r:'$9'},{t:'row',txt:'Garlic Bread',r:'$4'},{t:'row',txt:'Total',r:'$13'},{t:'btn',p:1,txt:'Checkout'}]},
+  {name:'5 · Payment',title:'Payment',el:[{t:'text',txt:'Card details'},{t:'field',txt:'Card number'},{t:'field',txt:'Expiry / CVC'},{t:'btn',p:1,txt:'Pay $13'}]},
+  {name:'6 · Track Order',title:'Order #1042',el:[{t:'status',txt:'Cooking…',txt2:'Placed ✓ · Driver assigned'},{t:'row',txt:'ETA 20 min'},{t:'text',txt:'On the way 🛵'}]},
+  {name:'7 · Rate Order',title:'Rate order',el:[{t:'text',txt:'How was it?'},{t:'stars'},{t:'field',txt:'Comment'},{t:'btn',p:1,txt:'Submit'}]},
+];
+const STAFF=[
+  {name:'Restaurant · Orders',title:'Incoming',el:[{t:'text',txt:'New orders'},{t:'row',txt:'#1042 Margherita',r:'new'},{t:'btn',p:1,txt:'Confirm'},{t:'btn',txt:'Reject'}]},
+  {name:'Driver · Deliveries',title:'Deliveries',el:[{t:'text',txt:'Available'},{t:'row',txt:'#1042 → 5th Ave',r:'2 km'},{t:'btn',p:1,txt:'Accept'},{t:'btn',txt:'Mark Delivered'}]},
+];
+document.getElementById('galCust').innerHTML=CUST.map(phone).join('');
+document.getElementById('galStaff').innerHTML=STAFF.map(phone).join('');
+</script>
+</body>
+</html>
