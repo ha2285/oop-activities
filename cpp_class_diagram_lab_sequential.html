@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>C++ Class Diagram Studio</title>
+<style>
+:root{--bg:#07101f;--panel:#0d192b;--panel2:#12243b;--line:#2b4564;--text:#eef5ff;--muted:#9eb0c8;--blue:#56a8ff;--cyan:#58e1d2;--gold:#ffc857;--red:#ff6b7a;--green:#65df9b}
+*{box-sizing:border-box}body{margin:0;background:#07101f;color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif}button,select{font:inherit}
+header{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:14px 18px;background:#091426;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}.brand{display:flex;align-items:center;gap:10px}.logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:grid;place-items:center;color:#04111f;font-weight:900}.brand h1{font-size:17px;margin:0}.brand small,.mini{color:var(--muted);font-size:12px}
+.actions,.tabs{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#12243b;color:var(--text);border-radius:9px;padding:9px 12px;cursor:pointer}.btn:hover{filter:brightness(1.12)}.btn.primary{background:var(--blue);border-color:var(--blue);color:#04111f;font-weight:800}.btn.active{border-color:var(--cyan);color:var(--cyan)}.btn.danger{color:#ffb8c0}.btn:disabled{opacity:.45;cursor:not-allowed}
+.shell{display:grid;grid-template-columns:300px minmax(500px,1fr) 290px}.side{padding:14px;background:#0a1424;border-right:1px solid var(--line)}.right{border-right:0;border-left:1px solid var(--line)}.center{min-width:0}
+.card{background:linear-gradient(#111f34,#0c1829);border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:12px}.card h2,.card h3{margin:3px 0 8px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);font-size:11px;font-weight:900}.scenario{color:#dce8f7}.requirements{padding-left:18px;color:#bfd0e4}.requirements li{margin:5px 0}
+.palette{display:grid;gap:7px}.palette-item{border:1px dashed #466889;background:#10213a;border-radius:9px;padding:9px;cursor:grab}.palette-item b{display:block}.palette-item span{color:var(--muted);font-size:11px}
+.toolbar{padding:10px 13px;background:#0a1526;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}.toolbar .mini{margin-left:auto}
+#canvas{height:680px;position:relative;overflow:hidden;background-color:#081322;background-image:linear-gradient(#19334d55 1px,transparent 1px),linear-gradient(90deg,#19334d55 1px,transparent 1px);background-size:24px 24px}
+#links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}.classbox{position:absolute;width:205px;background:#10213b;border:1px solid #456787;border-radius:11px;overflow:hidden;box-shadow:0 12px 28px #0008;z-index:5;user-select:none}.classbox.selected{outline:2px solid var(--cyan)}.class-head{background:#183452;padding:9px 10px;display:flex;justify-content:space-between;cursor:move;font-weight:800}.classbox.abstract .class-head{background:#29335a}.badge{font-size:10px;background:#071422;color:var(--cyan);padding:2px 6px;border-radius:10px}.class-body{padding:8px 10px;font:12px ui-monospace,monospace}.class-body div{padding:2px 0}
+.field{margin:9px 0}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}.field select{width:100%;padding:8px;border-radius:8px;border:1px solid #385676;background:#081526;color:#fff}.status{padding:10px;border-radius:9px;background:#091729;color:var(--muted)}#relList>div{margin:6px 0;padding:7px;background:#091729;border-radius:7px}
+.assessment{display:none;border-top:1px solid var(--line);padding:20px;background:#091322}.assessment.show{display:block}.assessment-inner{max-width:1100px;margin:auto}.assessment-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:16px}.score{font-size:42px;font-weight:900;color:var(--cyan)}.feedback-item{padding:9px;margin:7px 0;background:#0d1b2e;border-left:3px solid var(--red);border-radius:4px}.feedback-item.good{border-color:var(--green)}.reference{background:#0c192b;border:1px solid #315579;border-radius:12px;padding:12px}.reference h3{margin-top:0}
+#solutionSvg{width:100%;height:390px;background:#081322;border-radius:9px;border:1px solid #29415f}.explain{margin-top:10px;color:#c5d5e7}
+.relation-legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12px}.legend-line{display:inline-block;width:34px;border-top:2px solid #76c8ff;vertical-align:middle;margin-right:5px}
+.locked #canvas:after{content:"Submitted — design locked";position:absolute;inset:0;background:#06101acc;display:grid;place-items:center;font-size:23px;font-weight:900;z-index:15}
+@media(max-width:1050px){.shell{grid-template-columns:260px 1fr}.right{grid-column:1/-1;border-left:0;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:12px}.assessment-grid{grid-template-columns:1fr}}@media(max-width:720px){header{align-items:flex-start;flex-direction:column}.shell{display:block}.side{border:0;border-bottom:1px solid var(--line)}.right{display:block}#canvas{height:720px}.toolbar .mini{display:none}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">C++</div><div><h1>Class Diagram Studio</h1><small>Inheritance · polymorphism · friend functions · virtual inheritance</small></div></div>
+ <div class="actions"><button class="btn" id="resetBtn">Reset activity</button><button class="btn primary" id="submitBtn">Submit design</button></div>
+</header>
+<div class="shell">
+ <aside class="side">
+  <div class="card"><div class="eyebrow">Choose activity</div><div class="tabs"><button class="btn active" id="stepFleet" disabled>✓ 1 · Delivery Fleet</button><button class="btn" id="stepAgents" disabled>🔒 2 · AI Agents</button></div><p class="mini" id="progressNote">Complete and submit Activity 1 to unlock Activity 2.</p></div>
+  <div class="card"><div class="eyebrow" id="scenarioLabel"></div><h2 id="scenarioTitle"></h2><p class="scenario" id="scenarioText"></p><ul class="requirements" id="requirements"></ul></div>
+  <div class="card"><div class="eyebrow">Class palette</div><h3>Drag onto canvas</h3><div class="palette" id="palette"></div><p class="mini">You can also click a class to add it automatically—useful on touch devices.</p></div>
+ </aside>
+ <section class="center">
+  <div class="toolbar"><b>Student design</b><div class="relation-legend"><span><i class="legend-line"></i>inheritance arrow points to base class</span></div><span class="mini">Drag boxes to rearrange</span></div>
+  <div id="canvas"><svg id="links"></svg></div>
+  <section class="assessment" id="assessment">
+   <div class="assessment-inner">
+    <div class="eyebrow">Assessment · shown only after submission</div>
+    <h2>Your design feedback & reference design</h2>
+    <div class="assessment-grid">
+     <div><div id="feedback"></div></div>
+     <div class="reference"><h3>Correct design</h3><svg id="solutionSvg" viewBox="0 0 700 390" aria-label="Reference class diagram"></svg><div class="explain" id="explain"></div></div>
+    </div>
+    <div id="sequenceAction" style="margin-top:16px;text-align:center"></div>
+   </div>
+  </section>
+ </section>
+ <aside class="side right">
+  <div class="card"><div class="eyebrow">Class inspector</div><h3 id="inspectTitle">Select a class</h3><div id="inspector" style="display:none">
+   <div class="field"><label>Class role</label><select id="role"><option>Concrete</option><option>Abstract</option></select></div>
+   <div class="field"><label id="primaryMethodLabel">Primary polymorphic method</label><select id="cost"><option>normal</option><option>virtual</option><option>pure virtual</option></select></div>
+   <div class="field"><label id="secondaryMethodLabel">Shared method</label><select id="report"><option>normal</option><option>virtual</option></select></div>
+   <div class="field"><label>Friend access</label><select id="friend"></select></div>
+   <button class="btn danger" id="removeBtn" style="width:100%">Remove class</button>
+  </div><div id="noInspector" class="status">Select a class to configure its methods and friend access.</div></div>
+  <div class="card"><div class="eyebrow">Relationships</div><h3>Add inheritance</h3>
+   <div class="field"><label>Derived class</label><select id="child"></select></div>
+   <div class="field"><label>Base class</label><select id="parent"></select></div>
+   <div class="field"><label>Inheritance mode</label><select id="mode"><option>public</option><option>protected</option><option>private</option></select></div>
+   <div class="field"><label>Virtual inheritance?</label><select id="virtInh"><option value="no">No</option><option value="yes">Yes</option></select></div>
+   <button class="btn" id="addRel" style="width:100%">Add & visualize relationship</button><div id="relList" class="mini" style="margin-top:9px"></div>
+  </div>
+ </aside>
+</div>
+<script>
+const activities={
+ fleet:{
+  label:'Activity 1 · Smart Delivery Fleet',title:'Design the vehicle hierarchy',
+  text:'A delivery company operates vans, drones, and refrigerated vans. Every vehicle reports an ID and must calculate delivery cost differently. Refrigerated vans reuse van behavior but add temperature control. A maintenance inspector needs privileged access to internal diagnostics without becoming a vehicle.',
+  req:['Model the shared vehicle abstraction.','Choose the inheritance access mode.','Decide which method is virtual or pure virtual.','Represent the specialized refrigerated van.','Use a friend function only where justified.'],
+  classes:['Vehicle','Van','Drone','RefrigeratedVan'],primary:'calculateDeliveryCost()',secondary:'reportId()',friend:'inspectDiagnostics(Vehicle&)',
+  expected:{Vehicle:['Abstract','pure virtual','normal','inspectDiagnostics(Vehicle&)'],Van:['Concrete','virtual','normal','none'],Drone:['Concrete','virtual','normal','none'],RefrigeratedVan:['Concrete','virtual','normal','none']},
+  rel:[['Van','Vehicle','public','no'],['Drone','Vehicle','public','no'],['RefrigeratedVan','Van','public','no']],
+  explain:'Vehicle is abstract because delivery cost depends on the concrete vehicle. Public inheritance models each “is-a” relationship. RefrigeratedVan specializes Van. There is no diamond, so virtual inheritance is unnecessary. The external diagnostics function is the narrowly scoped friend.'
+ },
+ agents:{
+  label:'Activity 2 · AI Agent Platform',title:'Design an AI-agent hierarchy',
+  text:'An AI platform runs ResearchAgent and CodingAgent. A HybridAgent combines both capabilities. All agents share an identity and must implement runTask(). ResearchAgent and CodingAgent both derive from Agent, so HybridAgent creates a diamond. An AuditService function needs privileged access to protected execution traces without becoming an Agent.',
+  req:['Create an abstract Agent contract.','Model ResearchAgent and CodingAgent as specializations.','Model HybridAgent with multiple inheritance.','Prevent duplicate Agent subobjects in the diamond.','Choose the appropriate friend function.'],
+  classes:['Agent','ResearchAgent','CodingAgent','HybridAgent'],primary:'runTask()',secondary:'getAgentId()',friend:'auditTrace(Agent&)',
+  expected:{Agent:['Abstract','pure virtual','normal','auditTrace(Agent&)'],ResearchAgent:['Concrete','virtual','normal','none'],CodingAgent:['Concrete','virtual','normal','none'],HybridAgent:['Concrete','virtual','normal','none']},
+  rel:[['ResearchAgent','Agent','public','yes'],['CodingAgent','Agent','public','yes'],['HybridAgent','ResearchAgent','public','no'],['HybridAgent','CodingAgent','public','no']],
+  explain:'Agent supplies the pure-virtual runTask() contract. ResearchAgent and CodingAgent virtually inherit Agent so a HybridAgent contains one shared Agent base subobject instead of two. HybridAgent then publicly inherits both capability classes. auditTrace(Agent&) is a friend only where privileged trace access is required.'
+ }
+};
+let activity='fleet',boxes={},relations=[],selected=null,submitted=false,z=4;
+const $=id=>document.getElementById(id),canvas=$('canvas'),svg=$('links');
+
+function loadActivity(name){
+ activity=name;boxes={};relations=[];selected=null;submitted=false;document.body.classList.remove('locked');$('submitBtn').disabled=false;$('assessment').classList.remove('show');$('sequenceAction').innerHTML='';canvas.querySelectorAll('.classbox').forEach(x=>x.remove());svg.innerHTML='';
+ $('stepFleet').classList.toggle('active',name==='fleet');$('stepAgents').classList.toggle('active',name==='agents');
+ const a=activities[name];$('scenarioLabel').textContent=a.label;$('scenarioTitle').textContent=a.title;$('scenarioText').textContent=a.text;$('requirements').innerHTML=a.req.map(x=>'<li>'+x+'</li>').join('');
+ $('primaryMethodLabel').textContent=a.primary;$('secondaryMethodLabel').textContent=a.secondary;$('friend').innerHTML='<option>none</option><option>'+a.friend.replace('&','&amp;')+'</option>';
+ $('palette').innerHTML=a.classes.map(c=>`<div class="palette-item" draggable="true" data-type="${c}"><b>${c}</b><span>Drag or click to add</span></div>`).join('');
+ bindPalette();refreshSelects();renderRels();closeInspector();
+}
+function bindPalette(){document.querySelectorAll('.palette-item').forEach(x=>{x.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',x.dataset.type));x.addEventListener('click',()=>{if(submitted||boxes[x.dataset.type])return;let i=Object.keys(boxes).length;addBox(x.dataset.type,40+(i%2)*250,45+Math.floor(i/2)*230)})})}
+canvas.addEventListener('dragover',e=>e.preventDefault());canvas.addEventListener('drop',e=>{e.preventDefault();if(submitted)return;const n=e.dataTransfer.getData('text/plain');if(!n||boxes[n])return;const r=canvas.getBoundingClientRect();addBox(n,e.clientX-r.left-100,e.clientY-r.top-30)});
+function addBox(name,x,y){const a=activities[activity],d=document.createElement('div');d.className='classbox';d.dataset.name=name;d.style.left=Math.max(6,x)+'px';d.style.top=Math.max(6,y)+'px';d.innerHTML=`<div class="class-head"><span>${name}</span><span class="badge">class</span></div><div class="class-body"></div>`;canvas.appendChild(d);boxes[name]={el:d,role:'Concrete',cost:'normal',report:'normal',friend:'none'};updateBody(name);makeMovable(d);d.addEventListener('click',e=>{e.stopPropagation();select(name)});refreshSelects();draw()}
+function updateBody(n){const a=activities[activity],b=boxes[n];b.el.classList.toggle('abstract',b.role==='Abstract');let p=b.cost==='virtual'?' «virtual»':b.cost==='pure virtual'?' = 0 «pure virtual»':'';let s=b.report==='virtual'?' «virtual»':'';let arr=['- id : string','+ '+a.secondary+s,'+ '+a.primary+p];if(b.friend!=='none')arr.push('friend '+a.friend);b.el.querySelector('.class-body').innerHTML=arr.map(x=>'<div>'+x.replace('&','&amp;')+'</div>').join('')}
+function makeMovable(el){let on=false,sx=0,sy=0,ox=0,oy=0;const h=el.querySelector('.class-head');h.addEventListener('pointerdown',e=>{if(submitted)return;on=true;sx=e.clientX;sy=e.clientY;ox=parseFloat(el.style.left);oy=parseFloat(el.style.top);h.setPointerCapture(e.pointerId);el.style.zIndex=++z});h.addEventListener('pointermove',e=>{if(!on)return;el.style.left=Math.max(0,ox+e.clientX-sx)+'px';el.style.top=Math.max(0,oy+e.clientY-sy)+'px';draw()});h.addEventListener('pointerup',()=>on=false)}
+function select(n){selected=n;document.querySelectorAll('.classbox').forEach(x=>x.classList.toggle('selected',x.dataset.name===n));$('inspectTitle').textContent=n;$('inspector').style.display='block';$('noInspector').style.display='none';['role','cost','report','friend'].forEach(id=>$(id).value=boxes[n][id])}
+function closeInspector(){selected=null;$('inspector').style.display='none';$('noInspector').style.display='block';$('inspectTitle').textContent='Select a class'}
+['role','cost','report','friend'].forEach(id=>$(id).addEventListener('change',e=>{if(!selected||submitted)return;boxes[selected][id]=e.target.value;updateBody(selected)}));
+function refreshSelects(){['child','parent'].forEach(id=>{const s=$(id),old=s.value;s.innerHTML=Object.keys(boxes).map(n=>'<option>'+n+'</option>').join('');if([...s.options].some(o=>o.value===old))s.value=old})}
+$('addRel').addEventListener('click',()=>{if(submitted)return;let c=$('child').value,p=$('parent').value;if(!c||!p||c===p){alert('Choose two different classes.');return}if(relations.some(r=>r[0]===c&&r[1]===p)){alert('That relationship already exists.');return}relations.push([c,p,$('mode').value,$('virtInh').value]);draw();renderRels()});
+function renderRels(){$('relList').innerHTML=relations.length?relations.map((r,i)=>`<div><b>${r[0]}</b> → ${r[1]} · ${r[3]==='yes'?'virtual ':''}${r[2]} <button class="btn" data-del="${i}" ${submitted?'disabled':''}>×</button></div>`).join(''):'No relationships yet.';document.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{if(submitted)return;relations.splice(+b.dataset.del,1);draw();renderRels()}))}
+function edgePoints(from,to){let ax=from.offsetLeft+from.offsetWidth/2,ay=from.offsetTop+from.offsetHeight/2,bx=to.offsetLeft+to.offsetWidth/2,by=to.offsetTop+to.offsetHeight/2,dx=bx-ax,dy=by-ay;let fa=Math.min(Math.abs((from.offsetWidth/2)/(dx||.001)),Math.abs((from.offsetHeight/2)/(dy||.001))),fb=Math.min(Math.abs((to.offsetWidth/2)/(dx||.001)),Math.abs((to.offsetHeight/2)/(dy||.001)));return {x1:ax+dx*fa,y1:ay+dy*fa,x2:bx-dx*fb,y2:by-dy*fb}}
+function draw(){svg.innerHTML='<defs><marker id="tri" markerWidth="13" markerHeight="13" refX="11" refY="6.5" orient="auto"><path d="M1,1 L12,6.5 L1,12 Z" fill="#081322" stroke="#76c8ff" stroke-width="1.4"/></marker></defs>';relations.forEach((r,i)=>{if(!boxes[r[0]]||!boxes[r[1]])return;let q=edgePoints(boxes[r[0]].el,boxes[r[1]].el),mx=(q.x1+q.x2)/2,my=(q.y1+q.y2)/2,label=(r[3]==='yes'?'virtual ':'')+r[2];svg.insertAdjacentHTML('beforeend',`<line x1="${q.x1}" y1="${q.y1}" x2="${q.x2}" y2="${q.y2}" stroke="#76c8ff" stroke-width="3" marker-end="url(#tri)"/><rect x="${mx-42}" y="${my-14}" width="84" height="20" rx="6" fill="#07101f" stroke="#315579"/><text x="${mx}" y="${my}" text-anchor="middle" fill="#d9efff" font-size="11">${label}</text>`)});}
+$('removeBtn').addEventListener('click',()=>{if(!selected||submitted)return;boxes[selected].el.remove();delete boxes[selected];relations=relations.filter(r=>r[0]!==selected&&r[1]!==selected);closeInspector();refreshSelects();draw();renderRels()});
+canvas.addEventListener('click',()=>{document.querySelectorAll('.classbox').forEach(x=>x.classList.remove('selected'));closeInspector()});
+function grade(){const a=activities[activity];let pts=0,max=0,items=[];for(const n of a.classes){max+=4;if(!boxes[n]){items.push([false,n+' is missing.']);continue}let v=[boxes[n].role,boxes[n].cost,boxes[n].report,boxes[n].friend],ok=0;for(let i=0;i<4;i++)if(v[i]===a.expected[n][i])ok++;pts+=ok;items.push([ok===4,`${n}: ${ok}/4 class decisions correct.`])}for(const er of a.rel){max+=2;let hit=relations.find(r=>r[0]===er[0]&&r[1]===er[1]),ok=0;if(hit){if(hit[2]===er[2])ok++;if(hit[3]===er[3])ok++}pts+=ok;items.push([ok===2,`${er[0]} → ${er[1]}: ${ok}/2 inheritance decisions correct.`])}let extras=relations.filter(r=>!a.rel.some(e=>e[0]===r[0]&&e[1]===r[1])).length;pts=Math.max(0,pts-extras);let pct=Math.round(100*pts/max);$('feedback').innerHTML=`<div class="score">${pct}%</div><div class="mini">${pts}/${max} rubric points${extras?' · '+extras+' point penalty for extra relationship(s)':''}</div>`+items.map(x=>`<div class="feedback-item ${x[0]?'good':''}">${x[0]?'✓':'△'} ${x[1]}</div>`).join('');$('explain').textContent=a.explain;drawSolution()}
+function drawSolution(){const a=activities[activity],s=$('solutionSvg');let pos={};if(activity==='fleet')pos={Vehicle:[250,30],Van:[105,180],Drone:[390,180],RefrigeratedVan:[105,300]};else pos={Agent:[250,25],ResearchAgent:[80,160],CodingAgent:[420,160],HybridAgent:[250,300]};let out='<defs><marker id="stri" markerWidth="13" markerHeight="13" refX="11" refY="6.5" orient="auto"><path d="M1,1 L12,6.5 L1,12 Z" fill="#081322" stroke="#76c8ff" stroke-width="1.4"/></marker></defs>';function box(n){let [x,y]=pos[n],e=a.expected[n],p=e[1]==='pure virtual'?' = 0':e[1]==='virtual'?' «virtual»':'',fr=e[3]!=='none'?`<text x="${x+10}" y="${y+91}" fill="#ffc857" font-size="10">friend ${a.friend.replace('&','&amp;')}</text>`:'';return `<g><rect x="${x}" y="${y}" width="190" height="${fr?108:90}" rx="9" fill="#10213b" stroke="#527493"/><rect x="${x}" y="${y}" width="190" height="30" rx="9" fill="${e[0]==='Abstract'?'#29335a':'#183452'}"/><text x="${x+95}" y="${y+20}" text-anchor="middle" fill="#fff" font-weight="700" font-size="12">${n}</text><text x="${x+10}" y="${y+50}" fill="#d9e8f6" font-size="10">+ ${a.secondary}</text><text x="${x+10}" y="${y+68}" fill="#d9e8f6" font-size="10">+ ${a.primary}${p}</text>${fr}</g>`}function ctr(n){let p=pos[n];return [p[0]+95,p[1]+45]}for(const r of a.rel){let [x1,y1]=ctr(r[0]),[x2,y2]=ctr(r[1]);out+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#76c8ff" stroke-width="2.5" marker-end="url(#stri)"/><text x="${(x1+x2)/2}" y="${(y1+y2)/2-7}" text-anchor="middle" fill="#58e1d2" font-size="10">${r[3]==='yes'?'virtual ':''}${r[2]}</text>`}a.classes.forEach(n=>out+=box(n));s.innerHTML=out}
+let completed={fleet:false,agents:false};
+function updateSequenceAction(){
+ const area=$('sequenceAction');
+ if(activity==='fleet'){
+   area.innerHTML='<button class="btn primary" id="continueBtn">Continue to Activity 2 →</button><p class="mini">Your Activity 1 submission is complete. Activity 2 is now unlocked.</p>';
+   $('stepAgents').textContent='2 · AI Agents';
+   $('progressNote').textContent='Activity 1 complete. Continue to Activity 2.';
+   $('continueBtn').addEventListener('click',()=>{loadActivity('agents');$('stepFleet').textContent='✓ 1 · Delivery Fleet';$('stepAgents').textContent='2 · AI Agents';$('progressNote').textContent='Now complete and submit Activity 2.';window.scrollTo({top:0,behavior:'smooth'})});
+ }else{
+   area.innerHTML='<div class="status" style="border:1px solid var(--green);color:var(--text)"><b>✓ Lab complete</b><br><span class="mini">You completed both C++ class-design activities in sequence.</span></div>';
+   $('stepFleet').textContent='✓ 1 · Delivery Fleet';$('stepAgents').textContent='✓ 2 · AI Agents';$('progressNote').textContent='Both activities completed.';
+ }
+}
+$('submitBtn').addEventListener('click',()=>{if(submitted)return;submitted=true;completed[activity]=true;document.body.classList.add('locked');$('submitBtn').disabled=true;grade();renderRels();$('assessment').classList.add('show');updateSequenceAction();setTimeout(()=>$('assessment').scrollIntoView({behavior:'smooth',block:'start'}),80)});
+$('resetBtn').addEventListener('click',()=>loadActivity(activity));
+loadActivity('fleet');
+</script>
+</body></html>
