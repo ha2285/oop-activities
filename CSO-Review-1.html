@@ -1,0 +1,630 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CSO Lecture 12 Explained</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Lexend:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a guided notebook — tab per lecture page; each tab reads top to bottom: big idea, analogy, numbered steps with a try-it box, mix-ups, self-check */
+:root{
+  --bg:#f5f6fb; --paper:#ffffff; --sunk:#eceef8; --ink:#1c2340; --soft:#5a6182; --line:#d9dcec;
+  --accent:#3b45c9; --accent-ink:#ffffff; --tint:#e3e5fb; --mark:#ffe766; --mark-ink:#1c2340;
+  --good:#17803d; --good-bg:#dff3e5; --bad:#b4261f; --bad-bg:#fbe3e1; --warm:#c76a12;
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Lexend", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11142a; --paper:#191d38; --sunk:#222748; --ink:#e7e9f7; --soft:#a1a6c8; --line:#2e3460;
+  --accent:#9aa3ff; --accent-ink:#11142a; --tint:#262c5c; --mark:#5e5210; --mark-ink:#fff5bf;
+  --good:#7fdc9c; --good-bg:#16351f; --bad:#ff9b92; --bad-bg:#3d1a18; --warm:#f2a95a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11142a; --paper:#191d38; --sunk:#222748; --ink:#e7e9f7; --soft:#a1a6c8; --line:#2e3460;
+  --accent:#9aa3ff; --accent-ink:#11142a; --tint:#262c5c; --mark:#5e5210; --mark-ink:#fff5bf;
+  --good:#7fdc9c; --good-bg:#16351f; --bad:#ff9b92; --bad-bg:#3d1a18; --warm:#f2a95a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:300 16px/1.65 var(--body);padding-inline:16px;padding-block:0 56px}
+b,strong{font-weight:600}
+.wrap{max-width:860px;margin:0 auto}
+header.top{padding-block:30px 16px}
+.kicker{font:500 12px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+h1{font:400 clamp(30px,6vw,46px)/1.08 var(--display);margin:6px 0 8px;text-wrap:balance}
+.top p{margin:0;color:var(--soft);max-width:60ch}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;padding-block:10px;border-bottom:1px solid var(--line)}
+.tab{flex:none;font:400 14px var(--body);color:var(--soft);background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.tab:hover{color:var(--ink);border-color:var(--soft)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:500}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section.panel{padding-top:28px;display:grid;gap:26px}
+.bigidea h2{font:400 clamp(26px,4.5vw,34px)/1.15 var(--display);margin:0 0 10px;text-wrap:balance}
+.bigidea .lead{font-size:19px;line-height:1.55;margin:0;max-width:60ch}
+mark{background:var(--mark);color:var(--mark-ink);padding:0 3px;border-radius:3px}
+.analogy{background:var(--tint);border-radius:14px;padding:16px 20px;display:grid;gap:4px}
+.analogy .lbl,.mixups .lbl,.check .lbl{font:500 12px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.analogy p{margin:0;max-width:62ch}
+ol.steps{list-style:none;margin:0;padding:0;display:grid;gap:22px;counter-reset:st}
+ol.steps>li{counter-increment:st;display:grid;grid-template-columns:40px 1fr;gap:4px 14px}
+ol.steps>li::before{content:counter(st);grid-row:1/span 3;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);display:grid;place-items:center;font:400 17px var(--display)}
+ol.steps h3{font:400 21px/1.3 var(--display);margin:3px 0 2px}
+ol.steps p{margin:0 0 8px;max-width:64ch}
+.step-body{min-width:0;display:grid;gap:4px}
+.try{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:12px;min-width:0;margin-top:6px}
+.try>.tl{font:500 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button.b{font:500 14px var(--body);background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:8px 14px;cursor:pointer}
+button.b.o{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+button.b:disabled{opacity:.4;cursor:default}
+.chip{font:400 13px var(--body);background:var(--sunk);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+input,select{font:15px var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
+input[type=number]{width:96px}
+input[type=range]{padding:0;accent-color:var(--accent);width:180px}
+label.f{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--soft)}
+.say{background:var(--sunk);border-radius:10px;padding:10px 14px;margin:0;min-height:2.6em}
+.say.good{background:var(--good-bg)} .say.bad{background:var(--bad-bg)}
+code,.m{font-family:var(--mono);font-size:.9em}
+code{background:var(--sunk);padding:1px 6px;border-radius:5px}
+pre.code{margin:0;font:14px/1.75 var(--mono);background:var(--sunk);border-radius:10px;padding:10px 0;overflow-x:auto}
+pre.code span{display:block;padding:0 14px;border-left:3px solid transparent;white-space:pre}
+pre.code span.cur{background:var(--tint);border-left-color:var(--accent)}
+pre.code i{font-style:normal;padding:1px 2px;border-radius:3px}
+pre.code i.cur{background:var(--mark);color:var(--mark-ink)}
+.scroll{overflow-x:auto;min-width:0}
+/* switches */
+.sws{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.swc{display:grid;justify-items:center;gap:4px}
+.swc small{font:12px var(--mono);color:var(--soft)}
+.sw{width:42px;height:58px;border-radius:10px;border:1.5px solid var(--line);background:var(--sunk);cursor:pointer;display:grid;place-items:center;font:600 18px var(--mono);color:var(--soft);padding:0}
+.sw.on{background:var(--mark);color:var(--mark-ink);border-color:var(--warm)}
+.nib{display:flex;gap:10px;padding:8px;border:1px dashed var(--line);border-radius:12px;flex-wrap:wrap}
+/* odometer */
+.odo{display:flex;gap:4px}
+.wheel{width:52px;height:68px;background:var(--ink);color:var(--paper);border-radius:8px;display:grid;place-items:center;font:600 34px var(--mono)}
+.wheel.roll{background:var(--accent);color:var(--accent-ink)}
+.ladder{display:grid;gap:4px;font-family:var(--mono);font-size:15px}
+.ladder div{display:flex;gap:14px;flex-wrap:wrap}
+.ladder .r{color:var(--warm);font-weight:600}
+.letters{display:flex;flex-wrap:wrap;gap:8px}
+.lt{border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:center;min-width:66px;background:var(--bg)}
+.lt b{display:block;font:400 24px var(--display)}
+.lt span{display:block;font:13px var(--mono)}
+.lt small{display:block;font:11px var(--mono);color:var(--soft)}
+.boxes3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.fbox{border-radius:10px;padding:10px 12px;background:var(--sunk);display:grid;gap:2px}
+.fbox small{font-size:12px;color:var(--soft)}
+.fbox b{font:600 17px var(--mono);word-break:break-all}
+.px{display:grid;grid-template-columns:repeat(8,26px);gap:2px}
+.px button{width:26px;height:26px;border:1px solid var(--line);background:var(--paper);border-radius:3px;padding:0;cursor:pointer}
+.px button.on{background:var(--ink);border-color:var(--ink)}
+.pxrows{font:13px/26px var(--mono);color:var(--soft)}
+.pxwrap{display:flex;gap:14px;flex-wrap:wrap}
+.lockers{display:flex;flex-wrap:wrap;gap:5px}
+.lk{border:1.5px solid var(--line);border-radius:6px;background:var(--paper);padding:6px 5px 4px;min-width:52px;text-align:center;font:12px var(--mono)}
+.lk small{display:block;color:var(--soft);font-size:10px}
+.lk.sel{border-color:var(--warm);background:var(--mark);color:var(--mark-ink)}
+button.lk{cursor:pointer}
+.tbox{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center}
+.bytes{display:flex;gap:3px;flex-wrap:wrap}
+.by{width:24px;height:24px;border-radius:4px;background:var(--accent);opacity:.85}
+.tname{font:600 14px var(--mono)}
+.tbox small{grid-column:2;color:var(--soft);font-size:13px;margin-top:-6px}
+.regions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px}
+.reg{border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:6px;align-content:start;min-height:120px;background:var(--bg)}
+.reg h4{margin:0;font:500 14px var(--body)} .reg h4 small{display:block;font-weight:300;color:var(--soft);font-size:12px}
+.plate{border-radius:8px;padding:6px 10px;background:var(--tint);font:13px var(--mono);display:flex;justify-content:space-between;gap:8px}
+.plate.top{outline:2px solid var(--accent)}
+.unit{border-radius:8px;padding:6px 10px;background:var(--sunk);font:13px var(--mono);border:1px dashed var(--soft)}
+.unit.leak{background:var(--bad-bg);border-color:var(--bad)}
+.scene{display:flex;flex-wrap:wrap;gap:18px;align-items:center}
+.house{border:2px solid var(--ink);border-radius:4px 4px 10px 10px;padding:22px 14px 10px;position:relative;min-width:120px;text-align:center;background:var(--paper)}
+.house::before{content:"";position:absolute;left:-2px;right:-2px;top:-20px;height:20px;background:var(--ink);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.house b{display:block;font:400 30px var(--display)}
+.house small,.note small{display:block;font:12px var(--mono);color:var(--soft)}
+.note{background:var(--mark);color:var(--mark-ink);padding:10px 14px;border-radius:2px 2px 12px 2px;transform:rotate(-1.5deg);min-width:110px;text-align:center;font:600 16px var(--mono);box-shadow:0 2px 0 var(--line)}
+.note small{color:var(--mark-ink);opacity:.75}
+.hl{outline:3px solid var(--accent);outline-offset:3px}
+.arrow{font:400 26px var(--display);color:var(--soft)}
+.cups{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.frame{border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:8px;background:var(--bg)}
+.frame h4{margin:0;font:500 14px var(--body)}
+.cuprow{display:flex;gap:10px;flex-wrap:wrap}
+.cup{border:2px solid var(--ink);border-top:0;border-radius:0 0 14px 14px;width:64px;padding:8px 4px;text-align:center;background:var(--paper)}
+.cup b{display:block;font:400 24px var(--display)} .cup small{font:12px var(--mono);color:var(--soft)}
+.cup.ch{background:var(--mark);color:var(--mark-ink)}
+.card{border:1.5px solid var(--ink);border-radius:12px;padding:12px 16px;display:grid;gap:4px;max-width:260px;background:var(--paper)}
+.card .ttl{font:500 11px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.card button{all:unset;cursor:pointer;display:flex;justify-content:space-between;gap:12px;font:14px var(--mono);padding:3px 6px;border-radius:6px}
+.card button:focus-visible{outline:2px solid var(--accent)}
+.card button.sel{background:var(--mark);color:var(--mark-ink)}
+.train{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.car{border:1.5px solid var(--ink);border-radius:8px;display:grid;grid-template-columns:auto auto;overflow:hidden;background:var(--paper);font-family:var(--mono)}
+.car b{padding:8px 12px;font-size:16px} .car span{padding:8px;background:var(--sunk);font-size:11px;color:var(--soft);display:grid;place-items:center}
+.car.new{border-color:var(--warm);box-shadow:0 0 0 3px var(--mark)}
+.tag{font:12px var(--mono);padding:5px 9px;border-radius:6px;background:var(--ink);color:var(--paper)}
+.tag.null{background:var(--sunk);color:var(--soft)}
+svg text{font-family:var(--mono)}
+.bulbs{display:flex;gap:10px;flex-wrap:wrap}
+.bulb{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font:600 16px var(--mono);color:var(--soft);background:var(--sunk)}
+.bulb.on{background:var(--mark);color:var(--mark-ink);border-color:var(--warm);box-shadow:0 0 14px var(--mark)}
+.grid-lbl{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:center}
+.grid-lbl>span{font:13px var(--mono);color:var(--soft)}
+.mixups ul{margin:6px 0 0;padding-left:20px;display:grid;gap:6px;max-width:66ch}
+.mixups{border-left:3px solid var(--warm);padding-left:16px}
+.check{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px}
+.q{display:grid;gap:8px}
+.q p.qq{margin:0;font-weight:500}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{font:400 14px var(--body);background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 14px;cursor:pointer}
+.opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.why{margin:0;font-size:14px;color:var(--soft)}
+.score{font-size:14px;color:var(--soft)}
+.nextp{display:flex;justify-content:flex-end}
+@media (prefers-reduced-motion:no-preference){.sw,.wheel,.lk,.cup,.car,.bulb,.plate,.house,.note{transition:background .2s,box-shadow .2s,outline-color .2s}}
+@media (max-width:480px){ol.steps>li{grid-template-columns:1fr}ol.steps>li::before{grid-row:auto}.px{grid-template-columns:repeat(8,22px)}.px button{width:22px;height:22px}.pxrows{line-height:24px}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="kicker">CSO · Lecture 12 · Concepts from scratch</div>
+  <h1>How a computer sees your program</h1>
+  <p>No background needed. Each tab covers one page of the lecture notes: the main idea, an everyday comparison, small experiments you can click, the usual mistakes, and three quick questions.</p>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Topics">
+  <button class="tab" role="tab" id="tab-c1" aria-controls="c1">1 · Counting in bases</button>
+  <button class="tab" role="tab" id="tab-c2" aria-controls="c2">2 · Data as bits</button>
+  <button class="tab" role="tab" id="tab-c3" aria-controls="c3">3 · C basics</button>
+  <button class="tab" role="tab" id="tab-c4" aria-controls="c4">4 · Pointers</button>
+  <button class="tab" role="tab" id="tab-c5" aria-controls="c5">5 · Functions &amp; arrays</button>
+  <button class="tab" role="tab" id="tab-c6" aria-controls="c6">6 · Structs &amp; lists</button>
+  <button class="tab" role="tab" id="tab-c7" aria-controls="c7">7 · Files &amp; bits</button>
+</nav>
+
+<!-- ================= 1 ================= -->
+<section class="panel" id="c1" role="tabpanel" aria-labelledby="tab-c1">
+  <div class="bigidea"><h2>A number is a count. A base is a way of writing it down.</h2>
+  <p class="lead">Twelve apples are twelve apples. We can write that count as <mark>12</mark> in decimal, <mark>1100</mark> in binary or <mark>C</mark> in hexadecimal. The count never changes, only the notation.</p></div>
+  <div class="analogy"><span class="lbl">Think of it like</span><p>A car's odometer. Each wheel shows 0 to 9. When a wheel passes 9 it rolls back to 0 and nudges the wheel on its left up by one. A binary odometer works the same way, except each wheel only has 0 and 1.</p></div>
+  <ol class="steps">
+    <li><h3>Counting means rolling over</h3><div class="step-body">
+      <p>Pick a base and press +1. Watch when a wheel runs out of digits and pushes the next one. That push is called a <b>carry</b>.</p>
+      <div class="try" data-w="odometer"></div></div></li>
+    <li><h3>Every position has a weight</h3><div class="step-body">
+      <p>In decimal, 345 means 3 hundreds + 4 tens + 5 ones. Each position is worth 10 times the one to its right. In binary each position is worth <b>2 times</b> the one to its right: 1, 2, 4, 8, 16…</p>
+      <p>Treat each bit as a light switch. Turn switches on and add up the weights of the ones that are on.</p>
+      <div class="try" data-w="place"></div></div></li>
+    <li><h3>Hexadecimal is shorthand for binary</h3><div class="step-body">
+      <p>Long rows of 0s and 1s are hard to read. Since 16 = 2⁴, every group of <b>4 bits</b> becomes exactly one hex digit. Hex needs 16 digits, so after 9 it uses letters: A = 10, B = 11, up to F = 15.</p>
+      <div class="try" data-w="hexgroup"></div></div></li>
+    <li><h3>Decimal to binary: keep halving</h3><div class="step-body">
+      <p>Divide by 2 and write down the remainder (0 or 1). Repeat with the quotient until you reach 0. Reading the remainders from <b>bottom to top</b> gives the binary number. For hex, divide by 16 instead.</p>
+      <div class="try" data-w="divide"></div></div></li>
+  </ol>
+  <div class="mixups"><span class="lbl">Common mix-ups</span><ul>
+    <li>"10" is not always ten. (10)₂ is two and (10)₁₆ is sixteen. Always say which base you mean.</li>
+    <li>A to F in hex are digits, not letters. F is just the digit for fifteen.</li>
+    <li>Weights start at 1 on the <b>right</b>, not the left.</li>
+    <li>After dividing, read the remainders from the bottom up.</li></ul></div>
+  <div class="check" data-q="c1"></div>
+</section>
+
+<!-- ================= 2 ================= -->
+<section class="panel" id="c2" role="tabpanel" aria-labelledby="tab-c2" hidden>
+  <div class="bigidea"><h2>Memory only stores 0s and 1s. Every kind of data needs a rule for turning it into bits.</h2>
+  <p class="lead">Text, negative numbers, decimals, pictures and sound all end up as bits. The computer and the programmer simply <mark>agree on a code</mark> for each kind of data.</p></div>
+  <div class="analogy"><span class="lbl">Think of it like</span><p>Morse code. Only two signals, short and long, yet you can send any message because everyone shares the same codebook. ASCII, two's complement and IEEE 754 are codebooks for computers.</p></div>
+  <ol class="steps">
+    <li><h3>Text: every character has a number</h3><div class="step-body">
+      <p>The ASCII table gives each character a number from 0 to 127. 'A' is 65, 'B' is 66, 'a' is 97. Unicode extends this to every language and emoji, using more bytes for the extra characters.</p>
+      <div class="try" data-w="codebook"></div></div></li>
+    <li><h3>Negative numbers: two's complement</h3><div class="step-body">
+      <p>With 3 bits there are only 8 patterns. Two's complement gives half of them to negative numbers. The leftmost bit tells you the sign: 0 means positive, 1 means negative. Picture the patterns arranged on a clock face.</p>
+      <div class="try" data-w="wheel"></div>
+      <p>To make a negative number by hand: write the positive value, flip every bit, then add 1. For −3: 011 → 100 → 101.</p></div></li>
+    <li><h3>Real numbers: scientific notation in base 2</h3><div class="step-body">
+      <p>Scientists write 5250 as 5.25 × 10³. Floats do the same thing in binary: <b>1.something × 2<sup>power</sup></b>. The IEEE format stores three parts: a sign, the power (exponent) and the "something" (mantissa).</p>
+      <div class="try" data-w="sci"></div></div></li>
+    <li><h3>Images: a grid of numbers</h3><div class="step-body">
+      <p>A picture is a grid of tiny squares called pixels. In black and white, each pixel is 1 bit. Grayscale uses 8 bits (256 shades). Color uses 24 bits: 8 each for red, green and blue. Click squares to draw.</p>
+      <div class="try" data-w="pixels"></div></div></li>
+    <li><h3>Sound: many measurements per second</h3><div class="step-body">
+      <p>Sound is a smooth wave. The computer measures its height many times per second; each measurement is a <b>sample</b>. One sample per second is 1 Hz. More samples follow the wave more closely.</p>
+      <div class="try" data-w="sound"></div></div></li>
+    <li><h3>How much memory? Count the lockers</h3><div class="step-body">
+      <p>Memory is a long row of lockers, and each locker holds 1 byte (8 bits). Every locker has a number, its <b>address</b>. With n bits for the address you can number 2ⁿ lockers. That's why memory size and address length go together: 2¹⁰ = 1 KB, 2²⁰ = 1 MB, 2³⁰ = 1 GB.</p>
+      <div class="try" data-w="lockers"></div></div></li>
+  </ol>
+  <div class="mixups"><span class="lbl">Common mix-ups</span><ul>
+    <li>The character '7' is not the number 7. The character is stored as 55.</li>
+    <li>Some decimals such as 0.1 have no exact binary form, so floats store a very close value instead.</li>
+    <li>Adding 1 to the largest positive number wraps around to the most negative one. This is called overflow.</li>
+    <li>A bit is one 0 or 1. A byte is 8 bits.</li></ul></div>
+  <div class="check" data-q="c2"></div>
+</section>
+
+<!-- ================= 3 ================= -->
+<section class="panel" id="c3" role="tabpanel" aria-labelledby="tab-c3" hidden>
+  <div class="bigidea"><h2>A C program names boxes, fills them, and decides what happens next.</h2>
+  <p class="lead">Variables are <mark>boxes with a type</mark>. The type fixes the box size and how its bits are read. Control statements choose which instructions run and how many times.</p></div>
+  <div class="analogy"><span class="lbl">Think of it like</span><p>Cooking from a recipe. Containers have labels and fixed sizes (variables). Steps say "if the sauce is thick, add water" or "stir 10 times" (if and loops). The kitchen has a counter you clean as you go and a storage room you have to tidy yourself (stack and heap).</p></div>
+  <ol class="steps">
+    <li><h3>Every variable is a box of a fixed size</h3><div class="step-body">
+      <p>Whole-number types (<code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>) use two's complement. Decimal types (<code>float</code>, <code>double</code>) use IEEE format. Bigger boxes hold bigger or more precise values.</p>
+      <div class="try" data-w="boxes"></div></div></li>
+    <li><h3>printf talks, scanf listens</h3><div class="step-body">
+      <p><code>printf</code> writes to the screen. <code>scanf</code> reads from the keyboard and has to know <b>where to put</b> the value, so you pass the address with <code>&amp;</code>, like giving a delivery address.</p>
+<pre class="code"><span>int age;</span><span>printf("How old are you? ");</span><span>scanf("%d", &amp;age);     // deliver the number to age's address</span><span>printf("Next year you'll be %d\n", age + 1);</span></pre>
+      <p><code>%d</code> is for int, <code>%f</code> for float, <code>%c</code> for char and <code>%s</code> for text.</p></div></li>
+    <li><h3>Loops: run laps until the condition fails</h3><div class="step-body">
+      <p>A <code>for</code> loop has four parts that run in a fixed order: set up once, check, do the body, update, then check again. Step through to watch the order.</p>
+      <div class="try" data-w="loop"></div>
+      <p><code>while</code> checks before each lap. <code>do … while</code> checks after, so its body always runs at least once. <code>switch</code> jumps to a matching case.</p></div></li>
+    <li><h3>Four areas of memory</h3><div class="step-body">
+      <p><b>Code</b> holds your program's instructions. <b>Data</b> holds global variables. The <b>stack</b> works like a stack of plates: each function call adds a plate for its local variables and removes it automatically on return. The <b>heap</b> is a storage room: <code>malloc</code> rents space and only <code>free</code> gives it back.</p>
+      <div class="try" data-w="plates"></div></div></li>
+  </ol>
+  <div class="mixups"><span class="lbl">Common mix-ups</span><ul>
+    <li><code>=</code> stores a value and <code>==</code> compares. <code>if (x = 5)</code> is almost always a bug.</li>
+    <li>Leaving out <code>&amp;</code> in scanf makes it write to the wrong place.</li>
+    <li>Dividing two ints drops the fraction: <code>7 / 2</code> is 3.</li>
+    <li>A semicolon right after <code>for(...)</code> makes the loop body empty.</li></ul></div>
+  <div class="check" data-q="c3"></div>
+</section>
+
+<!-- ================= 4 ================= -->
+<section class="panel" id="c4" role="tabpanel" aria-labelledby="tab-c4" hidden>
+  <div class="bigidea"><h2>A pointer holds an address. It tells you where something lives, not what it is.</h2>
+  <p class="lead">Two symbols do all the work. <mark>&amp;x</mark> means "the address of x". <mark>*p</mark> means "go to the address in p and use what is there".</p></div>
+  <div class="analogy"><span class="lbl">Think of it like</span><p>A sticky note with a house address written on it. The note is not the house, but you can follow it to the house and change what's inside. You can also have a note that tells you where to find another note.</p></div>
+  <ol class="steps">
+    <li><h3>A variable is a house, a pointer is a note</h3><div class="step-body">
+      <p>After <code>int x = 7; int *p = &amp;x;</code> the house x (at address 0xFA) contains 7, and the note p contains 0xFA. Try each expression.</p>
+      <div class="try" data-w="house"></div></div></li>
+    <li><h3>A pointer to a pointer: a two-step treasure hunt</h3><div class="step-body">
+      <p><code>int **q = &amp;p;</code> makes q a note that holds the address of the note p. To reach x from q you follow two arrows, which is why it's written <code>**q</code>.</p>
+      <div class="try" data-w="hunt"></div></div></li>
+    <li><h3>Borrowing memory: malloc and free</h3><div class="step-body">
+      <p><code>malloc</code> rents a storage unit on the heap and gives you its address. <code>free</code> hands the unit back. Your note still has the old address on it, so set it to <code>NULL</code> to avoid using it by mistake.</p>
+      <div class="try" data-w="storage"></div></div></li>
+  </ol>
+  <div class="mixups"><span class="lbl">Common mix-ups</span><ul>
+    <li>In a declaration, <code>int *p</code> means "p is a pointer". In an expression, <code>*p</code> means "go to that address".</li>
+    <li>A pointer you haven't set could point anywhere. Give it a value before using it.</li>
+    <li>After <code>free(p)</code>, p still holds the old address. Using it is undefined behaviour.</li></ul></div>
+  <div class="check" data-q="c4"></div>
+</section>
+
+<!-- ================= 5 ================= -->
+<section class="panel" id="c5" role="tabpanel" aria-labelledby="tab-c5" hidden>
+  <div class="bigidea"><h2>Functions get copies. To let a function change your variable, give it the address.</h2>
+  <p class="lead">This is the main reason pointers exist. Arrays rely on the same idea: an array's name is the <mark>address of its first element</mark>.</p></div>
+  <div class="analogy"><span class="lbl">Think of it like</span><p>Lending a photocopy of your notebook versus giving someone your home address. They can scribble on the photocopy all they like and your notebook stays the same. With your address they can walk in and change the real thing.</p></div>
+  <ol class="steps">
+    <li><h3>Copy vs. address</h3><div class="step-body">
+      <p>Both versions try to swap two cups. Choose a version and step through it.</p>
+      <div class="try" data-w="copyswap"></div></div></li>
+    <li><h3>An array is a row of identical lockers</h3><div class="step-body">
+      <p><code>int a[5]</code> reserves 5 lockers side by side, each the size of an int (4 bytes). <code>a</code> is the address of the first locker. To find <code>a[i]</code>, start at <code>a</code> and move i lockers along, so <code>a[i]</code> is the same as <code>*(a + i)</code>.</p>
+      <div class="try" data-w="lockarr"></div></div></li>
+    <li><h3>Arrays are always passed by address</h3><div class="step-body">
+      <p>When you pass an array to a function, C passes its address. That's why a function can fill or change your array without any <code>&amp;</code>.</p>
+<pre class="code"><span>void doubleAll(int a[], int n) {</span><span>    for (int i = 0; i &lt; n; i++) a[i] = a[i] * 2;</span><span>}</span><span>int nums[3] = {1, 2, 3};</span><span>doubleAll(nums, 3);   // nums is now {2, 4, 6}</span></pre>
+      <p>You can also create an array at run time: <code>int *a = malloc(n * sizeof(int));</code> and use it the same way, <code>a[0]</code>, <code>a[1]</code> and so on. Remember to <code>free(a)</code> afterwards.</p></div></li>
+  </ol>
+  <div class="mixups"><span class="lbl">Common mix-ups</span><ul>
+    <li>Indexes start at 0. An array of 5 runs from a[0] to a[4], so a[5] is outside it.</li>
+    <li>C does not check array bounds. Going past the end silently reads or writes other memory.</li>
+    <li>Inside a function an array parameter is only a pointer, so <code>sizeof</code> gives the pointer size. Pass the length separately.</li></ul></div>
+  <div class="check" data-q="c5"></div>
+</section>
+
+<!-- ================= 6 ================= -->
+<section class="panel" id="c6" role="tabpanel" aria-labelledby="tab-c6" hidden>
+  <div class="bigidea"><h2>Structs bundle related data. Pointers link structs into chains and trees.</h2>
+  <p class="lead">A <mark>struct</mark> groups several fields under one name. Give a struct a field that points to another struct of the same kind and you can build lists and trees that grow while the program runs.</p></div>
+  <div class="analogy"><span class="lbl">Think of it like</span><p>An ID card has a name, an age and a GPA printed on one card: that's a struct. A linked list is a treasure hunt where each clue says where the next clue is hidden. A tree is a choose-your-path game where every stop offers two directions.</p></div>
+  <ol class="steps">
+    <li><h3>A struct is a form with fields</h3><div class="step-body">
+      <p>If you hold the card itself (a variable <code>s</code>), use a dot: <code>s.age</code>. If you only know where the card is (a pointer <code>p</code>), go there first: <code>(*p).age</code>, or the shorter <code>p-&gt;age</code>.</p>
+      <div class="try" data-w="idcard"></div></div></li>
+    <li><h3>A linked list: every cell knows the next one</h3><div class="step-body">
+      <p>Each cell holds a value and the address of the next cell. The last cell holds <code>NULL</code>. You only keep the address of the first cell, called <code>head</code>. To add a cell you don't move anything; you just re-link two pointers.</p>
+      <div class="try" data-w="train"></div></div></li>
+    <li><h3>A binary search tree: smaller left, bigger right</h3><div class="step-body">
+      <p>Each node has a <code>left</code> and a <code>right</code> pointer. Smaller values go left and bigger ones go right. To find a value, compare and pick a side at each node, the way you'd play "higher or lower". Search for a number below.</p>
+      <div class="try" data-w="guess"></div></div></li>
+  </ol>
+  <div class="mixups"><span class="lbl">Common mix-ups</span><ul>
+    <li><code>p.age</code> with a pointer is an error. <code>*p.age</code> is wrong too, because the dot binds first. Use <code>p-&gt;age</code>.</li>
+    <li>If you overwrite <code>head</code> before linking the new cell, you lose the whole list.</li>
+    <li>Forgetting <code>NULL</code> at the end means your loop never knows when to stop.</li></ul></div>
+  <div class="check" data-q="c6"></div>
+</section>
+
+<!-- ================= 7 ================= -->
+<section class="panel" id="c7" role="tabpanel" aria-labelledby="tab-c7" hidden>
+  <div class="bigidea"><h2>Files store data as readable characters or as raw bytes. Bitwise operators work on single bits.</h2>
+  <p class="lead">A <mark>text file</mark> writes every value as ASCII characters you could read in Notepad. A <mark>binary file</mark> copies the exact bytes from memory: two's complement for whole numbers and IEEE for floats.</p></div>
+  <div class="analogy"><span class="lbl">Think of it like</span><p>Writing a number on paper digit by digit, versus photocopying the memory chip that holds it. Bitwise operators are like rows of light switches wired into small circuits.</p></div>
+  <ol class="steps">
+    <li><h3>Same number, two kinds of file</h3><div class="step-body">
+      <p>Type a whole number. The text file stores one byte per digit. The binary file always uses 4 bytes for an int, however many digits the number has.</p>
+      <div class="try" data-w="filecmp"></div></div></li>
+    <li><h3>AND, OR, XOR: tiny circuits</h3><div class="step-body">
+      <p>The operators compare two numbers bit by bit. <b>AND</b> (<code>&amp;</code>) lights a bulb only if both switches are on. <b>OR</b> (<code>|</code>) lights it if either is on. <b>XOR</b> (<code>^</code>) lights it if exactly one is on. <b>NOT</b> (<code>~</code>) flips every bit, and shifts (<code>&lt;&lt;</code>, <code>&gt;&gt;</code>) slide the bits left or right.</p>
+      <div class="try" data-w="circuit"></div></div></li>
+    <li><h3>Masks: work on one bit</h3><div class="step-body">
+      <p>A mask is a number with a 1 only where you want to act, such as <code>1 &lt;&lt; k</code>. Combine it with OR to turn a bit on, AND-NOT to turn it off, XOR to flip it, or AND to check it.</p>
+      <div class="try" data-w="mask"></div></div></li>
+  </ol>
+  <div class="mixups"><span class="lbl">Common mix-ups</span><ul>
+    <li><code>&amp;</code> works on bits; <code>&amp;&amp;</code> means "and" for true/false conditions. The same goes for <code>|</code> and <code>||</code>.</li>
+    <li><code>^</code> is XOR, not "to the power of". In C, <code>2 ^ 3</code> is 1.</li>
+    <li>Open binary files with <code>"wb"</code> / <code>"rb"</code> and use <code>fwrite</code> / <code>fread</code>. For text, use <code>fprintf</code> / <code>fscanf</code>.</li></ul></div>
+  <div class="check" data-q="c7"></div>
+</section>
+</div>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const hx=(n,w)=>'0x'+n.toString(16).toUpperCase().padStart(w||0,'0');
+const bin=(n,w)=>n.toString(2).padStart(w,'0');
+const DIG='0123456789ABCDEF';
+const sub=n=>String(n).replace(/\d/g,d=>'₀₁₂₃₄₅₆₇₈₉'[d]);
+const sup=n=>String(n).replace(/[-\d]/g,d=>d==='-'?'⁻':'⁰¹²³⁴⁵⁶⁷⁸⁹'[d]);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function chips(el,list,cur,on){el.innerHTML=list.map(([v,l])=>`<button class="chip" data-v="${v}" aria-pressed="${v==cur}">${l}</button>`).join('');$$('.chip',el).forEach(c=>c.onclick=()=>{$$('.chip',el).forEach(x=>x.setAttribute('aria-pressed',x===c));on(c.dataset.v);});}
+const T=(el,label)=>{el.innerHTML=`<span class="tl">${label||'Try it'}</span>`;const d=document.createElement('div');d.style.cssText='display:grid;gap:12px;min-width:0';el.appendChild(d);return d;};
+
+/* tabs */
+const tabs=$$('.tab');
+function show(id,save){tabs.forEach(t=>{const on=t.getAttribute('aria-controls')===id;t.setAttribute('aria-selected',on);t.tabIndex=on?0:-1;$('#'+t.getAttribute('aria-controls')).hidden=!on;});
+  if(save){try{localStorage.setItem('cso-ex-tab',id)}catch(e){}try{history.replaceState(null,'','#'+id)}catch(e){}window.scrollTo({top:0});}}
+tabs.forEach((t,i)=>{t.onclick=()=>show(t.getAttribute('aria-controls'),1);t.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const j=(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[j].focus();tabs[j].click();}};});
+let st='c1';try{st=localStorage.getItem('cso-ex-tab')||'c1'}catch(e){}if(/^#c[1-7]$/.test(location.hash))st=location.hash.slice(1);show(st);
+
+const W={};
+
+/* ---- 1 ---- */
+W.odometer=el=>{const d=T(el);let base=10,n=0;
+  d.innerHTML=`<div class="row cb"></div><div class="odo"></div><div class="row"><button class="b plus">+1</button><button class="b o reset">Reset</button></div><p class="say"></p>`;
+  chips($('.cb',d),[[10,'Base 10'],[2,'Base 2'],[16,'Base 16']],10,v=>{base=+v;n=0;draw('')});
+  const draw=(msg,roll)=>{const s=n.toString(base).toUpperCase().padStart(4,'0').slice(-4);
+    $('.odo',d).innerHTML=[...s].map((c,i)=>`<div class="wheel${roll&&roll.includes(i)?' roll':''}">${c}</div>`).join('');
+    $('.say',d).innerHTML=(msg||`Each wheel has ${base} digits: ${DIG.slice(0,base).split('').join(' ')}.`)+` <br>Count so far: <b>${n}</b> things.`;};
+  $('.plus',d).onclick=()=>{const before=n.toString(base).padStart(4,'0').slice(-4);n=(n+1)%Math.pow(base,4);const max=DIG[base-1].toLowerCase();
+    let k=0;for(let i=3;i>=0&&before[i].toLowerCase()===max;i--)k++;
+    const roll=[];for(let i=0;i<=k&&3-i>=0;i++)roll.push(3-i);
+    draw(k?`The right${k>1?'most '+k+' wheels':' wheel'} ran out of digits, rolled back to 0 and carried 1 to the left.`:'The right wheel just moved up by one.',roll);};
+  $('.reset',d).onclick=()=>{n=0;draw('')};draw('');};
+
+W.place=el=>{const d=T(el);let b=[1,0,1,1];const w=[8,4,2,1];
+  const draw=()=>{d.innerHTML=`<div class="sws">${b.map((v,i)=>`<div class="swc"><button class="sw${v?' on':''}" data-i="${i}" aria-label="switch worth ${w[i]}">${v}</button><small>worth ${w[i]}</small></div>`).join('')}</div>
+    <p class="say">${b.map((v,i)=>v?`<b>${w[i]}</b>`:'0').join(' + ')} = <b>${b.reduce((s,v,i)=>s+v*w[i],0)}</b> &nbsp; so (${b.join('')})${sub(2)} = ${b.reduce((s,v,i)=>s+v*w[i],0)}${sub(10)}</p>`;
+    $$('.sw',d).forEach(s=>s.onclick=()=>{b[+s.dataset.i]^=1;draw();});};draw();};
+
+W.hexgroup=el=>{const d=T(el);let b=[0,1,0,1,0,0,0,1];
+  const draw=()=>{const hi=parseInt(b.slice(0,4).join(''),2),lo=parseInt(b.slice(4).join(''),2);
+    const g=(s,o)=>`<div class="nib">${s.map((v,i)=>`<div class="swc"><button class="sw${v?' on':''}" data-i="${i+o}" aria-label="bit">${v}</button><small>${[8,4,2,1][i]}</small></div>`).join('')}</div>`;
+    d.innerHTML=`<div class="sws">${g(b.slice(0,4),0)}${g(b.slice(4),4)}</div>
+     <p class="say">Left group ${b.slice(0,4).join('')} = ${hi} → hex <b>${DIG[hi]}</b>. Right group ${b.slice(4).join('')} = ${lo} → hex <b>${DIG[lo]}</b>.<br>So ${b.join('')}${sub(2)} = <b>${DIG[hi]}${DIG[lo]}</b>${sub(16)} = ${hi*16+lo}${sub(10)}. Eight switches became two characters.</p>`;
+    $$('.sw',d).forEach(s=>s.onclick=()=>{b[+s.dataset.i]^=1;draw();});};draw();};
+
+W.divide=el=>{const d=T(el);let rows=[],shown=0;
+  d.innerHTML=`<div class="row"><label class="f" for="dvn">Number<input id="dvn" type="number" value="13" min="1" max="9999"></label><button class="b nx">Next division</button><button class="b o all">Show all</button></div><div class="ladder"></div><p class="say"></p>`;
+  const build=()=>{let n=Math.max(1,Math.min(9999,parseInt($('#dvn').value,10)||1));rows=[];while(n>0){rows.push([n,Math.floor(n/2),n%2]);n=Math.floor(n/2);}shown=1;draw();};
+  const draw=()=>{$('.ladder',d).innerHTML=rows.slice(0,shown).map(r=>`<div><span>${r[0]} ÷ 2 = ${r[1]}</span><span>remainder <span class="r">${r[2]}</span></span></div>`).join('');
+    const done=shown>=rows.length;$('.nx',d).disabled=done;
+    $('.say',d).innerHTML=done?`The quotient reached 0. Read the remainders from bottom to top: <b>${rows.map(r=>r[2]).reverse().join('')}</b>${sub(2)} = ${rows[0][0]}${sub(10)}.`:`Keep going: divide the new quotient (${rows[shown-1][1]}) by 2.`;};
+  $('.nx',d).onclick=()=>{shown++;draw()};$('.all',d).onclick=()=>{shown=rows.length;draw()};$('#dvn').oninput=build;build();};
+
+/* ---- 2 ---- */
+W.codebook=el=>{const d=T(el);d.innerHTML=`<label class="f" for="cbt">Type a word<input id="cbt" value="Hi CS" maxlength="16" autocomplete="off"></label><div class="letters"></div><p class="say"></p>`;
+  const draw=()=>{const s=$('#cbt').value;$('.letters',d).innerHTML=[...s].map(ch=>{const c=ch.codePointAt(0);return `<div class="lt"><b>${ch===' '?'␣':esc(ch)}</b><span>${c}</span><small>${c<256?bin(c,8):'needs more bytes'}</small></div>`}).join('');
+    $('.say',d).innerHTML=s?`The computer stores ${[...s].length} number${[...s].length>1?'s':''}, not letters. Notice 'a' − 'A' = 32 for every letter.`:'Type something above.';};
+  $('#cbt').oninput=draw;draw();};
+
+W.wheel=el=>{const d=T(el);let cur=3,mode='s';
+  d.innerHTML=`<div class="row cb"></div><div class="scroll svgw"></div><div class="row"><button class="b plus">Add 1</button><button class="b o minus">Subtract 1</button></div><p class="say"></p>`;
+  chips($('.cb',d),[['s','Read as signed'],['u','Read as unsigned']],'s',v=>{mode=v;draw('')});
+  const val=i=>mode==='s'&&i>=4?i-8:i;
+  const draw=(msg)=>{const R=95,cx=140,cy=125;let s='';
+    for(let i=0;i<8;i++){const a=-Math.PI/2+i*Math.PI/4,x=cx+R*Math.cos(a),y=cy+R*Math.sin(a),on=i===cur,neg=val(i)<0;
+      s+=`<g data-i="${i}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="26" fill="${on?'var(--mark)':'var(--paper)'}" stroke="${on?'var(--warm)':neg?'var(--bad)':'var(--line)'}" stroke-width="2"/><text x="${x}" y="${y-3}" text-anchor="middle" font-size="12" fill="var(--soft)">${bin(i,3)}</text><text x="${x}" y="${y+14}" text-anchor="middle" font-size="15" font-weight="600" fill="${on?'var(--mark-ink)':'var(--ink)'}">${val(i)}</text></g>`;}
+    s+=`<text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="12" fill="var(--soft)">${mode==='s'?'top bit 1 = negative':'0 to 7'}</text>`;
+    $('.svgw',d).innerHTML=`<svg width="280" height="250" viewBox="0 0 280 250" role="img" aria-label="3-bit number wheel">${s}</svg>`;
+    $$('g[data-i]',d).forEach(g=>g.onclick=()=>{cur=+g.dataset.i;draw('')});
+    $('.say',d).innerHTML=(msg?msg+'<br>':'')+`Pattern <b>${bin(cur,3)}</b> means <b>${val(cur)}</b> ${mode==='s'?'as a signed number':'as an unsigned number'}.`;};
+  const step=k=>{const old=val(cur);cur=(cur+k+8)%8;const nw=val(cur);const wrap=(k>0&&nw<old)||(k<0&&nw>old);draw(wrap?`<span style="color:var(--bad)">Overflow!</span> ${old} ${k>0?'+':'−'} 1 wrapped around to ${nw}. With 3 bits there is no room for ${old+k}.`:'');};
+  $('.plus',d).onclick=()=>step(1);$('.minus',d).onclick=()=>step(-1);draw('');};
+
+W.sci=el=>{const d=T(el);d.innerHTML=`<div class="row cb"></div><div class="say st"></div><div class="boxes3"></div><p class="hint" style="margin:0;color:var(--soft);font-size:14px"></p>`;
+  const go=v=>{v=+v;const neg=v<0,a=Math.abs(v);const ip=Math.floor(a);let f=a-ip,fb='';for(let i=0;i<14&&f>0;i++){f*=2;const bt=Math.floor(f);fb+=bt;f-=bt;}const exact=f===0;
+    const ib=ip.toString(2);let e,mant;
+    if(ip>=1){e=ib.length-1;mant=(ib.slice(1)+fb).replace(/0+$/,'');}else{const k=fb.indexOf('1');e=-(k+1);mant=fb.slice(k+1).replace(/0+$/,'');}
+    $('.st',d).innerHTML=`<p style="margin:0">${v} in binary is <b class="m">${neg?'−':''}${ib}.${fb||'0'}${exact?'':'…'}</b></p><p style="margin:4px 0 0">Slide the point until one 1 is left in front of it: <b class="m">${neg?'−':''}1.${mant||'0'} × 2${sup(e)}</b></p>`;
+    $('.boxes3',d).innerHTML=`<div class="fbox"><small>Sign (1 bit)</small><b>${neg?1:0}</b><small>${neg?'negative':'positive'}</small></div><div class="fbox"><small>Exponent (8 bits)</small><b>${e}</b><small>stored as ${e}+127 = ${e+127} = ${bin(e+127,8)}</small></div><div class="fbox"><small>Mantissa (23 bits)</small><b>${(mant||'0').slice(0,12)}${(mant||'').length>12?'…':''}</b><small>the digits after "1." The leading 1 is not stored.</small></div>`;
+    $('.hint',d).textContent=exact?'This value fits exactly.':'The binary digits repeat forever, so the float keeps only the first 23 and rounds. That is why 0.1 + 0.2 is not exactly 0.3.';};
+  chips($('.cb',d),[['5.25','5.25'],['0.75','0.75'],['-10','−10'],['0.1','0.1'],['100.5','100.5']],'5.25',go);go(5.25);};
+
+W.pixels=el=>{const d=T(el);const P=['00111100','01000010','10100101','10000001','10100101','10011001','01000010','00111100'];let g=P.map(r=>[...r].map(Number));
+  const draw=()=>{d.innerHTML=`<div class="pxwrap"><div class="px">${g.map((r,y)=>r.map((v,x)=>`<button class="${v?'on':''}" data-x="${x}" data-y="${y}" aria-label="pixel ${x},${y}"></button>`).join('')).join('')}</div><div class="pxrows">${g.map(r=>{const s=r.join('');return `${s} = ${hx(parseInt(s,2),2)}`}).join('<br>')}</div></div>
+    <p class="say">8 × 8 pixels × 1 bit = 64 bits = <b>8 bytes</b>. The same picture in grayscale needs 64 bytes, and in color 192 bytes (3 per pixel).</p>`;
+    $$('.px button',d).forEach(b=>b.onclick=()=>{g[+b.dataset.y][+b.dataset.x]^=1;draw();});};draw();};
+
+W.sound=el=>{const d=T(el);d.innerHTML=`<label class="f" for="snd">Samples per second<input id="snd" type="range" min="4" max="48" value="10"><b class="m sv"></b></label><div class="scroll svgw"></div><p class="say"></p>`;
+  const wave=t=>Math.sin(2*Math.PI*2*t)*0.65+Math.sin(2*Math.PI*5*t)*0.25;
+  const draw=()=>{const n=+$('#snd').value,Wd=340,H=140,Y=v=>H/2-v*55,X=t=>10+t*(Wd-20);
+    let p='';for(let i=0;i<=200;i++){const t=i/200;p+=(i?'L':'M')+X(t).toFixed(1)+' '+Y(wave(t)).toFixed(1);}
+    let stp='',dots='';for(let i=0;i<n;i++){const t=i/n,t2=(i+1)/n,v=wave(t);stp+=(i?'L':'M')+X(t).toFixed(1)+' '+Y(v).toFixed(1)+'L'+X(t2).toFixed(1)+' '+Y(v).toFixed(1);dots+=`<circle cx="${X(t)}" cy="${Y(v)}" r="3.5" fill="var(--warm)"/>`;}
+    $('.svgw',d).innerHTML=`<svg width="${Wd}" height="${H}" viewBox="0 0 ${Wd} ${H}" role="img" aria-label="sound wave sampling"><line x1="10" y1="${H/2}" x2="${Wd-10}" y2="${H/2}" stroke="var(--line)"/><path d="${p}" fill="none" stroke="var(--soft)" stroke-width="1.5" stroke-dasharray="4 3"/><path d="${stp}" fill="none" stroke="var(--accent)" stroke-width="2"/>${dots}</svg>`;
+    $('.sv',d).textContent=n+' Hz';
+    $('.say',d).innerHTML=`Dashed line: the real sound. Blue line: what the computer keeps from ${n} samples. ${n<12?'Too few samples miss the detail.':'Much closer.'} Real music uses 44,100 samples per second.`;};
+  $('#snd').oninput=draw;draw();};
+
+W.lockers=el=>{const d=T(el);d.innerHTML=`<label class="f" for="lkb">Address bits<input id="lkb" type="range" min="1" max="6" value="3"><b class="m lv"></b></label><div class="lockers"></div><p class="say"></p>`;
+  const draw=()=>{const n=+$('#lkb').value,c=1<<n;$('.lv',d).textContent=n;
+    $('.lockers',d).innerHTML=[...Array(c).keys()].map(i=>`<div class="lk"><small>${bin(i,n)}</small>1 B</div>`).join('');
+    $('.say',d).innerHTML=`${n} address bit${n>1?'s':''} → 2${sup(n)} = <b>${c}</b> lockers → ${c} bytes of memory. A real 32-bit address reaches 2³² bytes = 4 GB.`;};
+  $('#lkb').oninput=draw;draw();};
+
+/* ---- 3 ---- */
+W.boxes=el=>{const d=T(el,'See the sizes');const L=[['char',1,"char c = 'A';",'one character or a small number'],['short',2,'short s = 300;','up to about ±32 thousand'],['int',4,'int n = 42;','up to about ±2 billion'],['long',8,'long big = 9000000000;','up to about ±9 × 10¹⁸'],['float',4,'float f = 3.14;','about 7 accurate digits'],['double',8,'double d = 3.14159265;','about 15 accurate digits']];
+  d.innerHTML=L.map(t=>`<div class="tbox"><span class="tname">${t[0]}</span><div class="bytes">${'<span class="by"></span>'.repeat(t[1])}<span class="m" style="margin-left:8px;color:var(--soft)">${t[1]} byte${t[1]>1?'s':''}</span></div><small><code>${esc(t[2])}</code> · ${t[3]}</small></div>`).join('');};
+
+W.loop=el=>{const d=T(el);const PH=['init','check','body','update'];let i,ph,out,done;
+  d.innerHTML=`<pre class="code lc"></pre><div class="row"><button class="b nx">Next step</button><button class="b o rs">Start over</button></div><p class="say"></p>`;
+  const reset=()=>{i=null;ph=-1;out=[];done=false;draw('Press Next step to begin.');};
+  const draw=msg=>{const hl=k=>ph===k?'cur':'';
+    $('.lc',d).innerHTML=`<span>for (<i class="${hl(0)}">int i = 0</i>; <i class="${hl(1)}">i &lt; 3</i>; <i class="${hl(3)}">i++</i>) {</span><span>    <i class="${hl(2)}">printf("lap %d\\n", i);</i></span><span>}</span>`;
+    $('.say',d).innerHTML=`${msg}<br><span class="m">i = ${i===null?'—':i} · screen: ${out.length?out.map(x=>'lap '+x).join(', '):'(empty)'}</span>`;$('.nx',d).disabled=done;};
+  $('.nx',d).onclick=()=>{if(ph===-1){ph=0;i=0;draw('Setup runs once: i starts at 0.');return;}
+    if(ph===0||ph===3){ph=1;const c=i<3;if(!c){done=true;draw(`Check: is ${i} &lt; 3? No. The loop ends. The body ran ${out.length} times.`);}else draw(`Check: is ${i} &lt; 3? Yes, so run the body.`);return;}
+    if(ph===1){ph=2;out.push(i);draw(`Body: print "lap ${i}".`);return;}
+    if(ph===2){ph=3;i++;draw(`Update: i++ makes i = ${i}. Back to the check.`);}};
+  $('.rs',d).onclick=reset;reset();};
+
+W.plates=el=>{const d=T(el);let stack=['main'],heap=[],cnt=0,uid=0;
+  d.innerHTML=`<div class="row"><button class="b call">Call a function</button><button class="b o ret">Return</button><button class="b o mal">malloc</button><button class="b o fre">free</button></div><div class="regions"></div><p class="say"></p>`;
+  const draw=msg=>{const r=(t,s,inner)=>`<div class="reg"><h4>${t}<small>${s}</small></h4>${inner}</div>`;
+    const sp=stack.slice().reverse().map((f,i)=>`<div class="plate${i===0?' top':''}"><span>${f}()</span><span>locals</span></div>`).join('')||'<small style="color:var(--soft)">empty: program ended</small>';
+    const hp=heap.map(h=>`<div class="unit${h.leak?' leak':''}">${hx(h.a)} · ${h.leak?'leaked: no pointer left':'owned by '+h.by+'()'}</div>`).join('')||'<small style="color:var(--soft)">nothing rented</small>';
+    $('.regions',d).innerHTML=r('Code','your instructions','<div class="unit">main, f1, f2… as machine code</div>')+r('Data','global variables','<div class="unit">int counter = 0;</div>')+r('Stack','automatic, last in first out',sp)+r('Heap','manual: malloc / free',hp);
+    $('.say',d).innerHTML=msg;$('.ret',d).disabled=!stack.length;$('.call',d).disabled=!stack.length||stack.length>4;$('.mal',d).disabled=!stack.length;$('.fre',d).disabled=!heap.some(h=>!h.leak);};
+  $('.call',d).onclick=()=>{cnt++;stack.push('f'+cnt);draw(`f${cnt}() was called, so a new plate with its local variables goes on top of the stack.`);};
+  $('.ret',d).onclick=()=>{const f=stack.pop();let leaked=0;heap.forEach(h=>{if(h.by===f&&!h.leak){h.leak=1;leaked++;}});draw(`${f}() returned and its plate was removed automatically.`+(leaked?` <b style="color:var(--bad)">It never freed its heap block, and the only pointer to it was a local variable. That memory is now leaked.</b>`:''));};
+  $('.mal',d).onclick=()=>{const f=stack[stack.length-1];const a=0x500+0x20*uid++;heap.push({a,by:f});draw(`${f}() called malloc. A block at ${hx(a)} was rented on the heap and its address stored in a local pointer.`);};
+  $('.fre',d).onclick=()=>{const k=heap.map(h=>!h.leak).lastIndexOf(true);const h=heap.splice(k,1)[0];draw(`free(${hx(h.a)}) returned the block to the heap.`);};
+  draw('main() is running. Try calling a function, renting heap memory, then returning without freeing it.');};
+
+/* ---- 4 ---- */
+W.house=el=>{const d=T(el);let x=7,hl=null;
+  d.innerHTML=`<div class="scene"></div><div class="row ex"></div><p class="say"></p>`;
+  const draw=msg=>{$('.scene',d).innerHTML=`<div class="note${hl==='p'?' hl':''}"><small>note p · lives at 0xFF</small>0xFA</div><span class="arrow" aria-hidden="true">→</span><div class="house${hl==='x'?' hl':''}"><small>house x · address 0xFA</small><b>${x}</b></div>`;$('.say',d).innerHTML=msg;};
+  const A={x:()=>['x',`<b>x = ${x}</b>. The value inside the house.`],'&x':()=>['x','<b>&amp;x = 0xFA</b>. Not what is inside, but where the house is.'],p:()=>['p','<b>p = 0xFA</b>. The note just holds an address.'],'*p':()=>['x',`<b>*p = ${x}</b>. Read the address on the note, walk to that house, look inside.`],'&p':()=>['p','<b>&amp;p = 0xFF</b>. The note itself is stored somewhere too.'],'*p = 10':()=>{x=10;return['x','Follow the note to the house and replace what is inside. <b>x is now 10</b>, even though we never wrote "x =".']},reset:()=>{x=7;return[null,'Back to x = 7.']}};
+  $('.ex',d).innerHTML=Object.keys(A).map(k=>`<button class="chip" data-k="${k}">${k==='reset'?'Reset':esc(k)}</button>`).join('');
+  $$('.ex .chip',d).forEach(c=>c.onclick=()=>{const r=A[c.dataset.k]();hl=r[0];draw(r[1]);});
+  draw('Click an expression to see what it means.');};
+
+W.hunt=el=>{const d=T(el);let s=0;
+  d.innerHTML=`<div class="scene"></div><div class="row"><button class="b nx">Follow one arrow</button><button class="b o rs">Start over</button></div><p class="say"></p>`;
+  const M=['Start at q. It holds 0xFF, the address of p.','*q: go to 0xFF. You are at note p, which holds 0xFA.','**q: go to 0xFA. You are at house x. Its value is 7.'];
+  const draw=()=>{const h=i=>s===i?' hl':'';$('.scene',d).innerHTML=`<div class="note${h(0)}"><small>q · at 0xF5</small>0xFF</div><span class="arrow">→</span><div class="note${h(1)}"><small>p · at 0xFF</small>0xFA</div><span class="arrow">→</span><div class="house${h(2)}"><small>x · at 0xFA</small><b>7</b></div>`;
+    $('.say',d).innerHTML=`${M[s]}<br><span class="m">${['q = 0xFF','*q = p = 0xFA','**q = *p = x = 7'][s]}</span>`;$('.nx',d).disabled=s===2;};
+  $('.nx',d).onclick=()=>{s++;draw()};$('.rs',d).onclick=()=>{s=0;draw()};draw();};
+
+W.storage=el=>{const d=T(el);let s=0;
+  const S=[{code:'int *p;',m:'p is declared but holds no useful address yet.',unit:null,p:'?'},
+   {code:'p = malloc(sizeof(int));',m:'You rented a 4-byte unit at 0xA00. It contains leftover garbage until you write to it.',unit:'?',p:'0xA00'},
+   {code:'*p = 99;',m:'Follow p to the unit and put 99 inside.',unit:'99',p:'0xA00'},
+   {code:'free(p);',m:'The unit is returned. p still says 0xA00, so it is a dangling pointer, like a key to a unit you no longer rent.',unit:'returned',p:'0xA00'},
+   {code:'p = NULL;',m:'Now p clearly points nowhere. Any accidental use crashes right away instead of corrupting memory.',unit:null,p:'NULL'}];
+  const T2=['Undefined: p was never set.','Garbage: whatever was left in that memory.','99','Undefined: the unit no longer belongs to you.','Crash: you cannot follow a NULL pointer.'];
+  d.innerHTML=`<pre class="code sc"></pre><div class="scene"></div><div class="row"><button class="b o pv">Back</button><button class="b nx">Next line</button><button class="chip tr">What would *p give now?</button></div><p class="say"></p>`;
+  const draw=extra=>{const c=S[s];$('.sc',d).innerHTML=S.map((x,i)=>`<span class="${i===s?'cur':''}">${esc(x.code)}</span>`).join('');
+    $('.scene',d).innerHTML=`<div class="note"><small>p (stack)</small>${c.p}</div><span class="arrow">→</span>${c.unit===null?'<div class="unit">no heap unit</div>':`<div class="house"${c.unit==='returned'?' style="opacity:.45"':''}><small>heap unit 0xA00</small><b>${c.unit==='returned'?'—':c.unit}</b></div>`}`;
+    $('.say',d).innerHTML=c.m+(extra?`<br><b>*p → ${extra}</b>`:'');$('.pv',d).disabled=s===0;$('.nx',d).disabled=s===S.length-1;};
+  $('.nx',d).onclick=()=>{s++;draw()};$('.pv',d).onclick=()=>{s--;draw()};$('.tr',d).onclick=()=>draw(T2[s]);draw();};
+
+/* ---- 5 ---- */
+W.copyswap=el=>{const d=T(el);let mode='val',s=0;
+  const V=[{c:[1,2],f:null,m:'In main: cup x holds 1, cup y holds 2.'},{c:[1,2],f:[1,2],m:'swap(x, y) is called. The function gets photocopies a = 1 and b = 2.'},{c:[1,2],f:[2,1],m:'The function swaps its copies. a = 2, b = 1.',ch:'f'},{c:[1,2],f:null,m:'The function ends and its copies are thrown away. x and y are unchanged: still 1 and 2.'}];
+  const P=[{c:[1,2],f:null,m:'In main: cup x (at 0xF0) holds 1, cup y (at 0xF4) holds 2.'},{c:[1,2],f:['0xF0','0xF4'],m:'swap(&x, &y) is called. The function gets the addresses of the real cups.'},{c:[2,1],f:['0xF0','0xF4'],m:'It follows the addresses (*a and *b) and swaps what is inside the real cups.',ch:'c'},{c:[2,1],f:null,m:'The function ends, but the change was made to x and y themselves. Now x = 2, y = 1.'}];
+  d.innerHTML=`<div class="row cb"></div><div class="cups"></div><div class="row"><button class="b o pv">Back</button><button class="b nx">Next</button></div><p class="say"></p>`;
+  chips($('.cb',d),[['val','swap(int a, int b)'],['ptr','swap(int *a, int *b)']],'val',v=>{mode=v;s=0;draw();});
+  const draw=()=>{const L=mode==='val'?V:P,c=L[s];const cup=(n,v,ch)=>`<div class="cup${ch?' ch':''}"><b>${v}</b><small>${n}</small></div>`;
+    $('.cups',d).innerHTML=`<div class="frame"><h4>main</h4><div class="cuprow">${cup('x',c.c[0],c.ch==='c')}${cup('y',c.c[1],c.ch==='c')}</div></div><div class="frame"><h4>swap</h4><div class="cuprow">${c.f?cup('a',c.f[0],c.ch==='f')+cup('b',c.f[1],c.ch==='f'):'<small style="color:var(--soft)">not running</small>'}</div></div>`;
+    $('.say',d).className='say'+(s===3?(mode==='val'?' bad':' good'):'');$('.say',d).innerHTML=c.m;$('.pv',d).disabled=s===0;$('.nx',d).disabled=s===3;};
+  $('.nx',d).onclick=()=>{s++;draw()};$('.pv',d).onclick=()=>{s--;draw()};draw();};
+
+W.lockarr=el=>{const d=T(el);let sz=4,i=2;const vals={1:["'C'","'S'","'O'","'!'","'?'"],4:[10,20,30,40,50],8:['1.5','2.5','3.5','4.5','5.5']};const tn={1:'char',4:'int',8:'double'};
+  d.innerHTML=`<div class="row cb"></div><div class="lockers la"></div><p class="say"></p>`;
+  chips($('.cb',d),[[1,'char (1 B)'],[4,'int (4 B)'],[8,'double (8 B)']],4,v=>{sz=+v;draw()});
+  const draw=()=>{$('.la',d).innerHTML=vals[sz].map((v,k)=>`<button class="lk${k===i?' sel':''}" data-k="${k}" style="min-width:${46+sz*6}px"><small>a[${k}] · ${hx(0x100+k*sz)}</small>${v}</button>`).join('');
+    $$('.la .lk',d).forEach(b=>b.onclick=()=>{i=+b.dataset.k;draw()});
+    $('.say',d).innerHTML=`<code>${tn[sz]} a[5]</code> starts at a = 0x100. To reach a[${i}], skip ${i} locker${i===1?'':'s'} of ${sz} byte${sz>1?'s':''}: 0x100 + ${i} × ${sz} = <b>${hx(0x100+i*sz)}</b>.<br>So <code>a[${i}]</code> = <code>*(a + ${i})</code> = ${vals[sz][i]}.`;};draw();};
+
+/* ---- 6 ---- */
+W.idcard=el=>{const d=T(el);let how='s',fld='age';const F={age:'20',name:'"Maya"',gpa:'3.7'};
+  d.innerHTML=`<div class="row cb"></div><div class="scene"></div><p class="say"></p>`;
+  chips($('.cb',d),[['s','I hold the card: STUDENT s'],['p','I know where it is: STUDENT *p']],'s',v=>{how=v;draw()});
+  const draw=()=>{$('.scene',d).innerHTML=(how==='p'?`<div class="note"><small>p</small>0x7A0</div><span class="arrow">→</span>`:'')+`<div class="card"><span class="ttl">STUDENT${how==='p'?' at 0x7A0':' s'}</span>${Object.keys(F).map(k=>`<button class="${k===fld?'sel':''}" data-f="${k}"><span>${k}</span><span>${F[k]}</span></button>`).join('')}</div>`;
+    $$('.card button',d).forEach(b=>b.onclick=()=>{fld=b.dataset.f;draw()});
+    $('.say',d).innerHTML=how==='s'?`You are holding the card, so read the field directly: <code>s.${fld}</code> → ${F[fld]}`:`First go to the card, then read the field: <code>(*p).${fld}</code>, or the shortcut <code>p-&gt;${fld}</code> → ${F[fld]}`;};draw();};
+
+W.train=el=>{const d=T(el);let L=[{v:10,a:0x1A0},{v:20,a:0x1C8},{v:30,a:0x1B4}],nv=5,na=0x200,newA=null;
+  d.innerHTML=`<div class="train"></div><div class="row"><button class="b f">Add at front</button><button class="b o e">Add at end</button><button class="b o r">Remove first</button></div><p class="say"></p>`;
+  const draw=msg=>{$('.train',d).innerHTML=`<span class="tag">head</span><span class="arrow">→</span>`+L.map((c,k)=>`<div class="car${c.a===newA?' new':''}"><b>${c.v}</b><span>next: ${k<L.length-1?hx(L[k+1].a):'NULL'}</span></div><span class="arrow">→</span>`).join('')+`<span class="tag null">NULL</span>`;$('.say',d).innerHTML=msg;$('.r',d).disabled=!L.length;};
+  const mk=()=>{const c={v:nv,a:na};nv+=5;na+=0x28;newA=c.a;return c;};
+  $('.f',d).onclick=()=>{const c=mk(),old=L[0];L.unshift(c);draw(`1. malloc a new cell (value ${c.v}).<br>2. Set its next to the old head${old?' ('+hx(old.a)+')':' (NULL)'}.<br>3. Move head to the new cell. Nothing else moved.`);};
+  $('.e',d).onclick=()=>{const c=mk();L.push(c);draw(`Walk from head through ${L.length-1} cell${L.length===2?'':'s'} to find the last one, then point its next at the new cell. The new cell's next is NULL.`);};
+  $('.r',d).onclick=()=>{const c=L.shift();newA=null;draw(`1. Remember the first cell.<br>2. Move head to its next${L[0]?' ('+hx(L[0].a)+')':' (NULL)'}.<br>3. free() the old first cell (value ${c.v}).`);};
+  draw('Each car holds a value and the address of the next car. Try adding and removing.');};
+
+W.guess=el=>{const d=T(el);const VALS=[50,30,70,20,40,60,80,35,65,90];let root=null,path=[],found=null,tm=[];
+  const ins=(t,v)=>!t?{v,l:null,r:null}:(v<t.v?(t.l=ins(t.l,v),t):v>t.v?(t.r=ins(t.r,v),t):t);VALS.forEach(v=>root=ins(root,v));
+  d.innerHTML=`<div class="row"><label class="f" for="gv">Find<input id="gv" type="number" value="65"></label><button class="b go">Search</button></div><div class="scroll svgw"></div><p class="say"></p>`;
+  const draw=(lit)=>{const pos=[];let x=0,md=0;(function lay(t,dp){if(!t)return;lay(t.l,dp+1);t.x=x++;t.d=dp;md=Math.max(md,dp);pos.push(t);lay(t.r,dp+1);})(root,0);
+    const Wd=x*44+20,H=(md+1)*58+16,X=t=>16+t.x*44+14,Y=t=>22+t.d*58;let s='';
+    pos.forEach(t=>[t.l,t.r].forEach(c=>{if(c)s+=`<line x1="${X(t)}" y1="${Y(t)}" x2="${X(c)}" y2="${Y(c)}" stroke="var(--line)" stroke-width="2"/>`}));
+    pos.forEach(t=>{const on=lit.includes(t.v),hit=t.v===found&&on;s+=`<circle cx="${X(t)}" cy="${Y(t)}" r="16" fill="${hit?'var(--mark)':on?'var(--tint)':'var(--paper)'}" stroke="${hit?'var(--warm)':on?'var(--accent)':'var(--soft)'}" stroke-width="2"/><text x="${X(t)}" y="${Y(t)+4.5}" text-anchor="middle" font-size="12.5" fill="${hit?'var(--mark-ink)':'var(--ink)'}">${t.v}</text>`;});
+    $('.svgw',d).innerHTML=`<svg width="${Wd}" height="${H}" viewBox="0 0 ${Wd} ${H}" role="img" aria-label="binary search tree">${s}</svg>`;};
+  const go=()=>{tm.forEach(clearTimeout);tm=[];const v=parseInt($('#gv').value,10);if(isNaN(v))return;path=[];const log=[];let t=root;found=null;
+    while(t){path.push(t.v);if(v===t.v){found=v;log.push(`${v} = ${t.v}: found it!`);break;}log.push(v<t.v?`${v} &lt; ${t.v}: go left`:`${v} &gt; ${t.v}: go right`);t=v<t.v?t.l:t.r;}
+    if(found===null)log.push('Reached NULL: the value is not in the tree.');
+    const fin=`<br>${path.length} comparison${path.length>1?'s':''} for ${VALS.length} values. A list would need up to ${VALS.length}.`;
+    if(RM){draw(path);$('.say',d).innerHTML=log.join('<br>')+fin;return;}
+    path.forEach((_,k)=>tm.push(setTimeout(()=>{draw(path.slice(0,k+1));$('.say',d).innerHTML=log.slice(0,k+1).join('<br>')+(k===path.length-1?(log.length>path.length?'<br>'+log[log.length-1]:'')+fin:'');},k*600)));};
+  $('.go',d).onclick=go;$('#gv').onkeydown=e=>{if(e.key==='Enter')go();};draw([]);$('.say',d).innerHTML='Root is 50. Everything on its left is smaller, everything on its right is bigger.';};
+
+/* ---- 7 ---- */
+W.filecmp=el=>{const d=T(el);d.innerHTML=`<label class="f" for="fcv">Whole number<input id="fcv" value="123456" maxlength="11" autocomplete="off" style="width:150px"></label><div class="cups"><div class="frame"><h4>Text file (fprintf)</h4><div class="letters tx"></div></div><div class="frame"><h4>Binary file (fwrite)</h4><div class="letters bn"></div></div></div><p class="say"></p>`;
+  const draw=()=>{const v=parseInt($('#fcv').value,10);if(isNaN(v)||Math.abs(v)>2147483647){$('.say',d).innerHTML='Enter a whole number between about −2 billion and 2 billion.';return;}
+    const s=String(v),dv=new DataView(new ArrayBuffer(4));dv.setInt32(0,v,true);
+    $('.tx',d).innerHTML=[...s].map(c=>`<div class="lt"><b>${c}</b><span>${c.charCodeAt(0)}</span><small>ASCII</small></div>`).join('');
+    $('.bn',d).innerHTML=[0,1,2,3].map(k=>{const b=dv.getUint8(k);return `<div class="lt"><b style="font-size:18px">${hx(b,2).slice(2)}</b><span>${bin(b,8)}</span><small>byte ${k}</small></div>`}).join('');
+    $('.say',d).innerHTML=`Text: <b>${s.length} bytes</b>, readable by people. Binary: <b>4 bytes</b> (sizeof(int)), exactly as in memory, smallest byte first. ${s.length>4?'Binary is smaller here.':s.length<4?'Text is smaller for short numbers, but binary is always the same size.':'Same size this time.'}`;};
+  $('#fcv').oninput=draw;draw();};
+
+W.circuit=el=>{const d=T(el);let a=[1,1,0,0],b=[1,0,1,0],op='&';
+  d.innerHTML=`<div class="row cb"></div><div class="body" style="display:grid;gap:10px"></div><p class="say"></p>`;
+  const N={'&':'AND: on only if both are on','|':'OR: on if either is on','^':'XOR: on if they differ','~':'NOT: flip every bit of a','<<':'shift a left by 1 (doubles it)','>>':'shift a right by 1 (halves it)'};
+  chips($('.cb',d),[['&','a & b'],['|','a | b'],['^','a ^ b'],['~','~a'],['<<','a << 1'],['>>','a >> 1']],'&',v=>{op=v;draw()});
+  const draw=()=>{const A=parseInt(a.join(''),2),B=parseInt(b.join(''),2);const r={'&':A&B,'|':A|B,'^':A^B,'~':(~A)&15,'<<':(A<<1)&15,'>>':A>>1}[op];const rb=bin(r,4).split('').map(Number);
+    const row=(nm,arr,id)=>`<div class="grid-lbl"><span>${nm} = ${parseInt(arr.join(''),2)}</span><div class="sws">${arr.map((v,i)=>`<button class="sw${v?' on':''}" data-w="${id}" data-i="${i}" aria-label="${nm} bit">${v}</button>`).join('')}</div></div>`;
+    const uses=!['~','<<','>>'].includes(op);
+    $('.body',d).innerHTML=row('a',a,'a')+(uses?row('b',b,'b'):'')+`<div class="grid-lbl"><span>out = ${r}</span><div class="bulbs">${rb.map(v=>`<div class="bulb${v?' on':''}">${v}</div>`).join('')}</div></div>`;
+    $$('.body .sw',d).forEach(s=>s.onclick=()=>{(s.dataset.w==='a'?a:b)[+s.dataset.i]^=1;draw();});
+    $('.say',d).innerHTML=`<b>${N[op]}</b>.${op==='<<'?' The leftmost bit falls off the end.':''} Flip the switches and watch the bulbs.`;};draw();};
+
+W.mask=el=>{const d=T(el);let x=0b10100110,k=0;
+  d.innerHTML=`<div class="sws xs"></div><div class="row kc"></div><div class="row"><button class="b o" data-o="set">Set bit</button><button class="b o" data-o="clr">Clear bit</button><button class="b o" data-o="tog">Toggle bit</button><button class="b o" data-o="tst">Test bit</button></div><p class="say"></p>`;
+  const kcs=()=>chips($('.kc',d),[0,1,2,3,4,5,6,7].map(i=>[i,'bit '+i]),k,v=>{k=+v;draw('Mask <code>1 &lt;&lt; '+k+'</code> = <span class="m">'+bin(1<<k,8)+'</span>. Now pick an action.')});
+  const draw=msg=>{$('.xs',d).innerHTML=[7,6,5,4,3,2,1,0].map(i=>`<div class="swc"><div class="sw${(x>>i)&1?' on':''}" style="${i===k?'outline:2px solid var(--accent);outline-offset:2px':''}">${(x>>i)&1}</div><small>bit ${i}</small></div>`).join('');$('.say',d).innerHTML=msg;};
+  $$('[data-o]',d).forEach(b=>b.onclick=()=>{const M=1<<k,o=b.dataset.o,old=x;let m;
+    if(o==='set'){x|=M;m=`x = x | (1 &lt;&lt; ${k})`;}else if(o==='clr'){x&=~M&255;m=`x = x &amp; ~(1 &lt;&lt; ${k})`;}else if(o==='tog'){x^=M;m=`x = x ^ (1 &lt;&lt; ${k})`;}
+    else{draw(`<code>(x &gt;&gt; ${k}) &amp; 1</code> = <b>${(x>>k)&1}</b>: bit ${k} is ${(x>>k)&1?'on':'off'}.`);return;}
+    draw(`<code>${m}</code><br><span class="m">${bin(old,8)} → ${bin(x,8)}</span> · only bit ${k} could change.`);});
+  kcs();draw('Choose a bit, then an action.');};
+
+$$('[data-w]').forEach(el=>{try{W[el.dataset.w](el)}catch(e){el.textContent='This demo could not load.';console.error(e);}});
+
+/* ---- quizzes ---- */
+const QZ={
+ c1:[['What is (110)₂ in decimal?',['3','6','110','12'],1,'4 + 2 + 0 = 6.'],['How many bits make one hex digit?',['2','4','8','16'],1,'16 = 2⁴, so 4 bits cover exactly the 16 hex digits.'],['Which hex digit stands for 1111?',['E','F','15','1F'],1,'1111 = 8 + 4 + 2 + 1 = 15, and the hex digit for 15 is F.']],
+ c2:[["'A' is 65 in ASCII. What is 'C'?",['66','67','99','3'],1,'Letters are in order: A = 65, B = 66, C = 67.'],['In 8-bit two\'s complement, what is 1111 1111?',['255','−1','−127','−128'],1,'All 1s is one step before 0 on the wheel, so it is −1.'],['A 10 × 10 color image (24 bits per pixel) takes how many bytes?',['100','240','300','2400'],2,'100 pixels × 3 bytes = 300 bytes.'],['With 10 address bits, how many bytes can memory hold?',['10','100','1024','2048'],2,'2¹⁰ = 1024 lockers, one byte each.']],
+ c3:[['If a and b are both int, what is 7 / 2 in C?',['3.5','3','4','an error'],1,'Integer division drops the fraction.'],['Which loop always runs its body at least once?',['for','while','do … while','switch'],2,'do … while checks the condition after the body.'],['Where does memory from malloc come from?',['Stack','Heap','Code','Data'],1,'The heap is the area you manage yourself with malloc and free.']],
+ c4:[['int x = 5; int *p = &x; What is *p?',['the address of x','5','p','an error'],1,'*p follows the address to x and reads its value.'],['What does &x give you?',['the value of x','the address of x','a copy of x','a pointer to a pointer'],1,'& asks "where is x?"'],['After free(p), what does p hold?',['NULL automatically','the old address','nothing, p is deleted','the address of x'],1,'free does not change p. Set it to NULL yourself.']],
+ c5:[['int a[4]; What is the last valid index?',['4','3','0','5'],1,'Indexes run 0, 1, 2, 3.'],['a starts at 0x100 and ints are 4 bytes. Where is a[2]?',['0x102','0x108','0x104','0x110'],1,'0x100 + 2 × 4 = 0x108.'],['Can swap(int a, int b) change the caller\'s variables?',['Yes','No, it only gets copies','Only if they are global','Only for small numbers'],1,'Passing by value hands over photocopies.']],
+ c6:[['STUDENT *p; How do you read the age?',['p.age','p->age','*p.age','&p.age'],1,'p->age is short for (*p).age.'],['To insert at the front of a linked list you change…',['every cell','the new cell\'s next and head','only the last cell','nothing'],1,'Link the new cell to the old head, then move head.'],['In a binary search tree, where are values smaller than the root?',['Left','Right','Either side','At the bottom'],0,'Smaller values always go left.']],
+ c7:[['How many bytes does 123456 take when written to a text file?',['4','6','8','3'],1,'One ASCII byte per digit: 6 digits.'],['0101 & 0011 = ?',['0001','0111','0110','1000'],0,'AND keeps a 1 only where both have a 1.'],['For an unsigned number, what does x << 1 do?',['halves it','doubles it','flips its bits','nothing'],1,'Shifting left by one multiplies by 2.']]};
+$$('[data-q]').forEach(box=>{const qs=QZ[box.dataset.q];let right=0,ans=0;
+  box.innerHTML=`<span class="lbl">Check yourself</span>`+qs.map((q,i)=>`<div class="q" data-i="${i}"><p class="qq">${i+1}. ${esc(q[0])}</p><div class="opts">${q[1].map((o,j)=>`<button class="opt" data-j="${j}">${esc(o)}</button>`).join('')}</div><p class="why" hidden></p></div>`).join('')+`<p class="score" aria-live="polite">Answer all ${qs.length} to see your score.</p>`;
+  $$('.q',box).forEach(qe=>{const q=qs[+qe.dataset.i];let done=false;$$('.opt',qe).forEach(b=>b.onclick=()=>{if(done)return;done=true;ans++;const j=+b.dataset.j,ok=j===q[2];if(ok)right++;
+    b.classList.add(ok?'right':'wrong');if(!ok)$$('.opt',qe)[q[2]].classList.add('right');const w=$('.why',qe);w.hidden=false;w.innerHTML=(ok?'<b style="color:var(--good)">Correct.</b> ':'<b style="color:var(--bad)">Not quite.</b> ')+esc(q[3]);
+    if(ans===qs.length)$('.score',box).textContent=`You got ${right} of ${qs.length}.${right===qs.length?' Ready for the next tab.':' Scroll up to the steps for the ones you missed.'}`;});});});
+})();
+</script>
+
+</body></html>
