@@ -43,6 +43,12 @@ code,.mono{font-family:var(--f-mono);font-size:.9em}
 .brand{font:800 16px var(--f-display);letter-spacing:-.01em;white-space:nowrap}
 .brand span{color:var(--accent)}
 .sp{flex:1}
+/* zoom */
+.zoom{display:inline-flex;gap:0}
+.zoom .btn{border-radius:0;min-width:34px;font-variant-numeric:tabular-nums}
+.zoom .btn:first-child{border-radius:6px 0 0 6px}
+.zoom .btn:last-child{border-radius:0 6px 6px 0}
+.zoom #zval{min-width:58px;border-left:0;border-right:0}
 #counter{font:600 13px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 #jump{font:600 12.5px var(--f-body);width:auto;padding:3px 6px}
 .progress{flex:1;min-width:80px;height:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:3px;overflow:hidden}
@@ -321,6 +327,7 @@ label[for=d-cast],label[for=c-cast]{display:none!important}
     <span class="sp"></span>
     <label for="jump" class="keys" style="display:flex;gap:6px;align-items:center">Go to<select id="jump"></select></label>
     <span id="counter"></span>
+    <span class="zoom" role="group" aria-label="Zoom"><button class="btn ghost sm" id="zout" aria-label="Zoom out">−</button><button class="btn ghost sm" id="zval" aria-label="Reset zoom" title="Reset zoom">100%</button><button class="btn ghost sm" id="zin" aria-label="Zoom in">+</button></span>
     <button class="btn ghost sm" id="fs">Full screen</button>
   </header>
   <main id="viewport"><div id="slides"></div></main>
@@ -1366,7 +1373,7 @@ function demoStart(){
   if(!demo.bound){
     demo.bound=true;
     $('#demo').addEventListener('pointerdown',e=>{
-      const r=e.currentTarget.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+      const c=e.currentTarget,r=c.getBoundingClientRect(),k=c.clientWidth/(r.width||1),x=(e.clientX-r.left)*k,y=(e.clientY-r.top)*k;
       for(let i=demo.items.length-1;i>=0;i--){const it=demo.items[i];if(Math.hypot(it.x-x,it.y-y)<=dRad(it)+8){
         const v=dPts(it);demo.score+=v;$('#demo-score').textContent=demo.score;demo.pops.push({x:it.x,y:it.y,v,t:1});demo.items.splice(i,1);demoDraw();break;}}
     });
@@ -1587,7 +1594,7 @@ function mgStart(ch,slideEl){
   if(!mgSize())return;
   if(!MG.bound.has(root)){
     MG.bound.add(root);
-    MG.cv.addEventListener('pointerdown',e=>{const r=e.currentTarget.getBoundingClientRect();mgTap(e.clientX-r.left,e.clientY-r.top);});
+    MG.cv.addEventListener('pointerdown',e=>{const c=e.currentTarget,r=c.getBoundingClientRect(),k=c.clientWidth/(r.width||1);mgTap((e.clientX-r.left)*k,(e.clientY-r.top)*k);});
     root.querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click',()=>mgAct(b.dataset.act)));
   }
   MG.mode=root.dataset.mode||'bug';mgReset();
@@ -1926,6 +1933,26 @@ const hm=/^#s(\d+)$/.exec(location.hash||'');
 if(hm)startAt=Math.min(SL.length-1,Math.max(0,+hm[1]-1));
 else{try{const v=parseInt(localStorage.getItem('shahdDeckSlide'),10);if(v>=0&&v<SL.length)startAt=v;}catch(e){}}
 slideEls[0].hidden=false;show(startAt);
+
+/* ================= zoom ================= */
+const ZSTEPS=[.6,.7,.8,.9,1,1.1,1.25,1.4,1.6];
+let zi=4;try{const v=parseFloat(localStorage.getItem('shahdDeckZoom'));const j=ZSTEPS.indexOf(v);if(j>=0)zi=j;}catch(e){}
+function applyZoom(){
+  const z=ZSTEPS[zi];$('#slides').style.zoom=z;$('#zval').textContent=Math.round(z*100)+'%';
+  $('#zout').disabled=zi===0;$('#zin').disabled=zi===ZSTEPS.length-1;
+  try{localStorage.setItem('shahdDeckZoom',String(z));}catch(e){}
+  if(MG.raf)mgSize();if(demo.raf)demoSize();
+}
+$('#zin').onclick=()=>{if(zi<ZSTEPS.length-1){zi++;applyZoom();}};
+$('#zout').onclick=()=>{if(zi>0){zi--;applyZoom();}};
+$('#zval').onclick=()=>{zi=4;applyZoom();};
+document.addEventListener('keydown',e=>{
+  const tag=document.activeElement?.tagName||'';if(/INPUT|SELECT|TEXTAREA/.test(tag)||e.ctrlKey||e.metaKey)return;
+  if(e.key==='+'||e.key==='='){e.preventDefault();$('#zin').click();}
+  else if(e.key==='-'||e.key==='_'){e.preventDefault();$('#zout').click();}
+  else if(e.key==='0'){$('#zval').click();}
+});
+applyZoom();
 
 })();
 </script>
