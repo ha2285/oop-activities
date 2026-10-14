@@ -1,0 +1,488 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Pet Park Design Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: brief on top; workspace = toolbar + scrollable UML canvas (left) + inspector (right); after submit: score card, checklist, student's frozen design, model design */
+:root{
+  --bg:#eef1f5; --surface:#ffffff; --surface-2:#f5f7fa; --ink:#18212e; --muted:#586376; --line:#d3d9e2;
+  --accent:#0f6e6e; --accent-soft:#dff1ef; --iface:#2d5c99; --iface-soft:#e4ecf8; --abs:#7a3e9d; --abs-soft:#f1e7f7;
+  --err:#b42318; --err-soft:#fdeceb; --exc:#c2570c; --exc-soft:#fdf0e3; --ok:#1f7a45; --ok-soft:#e5f4ea;
+  --ticket:#fff8e6; --ticket-line:#e6c873; --on-av:#ffffff; --grid:#dfe5ec;
+  --kw:#9b2c6f; --str:#1f7a45; --ty:#2d5c99; --com:#7b8494; --num:#b0590b; --ann:#8a6d00;
+  --c-rose:#d1495b;
+  --f-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#11151b; --surface:#191f28; --surface-2:#1f2631; --ink:#e5e9ef; --muted:#9aa4b3; --line:#2d3643;
+  --accent:#4cc2b4; --accent-soft:#163430; --iface:#8db6f0; --iface-soft:#1b2a40; --abs:#c99bea; --abs-soft:#2c2038;
+  --err:#ff8a7e; --err-soft:#3a1d1c; --exc:#f5a25c; --exc-soft:#3a2716; --ok:#74d39a; --ok-soft:#173023;
+  --ticket:#2b2616; --ticket-line:#7a6526; --grid:#232b36;
+  --kw:#e47cb7; --str:#7ccf9b; --ty:#8db6f0; --com:#7f8a99; --num:#f0a35c; --ann:#d9c060;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#11151b; --surface:#191f28; --surface-2:#1f2631; --ink:#e5e9ef; --muted:#9aa4b3; --line:#2d3643;
+  --accent:#4cc2b4; --accent-soft:#163430; --iface:#8db6f0; --iface-soft:#1b2a40; --abs:#c99bea; --abs-soft:#2c2038;
+  --err:#ff8a7e; --err-soft:#3a1d1c; --exc:#f5a25c; --exc-soft:#3a2716; --ok:#74d39a; --ok-soft:#173023;
+  --ticket:#2b2616; --ticket-line:#7a6526; --grid:#232b36;
+  --kw:#e47cb7; --str:#7ccf9b; --ty:#8db6f0; --com:#7f8a99; --num:#f0a35c; --ann:#d9c060;
+  color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.5;margin:0}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:20px;padding-block:28px 56px;display:flex;flex-direction:column;gap:18px}
+code{font-family:var(--f-mono);font-size:.9em}
+.eyebrow{font:700 13px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4.4vw,44px);letter-spacing:-.02em;line-height:1.05;margin:4px 0 0;text-wrap:balance}
+h1 span{color:var(--accent)}
+h2{font-family:var(--f-display);font-size:20px;margin:0}
+.lede{margin:8px 0 0;color:var(--muted);max-width:70ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0}
+.brief{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.brief{grid-template-columns:minmax(0,1fr)}}
+.bubble-row{display:flex;gap:14px;align-items:flex-start}
+.av{display:inline-grid;place-items:center;width:48px;height:48px;border-radius:50%;color:var(--on-av);background:var(--c-rose);font:800 20px var(--f-display);flex:none}
+.who{font:700 13px var(--f-body);color:var(--muted);margin-bottom:6px}
+.bubble{margin:0;background:var(--ticket);border:1px solid var(--ticket-line);border-radius:4px 20px 20px 20px;padding:14px 20px;font:600 18px/1.42 var(--f-display)}
+.reqs{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:7px;counter-reset:r}
+.reqs li{display:flex;gap:10px;align-items:baseline;counter-increment:r}
+.reqs li::before{content:"R" counter(r);font:700 12px var(--f-mono);color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:1px 6px;flex:none}
+.sec{font:700 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+label.fld{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--muted)}
+input,select{font:14px var(--f-mono);color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:0;max-width:100%}
+input.name{font:16px var(--f-body);width:16em;padding:8px 10px}
+input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn{font:700 14px var(--f-body);background:var(--accent);color:var(--surface);border:0;border-radius:6px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)} .btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:600}
+.btn.ghost[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.btn.sm{font-size:12.5px;padding:5px 10px}
+.btn.danger{background:transparent;color:var(--err);border:1px solid var(--err)}
+
+/* workspace */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.toolbar .grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.toolbar .lbl{font:700 11.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.status{font-size:13.5px;color:var(--muted);min-height:1.4em}
+.status b{color:var(--accent)}
+.timer{font:700 15px var(--f-mono);color:var(--accent);font-variant-numeric:tabular-nums}
+.timer.low{color:var(--exc)} .timer.out{color:var(--err)}
+.work{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:980px){.work{grid-template-columns:minmax(0,1fr)}}
+.board-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);max-height:640px}
+.board{position:relative;width:980px;height:600px;background-image:radial-gradient(var(--grid) 1.2px,transparent 1.2px);background-size:22px 22px;touch-action:none;user-select:none}
+.board svg.links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.link{fill:none;stroke:var(--ink);stroke-width:1.6}
+.link.impl{stroke:var(--iface);stroke-dasharray:7 5}
+.head{fill:var(--surface);stroke:var(--ink);stroke-width:1.6}
+.head.impl{stroke:var(--iface)}
+.link-hit{fill:none;stroke:transparent;stroke-width:16;pointer-events:stroke;cursor:pointer}
+.linkg.sel .link,.linkg.sel .head{stroke:var(--accent);stroke-width:2.6}
+.ubox{position:absolute;min-width:150px;max-width:240px;background:var(--surface);border:1.6px solid var(--ink);border-radius:5px;font:12.5px/1.45 var(--f-mono);cursor:grab;box-shadow:0 1px 0 var(--line)}
+.ubox.dragging{cursor:grabbing;opacity:.92}
+.ubox .uh{padding:6px 10px;text-align:center;border-bottom:1px solid var(--line);background:var(--surface-2);border-radius:4px 4px 0 0}
+.ubox.k-abstract .uh{background:var(--abs-soft)} .ubox.k-interface .uh{background:var(--iface-soft)}
+.ubox .ust{font-size:10.5px;color:var(--muted)}
+.ubox .un{font:700 14px var(--f-display)}
+.ubox.k-abstract .un{font-style:italic;color:var(--abs)} .ubox.k-interface .un{color:var(--iface)}
+.ubox .us{padding:4px 10px;min-height:14px}
+.ubox .us+.us{border-top:1px solid var(--line)}
+.ubox .m.abs{font-style:italic}
+.ubox .empty{color:var(--muted);opacity:.6}
+.ubox.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ubox.pending{border-color:var(--exc);box-shadow:0 0 0 3px var(--exc-soft)}
+.board.connecting .ubox{cursor:crosshair}
+.board.locked .ubox{cursor:default}
+.inspector{display:flex;flex-direction:column;gap:12px}
+.inspector .hint{font-size:13px;color:var(--muted);margin:0}
+.mrow{display:grid;grid-template-columns:52px minmax(0,1fr) 28px;gap:6px;align-items:center}
+.mrow input[type=text]{width:100%}
+.mrow .x{border:0;background:transparent;color:var(--muted);font-size:18px;cursor:pointer;border-radius:4px}
+.mrow .x:hover{color:var(--err);background:var(--err-soft)}
+.mabs{grid-column:2/4;display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--muted);margin-top:-2px}
+.mlist{display:flex;flex-direction:column;gap:8px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:var(--muted)}
+.legend svg{vertical-align:middle;margin-right:5px}
+.submitbar{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.submitbar .warn{color:var(--exc);font-weight:600}
+
+/* results */
+.scorecard{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px;align-items:center;background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:18px 22px}
+.sc-name{font:800 clamp(22px,2.6vw,32px) var(--f-display)}
+.sc-sub{color:var(--muted);font-size:14px}
+.sc-num{display:flex;align-items:baseline;gap:6px;font-family:var(--f-display)}
+.sc-num b{font-size:clamp(44px,5vw,64px);color:var(--accent);line-height:1}
+.sc-num span{font-size:22px;color:var(--muted)} .sc-num em{font-style:normal;font:700 16px var(--f-mono);color:var(--muted);margin-left:8px}
+.sc-msg{grid-column:1/-1;font-size:16.5px}
+.sc-actions{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:600px){.scorecard{grid-template-columns:minmax(0,1fr)}}
+.checks{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.chk{border:1px solid var(--line);border-left:5px solid var(--err);border-radius:8px;padding:10px 14px;background:var(--surface)}
+.chk.pass{border-left-color:var(--ok)}
+.chk .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.chk .ct{font-weight:700}
+.chk .st{font:700 11px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--err)}
+.chk.pass .st{color:var(--ok)}
+.chk .cc{font:700 11px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+.chk p{margin:4px 0 0;font-size:14px;color:var(--muted)}
+.copybox{width:100%;min-height:160px;font:12.5px var(--f-mono);background:var(--surface-2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<main class="wrap">
+  <header>
+    <div class="eyebrow">Java OOP · 5-minute design activity</div>
+    <h1>Pet Park: <span>design the classes</span></h1>
+    <p class="lede">You helped Dad build Shahd’s Bubble Pop. Now Shahd has a new game, and this time you are the designer. Draw the class diagram on the canvas, then submit to see how your design meets her requirements.</p>
+  </header>
+
+  <section class="brief">
+    <div class="card"><div class="bubble-row"><span class="av" aria-hidden="true">S</span><div><div class="who">Shahd → you</div>
+      <blockquote class="bubble">“My next game is Pet Park! I want cats, fish, parrots and ducks. They all have names and get hungry, and each one makes its own sound when I tap it. Fish swim, parrots fly, and ducks do both. And please add a Pool party button for everyone who can swim!”</blockquote></div></div></div>
+    <div class="card"><div class="sec">Requirements</div>
+      <ol class="reqs">
+        <li><span>Every pet has a <b>name</b> and a <b>hunger</b> level, written once (not copied into each pet).</span></li>
+        <li><span>Hunger must always stay between 0 and 100: no outside code may set it directly.</span></li>
+        <li><span>Every pet makes its <b>own sound</b>, and nobody may create a plain “pet” with no sound.</span></li>
+        <li><span>Fish and ducks can <b>swim</b>; parrots and ducks can <b>fly</b>. Cats do neither.</span></li>
+        <li><span>The Pool party button must be able to treat every swimmer the same way, whatever kind of pet it is.</span></li>
+      </ol></div>
+  </section>
+
+  <section id="gate" class="card">
+    <form class="row" id="start" autocomplete="off">
+      <label class="fld" for="sname">Your name<input class="name" id="sname" maxlength="40" spellcheck="false"></label>
+      <button class="btn" id="go" type="submit" disabled>Start designing</button>
+      <span class="status">The canvas starts with Cat, Fish, Parrot and Duck. You have 5 minutes.</span>
+    </form>
+  </section>
+
+  <section id="work" hidden>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <div class="toolbar">
+        <div class="grp"><span class="lbl">Add</span>
+          <button class="btn ghost sm" data-add="class">+ Class</button>
+          <button class="btn ghost sm" data-add="abstract">+ Abstract class</button>
+          <button class="btn ghost sm" data-add="interface">+ Interface</button></div>
+        <div class="grp"><span class="lbl">Draw arrow</span>
+          <button class="btn ghost sm" data-mode="extends" aria-pressed="false">extends ▷</button>
+          <button class="btn ghost sm" data-mode="implements" aria-pressed="false">implements ⇢</button></div>
+        <div class="grp"><span>Designer: <b id="who"></b></span><span class="timer" id="timer">5:00 left</span></div>
+      </div>
+      <div class="status" id="status" aria-live="polite">Click a box to select and edit it. Drag a box by any part of it.</div>
+      <div class="work">
+        <div class="board-wrap"><div class="board" id="board"><svg class="links" id="links"></svg></div></div>
+        <aside class="inspector card" id="inspector"></aside>
+      </div>
+      <div class="legend">
+        <span><svg width="40" height="14"><line x1="2" y1="7" x2="28" y2="7" stroke="currentColor" stroke-width="1.5"/><polygon points="38,7 28,2 28,12" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>extends (child → parent)</span>
+        <span style="color:var(--iface)"><svg width="40" height="14"><line x1="2" y1="7" x2="28" y2="7" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 3"/><polygon points="38,7 28,2 28,12" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>implements (class → interface)</span>
+        <span><i>italic</i> = abstract</span><span><code>-</code> private <code>#</code> protected <code>+</code> public</span>
+      </div>
+      <div class="submitbar" id="submitbar"></div>
+    </div>
+  </section>
+
+  <section id="result" hidden></section>
+</main>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const uid=()=>Math.random().toString(36).slice(2,9);
+const KEY='petParkDesignV1';
+
+/* ---------- state ---------- */
+const seed=()=>({classes:[
+  {id:uid(),name:'Cat',kind:'class',x:40,y:430,members:[]},
+  {id:uid(),name:'Fish',kind:'class',x:280,y:430,members:[]},
+  {id:uid(),name:'Parrot',kind:'class',x:520,y:430,members:[]},
+  {id:uid(),name:'Duck',kind:'class',x:760,y:430,members:[]}],links:[]});
+let S={name:'',stage:'gate',start:0,design:seed(),sel:null,mode:'select',pending:null,confirm:false};
+try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&v.design&&v.design.classes){S.design=v.design;S.name=v.name||'';if(v.stage==='work'){S.stage='work';S.start=v.start||Date.now();}}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({design:S.design,name:S.name,stage:S.stage==='done'?'gate':S.stage,start:S.start}));}catch(e){}}
+const D=()=>S.design;
+const byId=id=>D().classes.find(c=>c.id===id);
+
+/* ---------- board rendering ---------- */
+function boxHTML(c,opts){
+  const f=c.members.filter(m=>m.kind==='field'),m=c.members.filter(m=>m.kind==='method');
+  const st=c.kind==='abstract'?'«abstract»':c.kind==='interface'?'«interface»':'';
+  const line=x=>`<div class="${x.kind==='method'?'m':'f'}${x.abs?' abs':''}">${esc(x.vis)} ${esc(x.text||'…')}</div>`;
+  const sel=opts.sel&&S.sel&&S.sel.type==='class'&&S.sel.id===c.id,pend=opts.sel&&S.pending===c.id;
+  return `<div class="ubox k-${c.kind}${sel?' sel':''}${pend?' pending':''}" data-id="${c.id}" style="left:${c.x}px;top:${c.y}px" tabindex="${opts.sel?0:-1}" aria-label="${esc(c.name)}">
+    <div class="uh">${st?`<div class="ust">${st}</div>`:''}<div class="un">${esc(c.name||'Unnamed')}</div></div>
+    ${c.kind==='interface'&&!f.length?'':`<div class="us">${f.length?f.map(line).join(''):'<div class="empty">no fields</div>'}</div>`}
+    <div class="us">${m.length?m.map(line).join(''):'<div class="empty">no methods</div>'}</div></div>`;
+}
+function renderBoard(board,design,opts){
+  const svg=board.querySelector('svg.links');
+  board.querySelectorAll('.ubox').forEach(n=>n.remove());
+  board.insertAdjacentHTML('beforeend',design.classes.map(c=>boxHTML(c,opts)).join(''));
+  drawLinks(board,design,opts);
+}
+function rectOf(board,id){const el=board.querySelector(`.ubox[data-id="${id}"]`);if(!el)return null;return {x:el.offsetLeft,y:el.offsetTop,w:el.offsetWidth,h:el.offsetHeight};}
+function edge(r,tx,ty){const cx=r.x+r.w/2,cy=r.y+r.h/2,dx=tx-cx,dy=ty-cy;if(!dx&&!dy)return [cx,cy];const t=Math.min(dx?(r.w/2)/Math.abs(dx):Infinity,dy?(r.h/2)/Math.abs(dy):Infinity);return [cx+dx*t,cy+dy*t];}
+function drawLinks(board,design,opts){
+  const svg=board.querySelector('svg.links');let s='';
+  for(const l of design.links){
+    const a=rectOf(board,l.from),b=rectOf(board,l.to);if(!a||!b)continue;
+    const [x1,y1]=edge(a,b.x+b.w/2,b.y+b.h/2),[x2,y2]=edge(b,a.x+a.w/2,a.y+a.h/2);
+    const ang=Math.atan2(y2-y1,x2-x1),L=15,W=8;
+    const bx=x2-L*Math.cos(ang),by=y2-L*Math.sin(ang);
+    const p1=[bx+W*Math.sin(ang),by-W*Math.cos(ang)],p2=[bx-W*Math.sin(ang),by+W*Math.cos(ang)];
+    const im=l.type==='implements'?' impl':'',sel=opts.sel&&S.sel&&S.sel.type==='link'&&S.sel.id===l.id;
+    s+=`<g class="linkg${sel?' sel':''}" data-link="${l.id}"><line class="link${im}" x1="${x1}" y1="${y1}" x2="${bx}" y2="${by}"/>
+      <polygon class="head${im}" points="${x2},${y2} ${p1[0]},${p1[1]} ${p2[0]},${p2[1]}"/>
+      ${opts.sel?`<line class="link-hit" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`:''}</g>`;
+  }
+  svg.innerHTML=s;
+}
+const board=$('#board');
+function render(){renderBoard(board,D(),{sel:true});board.classList.toggle('connecting',S.mode!=='select');renderInspector();save();}
+
+/* ---------- inspector ---------- */
+function renderInspector(){
+  const ins=$('#inspector');
+  if(S.sel&&S.sel.type==='link'){
+    const l=D().links.find(x=>x.id===S.sel.id);if(!l){S.sel=null;return renderInspector();}
+    ins.innerHTML=`<div class="sec">Selected arrow</div><p style="margin:0;font:600 15px var(--f-mono)">${esc(byId(l.from)?.name)} <span style="color:var(--${l.type==='implements'?'iface':'ink'})">${l.type}</span> ${esc(byId(l.to)?.name)}</p>
+      <div class="row"><button class="btn ghost sm" id="flip">Swap direction</button><button class="btn danger sm" id="dellink">Delete arrow</button></div>`;
+    $('#flip').onclick=()=>{[l.from,l.to]=[l.to,l.from];render();};
+    $('#dellink').onclick=()=>{D().links=D().links.filter(x=>x.id!==l.id);S.sel=null;render();};
+    return;
+  }
+  const c=S.sel&&S.sel.type==='class'?byId(S.sel.id):null;
+  if(!c){ins.innerHTML=`<div class="sec">How to build your design</div>
+    <p class="hint">1. Add the classes and interfaces you need.</p>
+    <p class="hint">2. Click a box to name it and add fields (<code>hunger : int</code>) and methods (<code>sound() : String</code>).</p>
+    <p class="hint">3. Choose <b>extends</b> or <b>implements</b>, click the child, then the parent.</p>
+    <p class="hint">Click an arrow to select it. <kbd>Delete</kbd> removes the selected box or arrow.</p>`;return;}
+  ins.innerHTML=`<div class="sec">Selected ${c.kind==='interface'?'interface':c.kind==='abstract'?'abstract class':'class'}</div>
+    <label class="fld" for="cname">Name<input id="cname" type="text" value="${esc(c.name)}" spellcheck="false"></label>
+    <label class="fld" for="ckind">Kind<select id="ckind"><option value="class"${c.kind==='class'?' selected':''}>class</option><option value="abstract"${c.kind==='abstract'?' selected':''}>abstract class</option><option value="interface"${c.kind==='interface'?' selected':''}>interface</option></select></label>
+    <div><div class="sec">Fields</div><div class="mlist" id="flist"></div><button class="btn ghost sm" id="addf" style="margin-top:8px">+ Field</button></div>
+    <div><div class="sec">Methods</div><div class="mlist" id="mlist"></div><button class="btn ghost sm" id="addm" style="margin-top:8px">+ Method</button></div>
+    <button class="btn danger sm" id="delcls" style="align-self:flex-start">Delete ${esc(c.name||'box')}</button>`;
+  const memRows=kind=>c.members.map((m,i)=>m.kind!==kind?'':`<div class="mrow" data-i="${i}">
+      <select aria-label="Visibility" data-k="vis"><option value="+"${m.vis==='+'?' selected':''}>+</option><option value="-"${m.vis==='-'?' selected':''}>-</option><option value="#"${m.vis==='#'?' selected':''}>#</option></select>
+      <input type="text" data-k="text" value="${esc(m.text)}" placeholder="${kind==='field'?'hunger : int':'sound() : String'}" spellcheck="false" aria-label="${kind}">
+      <button class="x" data-k="del" aria-label="Remove">×</button>
+      ${kind==='method'?`<label class="mabs"><input type="checkbox" data-k="abs"${m.abs?' checked':''}> abstract (no body)</label>`:''}</div>`).join('');
+  $('#flist').innerHTML=memRows('field');$('#mlist').innerHTML=memRows('method');
+  $('#cname').addEventListener('input',e=>{c.name=e.target.value;renderBoxOnly();});
+  $('#ckind').addEventListener('change',e=>{c.kind=e.target.value;render();});
+  const add=kind=>{c.members.push({vis:kind==='field'?'-':'+',text:'',kind,abs:false});render();const ins2=[...$('#'+(kind==='field'?'flist':'mlist')).querySelectorAll('input[type=text]')].pop();ins2&&ins2.focus();};
+  $('#addf').onclick=()=>add('field');$('#addm').onclick=()=>add('method');
+  $('#delcls').onclick=()=>deleteClass(c.id);
+  ins.querySelectorAll('.mrow').forEach(r=>{
+    const m=c.members[+r.dataset.i];
+    r.querySelector('[data-k=vis]').addEventListener('change',e=>{m.vis=e.target.value;renderBoxOnly();});
+    r.querySelector('[data-k=text]').addEventListener('input',e=>{m.text=e.target.value;renderBoxOnly();});
+    r.querySelector('[data-k=text]').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add(m.kind);}});
+    r.querySelector('[data-k=del]').onclick=()=>{c.members.splice(+r.dataset.i,1);render();};
+    const ab=r.querySelector('[data-k=abs]');if(ab)ab.addEventListener('change',e=>{m.abs=e.target.checked;renderBoxOnly();});
+  });
+}
+function renderBoxOnly(){renderBoard(board,D(),{sel:true});save();}
+function deleteClass(id){const d=D();d.classes=d.classes.filter(c=>c.id!==id);d.links=d.links.filter(l=>l.from!==id&&l.to!==id);S.sel=null;render();}
+
+/* ---------- interactions ---------- */
+let drag=null;
+board.addEventListener('pointerdown',e=>{
+  if(S.stage!=='work')return;
+  const hit=e.target.closest('[data-link]');
+  if(hit&&e.target.classList.contains('link-hit')){S.sel={type:'link',id:hit.dataset.link};S.pending=null;render();return;}
+  const box=e.target.closest('.ubox');
+  if(!box){S.sel=null;S.pending=null;if(S.mode!=='select')setStatus();render();return;}
+  const id=box.dataset.id;
+  if(S.mode!=='select'){connectClick(id);return;}
+  S.sel={type:'class',id};render();
+  const c=byId(id),el=board.querySelector(`.ubox[data-id="${id}"]`);
+  drag={id,dx:e.clientX-c.x,dy:e.clientY-c.y,el};el.classList.add('dragging');
+  board.setPointerCapture(e.pointerId);e.preventDefault();
+});
+board.addEventListener('pointermove',e=>{
+  if(!drag)return;const c=byId(drag.id);
+  c.x=Math.max(0,Math.min(board.clientWidth-drag.el.offsetWidth,e.clientX-drag.dx));
+  c.y=Math.max(0,Math.min(board.clientHeight-drag.el.offsetHeight,e.clientY-drag.dy));
+  drag.el.style.left=c.x+'px';drag.el.style.top=c.y+'px';drawLinks(board,D(),{sel:true});
+});
+const endDrag=()=>{if(drag){drag.el.classList.remove('dragging');drag=null;save();}};
+board.addEventListener('pointerup',endDrag);board.addEventListener('pointercancel',endDrag);
+function setMode(m){
+  S.mode=S.mode===m?'select':m;S.pending=null;
+  document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===S.mode)));
+  setStatus();render();
+}
+function setStatus(msg){
+  $('#status').innerHTML=msg||(S.mode==='select'?'Click a box to select and edit it. Drag a box by any part of it.'
+    :S.pending?`Now click the <b>parent</b> that <b>${esc(byId(S.pending)?.name)}</b> ${S.mode}.`
+    :`Drawing <b>${S.mode}</b> arrows: click the <b>child</b> box first. Click the button again to stop.`);
+}
+function connectClick(id){
+  if(!S.pending){S.pending=id;setStatus();render();return;}
+  if(S.pending===id){S.pending=null;setStatus();render();return;}
+  const d=D(),dup=d.links.some(l=>l.from===S.pending&&l.to===id&&l.type===S.mode);
+  if(!dup)d.links.push({id:uid(),from:S.pending,to:id,type:S.mode});
+  const a=byId(S.pending)?.name,b=byId(id)?.name;S.pending=null;
+  render();setStatus(`Added: <b>${esc(a)} ${S.mode} ${esc(b)}</b>. Click another child to keep drawing, or the button to stop.`);
+}
+document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+document.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>{
+  const kind=b.dataset.add,d=D(),n=d.classes.length;
+  const wrap=$('.board-wrap');
+  const c={id:uid(),name:kind==='interface'?'NewInterface':kind==='abstract'?'NewAbstract':'NewClass',kind,
+    x:Math.min(780,wrap.scrollLeft+60+(n%5)*30),y:Math.min(380,wrap.scrollTop+40+(n%5)*30),members:[]};
+  d.classes.push(c);S.sel={type:'class',id:c.id};if(S.mode!=='select')setMode(S.mode);render();
+  const ni=$('#cname');if(ni){ni.focus();ni.select();}
+}));
+document.addEventListener('keydown',e=>{
+  if(S.stage!=='work')return;const t=document.activeElement?.tagName||'';
+  if(/INPUT|SELECT|TEXTAREA/.test(t))return;
+  if((e.key==='Delete'||e.key==='Backspace')&&S.sel){e.preventDefault();
+    if(S.sel.type==='class')deleteClass(S.sel.id);else{D().links=D().links.filter(l=>l.id!==S.sel.id);S.sel=null;render();}}
+  if(e.key==='Escape'){if(S.mode!=='select')setMode(S.mode);else{S.sel=null;render();}}
+});
+
+/* ---------- timer ---------- */
+let tmr=0;
+function tick(){
+  const left=Math.max(0,300-Math.floor((Date.now()-S.start)/1000)),t=$('#timer');
+  t.textContent=left>0?`${Math.floor(left/60)}:${String(left%60).padStart(2,'0')} left`:'Time’s up: submit when ready';
+  t.classList.toggle('low',left<=60);t.classList.toggle('out',left<=0);
+}
+
+/* ---------- grading ---------- */
+const norm=s=>String(s||'').trim().toLowerCase();
+const mName=m=>norm(m.text).split(/[(:\s]/)[0];
+function analyze(d){
+  const cls=n=>d.classes.find(c=>norm(c.name)===n);
+  const pets=['cat','fish','parrot','duck'].map(cls);
+  const supers=c=>d.links.filter(l=>l.from===c.id&&l.type==='extends').map(l=>d.classes.find(x=>x.id===l.to)).filter(Boolean);
+  const implsAll=(c,seen=new Set())=>{if(!c||seen.has(c.id))return new Set();seen.add(c.id);const out=new Set();
+    d.links.filter(l=>l.from===c.id).forEach(l=>{const t=d.classes.find(x=>x.id===l.to);if(!t)return;if(t.kind==='interface')out.add(t.id);implsAll(t,seen).forEach(i=>out.add(i));});return out;};
+  const has=(c,kind,re)=>!!c&&c.members.some(m=>m.kind===kind&&re.test(mName(m)));
+  const fieldOf=(c,re)=>c&&c.members.find(m=>m.kind==='field'&&re.test(mName(m)));
+  let base=null;
+  if(pets.every(Boolean)){
+    const sets=pets.map(p=>new Set(supers(p).filter(s=>s.kind!=='interface').map(s=>s.id)));
+    const common=[...sets[0]].filter(id=>sets.every(s=>s.has(id)));
+    base=common.length?d.classes.find(c=>c.id===common[0]):null;
+  }
+  const bn=base?base.name:'your superclass';
+  const ifaceWith=re=>d.classes.filter(c=>c.kind==='interface'&&has(c,'method',re));
+  const abilityOK=(re,yes,no)=>{
+    if(!pets.every(Boolean))return false;
+    return ifaceWith(re).some(I=>yes.every(n=>implsAll(cls(n)).has(I.id))&&no.every(n=>!implsAll(cls(n)).has(I.id)));
+  };
+  const hungerF=fieldOf(base,/hunger/);
+  const multi=d.classes.filter(c=>supers(c).filter(s=>s.kind!=='interface').length>1);
+  const badImpl=d.links.filter(l=>{const a=d.classes.find(x=>x.id===l.from),b=d.classes.find(x=>x.id===l.to);if(!a||!b)return false;
+    return l.type==='implements'?(b.kind!=='interface'||a.kind==='interface'):(a.kind==='interface')!==(b.kind==='interface');});
+  return [
+    {concept:'Classes',title:'All four pets are classes',pass:pets.every(Boolean),
+     ok:'Cat, Fish, Parrot and Duck are all on the canvas.',no:'Keep the four classes named Cat, Fish, Parrot and Duck.'},
+    {concept:'Inheritance',title:'One common superclass (R1)',pass:!!base,
+     ok:`Cat, Fish, Parrot and Duck all extend ${esc(bn)}: every pet IS-A ${esc(bn)}.`,no:'Add a superclass (for example <code>Pet</code>) and draw an <b>extends</b> arrow from each of the four pets to it.'},
+    {concept:'Inheritance',title:'name and hunger written once (R1)',pass:!!base&&has(base,'field',/name/)&&!!hungerF&&!pets.some(p=>has(p,'field',/name|hunger/)),
+     ok:`<code>name</code> and <code>hunger</code> live only in ${esc(bn)} and are inherited.`,no:'Put the fields <code>name</code> and <code>hunger</code> in the superclass only, not in each pet.'},
+    {concept:'Encapsulation',title:'hunger is protected by a method (R2)',pass:!!hungerF&&hungerF.vis==='-'&&d.classes.some(c=>c.members.some(m=>m.kind==='method'&&m.vis==='+'&&/hunger|eat|feed/.test(mName(m)))),
+     ok:'<code>hunger</code> is private, and a public method (such as <code>eat()</code> or <code>setHunger()</code>) is the only way to change it.',no:'Make <code>hunger</code> private (<code>-</code>) and add a public method like <code>setHunger(int)</code> or <code>eat()</code> that keeps it within 0–100.'},
+    {concept:'Abstract class',title:'Abstract superclass with abstract sound() (R3)',pass:!!base&&base.kind==='abstract'&&base.members.some(m=>m.kind==='method'&&m.abs&&/sound|speak|noise|cry|call/.test(mName(m))),
+     ok:`${esc(bn)} is abstract and declares an abstract <code>sound()</code>, so every pet must write its own and nobody can create a plain pet.`,no:'Make the superclass <b>abstract</b> and add a method <code>sound() : String</code> marked <b>abstract</b>.'},
+    {concept:'Interface',title:'A swimming ability for Fish and Duck (R4, R5)',pass:abilityOK(/swim/,['fish','duck'],['cat','parrot']),
+     ok:'An interface with <code>swim()</code> is implemented by Fish and Duck only, so the Pool party can loop over that interface type.',no:'Add an <b>interface</b> (for example <code>Swimmer</code>) with <code>swim()</code>, and draw <b>implements</b> arrows from Fish and Duck to it, not from Cat or Parrot.'},
+    {concept:'Interface',title:'A flying ability for Parrot and Duck (R4)',pass:abilityOK(/fly/,['parrot','duck'],['cat','fish']),
+     ok:'An interface with <code>fly()</code> is implemented by Parrot and Duck only.',no:'Add an <b>interface</b> (for example <code>Flyer</code>) with <code>fly()</code>, implemented by Parrot and Duck only.'},
+    {concept:'Java rules',title:'Legal Java: one superclass, correct arrows',pass:!multi.length&&!badImpl.length&&!has(base,'method',/swim|fly/)&&pets.every(Boolean),
+     ok:'Every class extends at most one class, arrows point the right way, and swim/fly aren’t forced on every pet.',
+     no:multi.length?`${multi.map(c=>esc(c.name)).join(', ')} extends more than one class. Java allows only one superclass; use interfaces for extra abilities.`
+       :badImpl.length?'Some arrow is the wrong kind: a class <b>implements</b> an interface, and a class <b>extends</b> a class.'
+       :'Don’t put <code>swim()</code> or <code>fly()</code> in the superclass: cats would be forced to swim and fly.'}
+  ];
+}
+
+/* ---------- Java export ---------- */
+function toJava(d){
+  const out=[];
+  for(const c of d.classes){
+    const ext=d.links.filter(l=>l.from===c.id&&l.type==='extends').map(l=>d.classes.find(x=>x.id===l.to)?.name).filter(Boolean);
+    const imp=d.links.filter(l=>l.from===c.id&&l.type==='implements').map(l=>d.classes.find(x=>x.id===l.to)?.name).filter(Boolean);
+    const head=c.kind==='interface'?`public interface ${c.name}${ext.length?' extends '+ext.join(', '):''}`
+      :`public ${c.kind==='abstract'?'abstract ':''}class ${c.name}${ext.length?' extends '+ext.join(', '):''}${imp.length?' implements '+imp.join(', '):''}`;
+    const vis=v=>v==='-'?'private':v==='#'?'protected':'public';
+    const body=c.members.filter(m=>m.text.trim()).map(m=>{
+      const [sig,type]=m.text.split(':').map(x=>x.trim());
+      if(m.kind==='field')return `    ${vis(m.vis)} ${type||'Object'} ${sig};`;
+      const s=/\(/.test(sig)?sig:sig+'()';
+      if(c.kind==='interface')return `    ${type||'void'} ${s};`;
+      return m.abs?`    ${vis(m.vis)} abstract ${type||'void'} ${s};`:`    ${vis(m.vis)} ${type||'void'} ${s} { }`;
+    });
+    out.push(`${head} {\n${body.join('\n')}${body.length?'\n':''}}`);
+  }
+  return `// Pet Park design by ${S.name.trim()}\n\n`+out.join('\n\n');
+}
+
+/* ---------- model answer ---------- */
+const MODEL={classes:[
+  {id:'sw',name:'Swimmer',kind:'interface',x:40,y:40,members:[{vis:'+',text:'swim()',kind:'method',abs:true}]},
+  {id:'pet',name:'Pet',kind:'abstract',x:370,y:24,members:[{vis:'-',text:'name : String',kind:'field'},{vis:'-',text:'hunger : int',kind:'field'},{vis:'+',text:'eat()',kind:'method'},{vis:'+',text:'setHunger(int h)',kind:'method'},{vis:'+',text:'sound() : String',kind:'method',abs:true}]},
+  {id:'fl',name:'Flyer',kind:'interface',x:770,y:40,members:[{vis:'+',text:'fly()',kind:'method',abs:true}]},
+  {id:'cat',name:'Cat',kind:'class',x:40,y:400,members:[{vis:'+',text:'sound() : String',kind:'method'}]},
+  {id:'fish',name:'Fish',kind:'class',x:280,y:400,members:[{vis:'+',text:'sound() : String',kind:'method'},{vis:'+',text:'swim()',kind:'method'}]},
+  {id:'par',name:'Parrot',kind:'class',x:520,y:400,members:[{vis:'+',text:'sound() : String',kind:'method'},{vis:'+',text:'fly()',kind:'method'}]},
+  {id:'duck',name:'Duck',kind:'class',x:760,y:400,members:[{vis:'+',text:'sound() : String',kind:'method'},{vis:'+',text:'swim()',kind:'method'},{vis:'+',text:'fly()',kind:'method'}]}],
+ links:[['cat','pet','extends'],['fish','pet','extends'],['par','pet','extends'],['duck','pet','extends'],['fish','sw','implements'],['duck','sw','implements'],['par','fl','implements'],['duck','fl','implements']].map(([f,t,y],i)=>({id:'m'+i,from:f,to:t,type:y}))};
+
+/* ---------- flow ---------- */
+const nameIn=$('#sname');nameIn.value=S.name;$('#go').disabled=!S.name.trim();
+nameIn.addEventListener('input',()=>{S.name=nameIn.value;$('#go').disabled=!nameIn.value.trim();});
+$('#start').addEventListener('submit',e=>{e.preventDefault();if(!S.name.trim())return;S.stage='work';S.start=Date.now();showWork();});
+function showWork(){
+  $('#gate').hidden=true;$('#result').hidden=true;$('#work').hidden=false;$('#who').textContent=S.name.trim();
+  clearInterval(tmr);tick();tmr=setInterval(tick,500);renderSubmit();render();setStatus();
+}
+function renderSubmit(){
+  const bar=$('#submitbar');
+  bar.innerHTML=S.confirm?`<span class="warn">After submitting you can’t edit this design.</span><button class="btn ghost" id="keep">Keep editing</button><button class="btn" id="sub">Submit now</button>`
+    :`<button class="btn ghost" id="reset">Start over</button><button class="btn" id="sub">Submit design</button>`;
+  $('#sub').onclick=()=>{if(!S.confirm){S.confirm=true;renderSubmit();return;}submit();};
+  const k=$('#keep');if(k)k.onclick=()=>{S.confirm=false;renderSubmit();};
+  const r=$('#reset');if(r)r.onclick=()=>{r.outerHTML=`<span class="warn">Clear the whole canvas?</span><button class="btn ghost" id="noreset">Cancel</button><button class="btn danger" id="yesreset">Clear it</button>`;
+    $('#noreset').onclick=renderSubmit;$('#yesreset').onclick=()=>{S.design=seed();S.sel=null;S.pending=null;render();renderSubmit();};};
+}
+function submit(){
+  S.stage='done';S.confirm=false;S.sel=null;S.pending=null;S.mode='select';clearInterval(tmr);
+  const used=Math.round((Date.now()-S.start)/1000),checks=analyze(D()),score=checks.filter(c=>c.pass).length,pct=Math.round(score/checks.length*100);
+  const mm=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  $('#work').hidden=true;
+  const R=$('#result');R.hidden=false;R.style.display='flex';R.style.flexDirection='column';R.style.gap='18px';
+  R.innerHTML=`<div class="scorecard"><div><div class="eyebrow">Your result</div><div class="sc-name">${esc(S.name.trim())}</div><div class="sc-sub">Designed in ${mm(used)}${used>300?' (over the 5 minutes)':''}</div></div>
+      <div class="sc-num"><b>${score}</b><span>/ ${checks.length}</span><em>${pct}%</em></div>
+      <div class="sc-msg">${pct===100?'Every requirement is met. Shahd’s Pet Park is in great shape.':pct>=75?'Strong design. Fix the items marked “Not yet” below.':pct>=40?'Good start. Read each “Not yet” item, then compare with the model design.':'Compare your diagram with the model design below; each check explains what to change.'}</div>
+      <div class="sc-actions"><button class="btn ghost" id="copy">Copy my design as Java</button><button class="btn ghost" id="again">Redesign from scratch</button></div></div>
+    <div id="copyout" hidden></div>
+    <section><h2 style="margin-bottom:10px">How your design meets the requirements</h2>
+      <ul class="checks">${checks.map(c=>`<li class="chk${c.pass?' pass':''}"><div class="top"><span class="ct">${c.title}</span><span class="st">${c.pass?'Met':'Not yet'}</span></div><div class="cc">${c.concept}</div><p>${c.pass?c.ok:c.no}</p></li>`).join('')}</ul></section>
+    <section class="card"><h2 style="margin-bottom:10px">Your design</h2><div class="board-wrap"><div class="board locked" id="mine"><svg class="links"></svg></div></div></section>
+    <section class="card"><h2>One good design</h2><p style="margin:4px 0 12px;color:var(--muted)">Abstract <code>Pet</code> holds the shared, protected state and forces each pet to define <code>sound()</code>; the interfaces <code>Swimmer</code> and <code>Flyer</code> add abilities only where they belong, so the Pool party loops over <code>Swimmer</code> with <code>instanceof</code>.</p>
+      <div class="board-wrap"><div class="board locked" id="model"><svg class="links"></svg></div></div></section>`;
+  renderBoard($('#mine'),D(),{sel:false});renderBoard($('#model'),MODEL,{sel:false});
+  $('#copy').onclick=()=>{const txt=toJava(D()),o=$('#copyout');
+    const show=()=>{o.hidden=false;o.innerHTML=`<p style="margin:0 0 6px;color:var(--muted)">Select all and copy:</p><textarea class="copybox" id="cb" readonly>${esc(txt)}</textarea>`;const t=$('#cb');t.focus();t.select();};
+    try{navigator.clipboard.writeText(txt).then(()=>{$('#copy').textContent='Copied ✓';},show);}catch(e){show();}};
+  $('#again').onclick=()=>{S.design=seed();S.stage='work';S.start=Date.now();showWork();window.scrollTo(0,0);};
+  try{localStorage.removeItem(KEY);}catch(e){}
+  window.scrollTo(0,0);
+}
+if(S.stage==='work'&&S.name.trim())showWork();
+})();
+</script>
+
+</body></html>
