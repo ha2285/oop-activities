@@ -1,0 +1,1933 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Java OOP Shape Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: full-height slide deck — top bar (title, chapter jump, counter), one slide at a time, bottom bar (prev / progress / next). Lab slides host the live interpreter. */
+:root{
+  --bg:#eef1f5; --surface:#ffffff; --surface-2:#f5f7fa; --ink:#18212e; --muted:#586376; --line:#d3d9e2;
+  --accent:#0f6e6e; --accent-soft:#dff1ef; --iface:#2d5c99; --iface-soft:#e4ecf8; --abs:#7a3e9d; --abs-soft:#f1e7f7;
+  --err:#b42318; --err-soft:#fdeceb; --exc:#c2570c; --exc-soft:#fdf0e3; --ok:#1f7a45; --ok-soft:#e5f4ea;
+  --ticket:#fff8e6; --ticket-line:#e6c873; --on-av:#ffffff;
+  --kw:#9b2c6f; --str:#1f7a45; --ty:#2d5c99; --com:#7b8494; --num:#b0590b; --ann:#8a6d00; --hl:#fff3c4;
+  --c-teal:#2a9d8f; --c-amber:#d98f1f; --c-rose:#d1495b; --c-indigo:#5163d6; --c-green:#4f9d4a; --c-violet:#8b5cf6; --c-slate:#5d6878; --c-gold:#e2ad12; --sky:#e8f1fa;
+  --f-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#11151b; --surface:#191f28; --surface-2:#1f2631; --ink:#e5e9ef; --muted:#9aa4b3; --line:#2d3643;
+  --accent:#4cc2b4; --accent-soft:#163430; --iface:#8db6f0; --iface-soft:#1b2a40; --abs:#c99bea; --abs-soft:#2c2038;
+  --err:#ff8a7e; --err-soft:#3a1d1c; --exc:#f5a25c; --exc-soft:#3a2716; --ok:#74d39a; --ok-soft:#173023;
+  --ticket:#2b2616; --ticket-line:#7a6526; --sky:#132131;
+  --kw:#e47cb7; --str:#7ccf9b; --ty:#8db6f0; --com:#7f8a99; --num:#f0a35c; --ann:#d9c060; --hl:#3a3418;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#11151b; --surface:#191f28; --surface-2:#1f2631; --ink:#e5e9ef; --muted:#9aa4b3; --line:#2d3643;
+  --accent:#4cc2b4; --accent-soft:#163430; --iface:#8db6f0; --iface-soft:#1b2a40; --abs:#c99bea; --abs-soft:#2c2038;
+  --err:#ff8a7e; --err-soft:#3a1d1c; --exc:#f5a25c; --exc-soft:#3a2716; --ok:#74d39a; --ok-soft:#173023;
+  --ticket:#2b2616; --ticket-line:#7a6526; --sky:#132131;
+  --kw:#e47cb7; --str:#7ccf9b; --ty:#8db6f0; --com:#7f8a99; --num:#f0a35c; --ann:#d9c060; --hl:#3a3418;
+  color-scheme:dark }
+*{box-sizing:border-box}
+html{height:100%;box-sizing:border-box}
+body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+code,.mono{font-family:var(--f-mono);font-size:.9em}
+
+/* deck chrome */
+.deck{height:100%;display:flex;flex-direction:column}
+.topbar,.bottombar{display:flex;align-items:center;gap:12px;padding:9px 18px;background:var(--surface);flex-wrap:wrap}
+.topbar{border-bottom:1px solid var(--line)}
+.bottombar{border-top:1px solid var(--line)}
+.brand{font:800 16px var(--f-display);letter-spacing:-.01em;white-space:nowrap}
+.brand span{color:var(--accent)}
+.sp{flex:1}
+#counter{font:600 13px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+#jump{font:600 12.5px var(--f-body);width:auto;padding:3px 6px}
+.progress{flex:1;min-width:80px;height:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.keys{font-size:12px;color:var(--muted);white-space:nowrap}
+kbd{font:600 11px var(--f-mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--surface-2);color:var(--ink)}
+#viewport{flex:1;overflow:auto;min-height:0}
+.slide{min-height:100%;display:flex}
+.slide>.inner{margin:auto;width:100%;max-width:1240px;padding-inline:28px;padding-block:28px 36px;display:flex;flex-direction:column;gap:22px;font-size:18px}
+@media (max-width:600px){.slide>.inner{padding-inline:16px;font-size:16px}.keys{display:none}}
+
+/* slide typography */
+.eyebrow{font:700 13px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.slide h1{font-family:var(--f-display);font-weight:800;font-size:clamp(40px,6.4vw,80px);letter-spacing:-.03em;line-height:1;margin:0;text-wrap:balance}
+.slide h1 span{color:var(--accent)}
+.slide h2{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,3.6vw,46px);letter-spacing:-.02em;line-height:1.08;margin:0;text-wrap:balance}
+.head{display:flex;flex-direction:column;gap:6px}
+.lede{margin:0;max-width:62ch;color:var(--muted);font-size:clamp(17px,1.6vw,21px)}
+.prose p{margin:0 0 12px;max-width:58ch}
+.prose p:last-child{margin-bottom:0}
+.concept{color:var(--accent)}
+.two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:26px;align-items:start}
+.two.fix{grid-template-columns:minmax(0,.85fr) minmax(0,1.35fr)}
+@media (max-width:900px){.two,.two.fix{grid-template-columns:minmax(0,1fr)}}
+
+/* people */
+.av{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;color:var(--on-av);font:800 18px var(--f-display);flex:none}
+.av.big{width:88px;height:88px;font-size:36px}
+.cast{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.person{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px}
+.person b{display:block;font-family:var(--f-display)}
+.person span.r{color:var(--muted);font-size:13.5px}
+.howto{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:15px;color:var(--muted)}
+
+/* wish */
+.bubble-row{display:flex;gap:24px;align-items:flex-start}
+@media (max-width:600px){.bubble-row{flex-direction:column}}
+.who{font:700 14px var(--f-body);color:var(--muted);margin-bottom:10px;letter-spacing:.02em}
+.bubble{margin:0;background:var(--ticket);border:1px solid var(--ticket-line);border-radius:4px 26px 26px 26px;padding:24px 30px;font:600 clamp(22px,2.7vw,36px)/1.32 var(--f-display);max-width:34ch;text-wrap:pretty}
+.tag-bug{display:inline-block;font:700 11px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--err);border:1px solid currentColor;border-radius:4px;padding:1px 6px;margin-left:8px;vertical-align:2px}
+.prompt{margin:0;font-size:19px;color:var(--muted);border-left:3px solid var(--accent);padding-left:14px}
+
+/* first try */
+.whybox .q{font:800 24px var(--f-display);color:var(--err);margin-bottom:12px}
+.whybox ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.whybox li{background:var(--err-soft);border-left:4px solid var(--err);padding:10px 14px;border-radius:0 8px 8px 0;font-size:17px}
+.frag{opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease}
+.frag.shown{opacity:1;transform:none}
+.fraghint{font-size:13px;color:var(--muted)}
+
+/* code */
+pre.code{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:12px 0;overflow-x:auto;font-family:var(--f-mono);font-size:14px;line-height:1.6;counter-reset:ln}
+pre.code.bad{border-left:4px solid var(--err)} pre.code.good{border-left:4px solid var(--ok)}
+pre.code .ln{display:block;padding:0 16px 0 0;counter-increment:ln;min-width:max-content}
+pre.code .ln::before{content:counter(ln);display:inline-block;width:3em;padding-right:.9em;text-align:right;color:var(--com);user-select:none}
+pre.code.tall{max-height:62vh}
+.k{color:var(--kw);font-weight:600}.s{color:var(--str)}.t{color:var(--ty)}.c{color:var(--com);font-style:italic}.n{color:var(--num)}.a{color:var(--ann)}
+.codelabel{font:700 12.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.codelabel.bad{color:var(--err)} .codelabel.good{color:var(--ok)}
+
+/* design + takeaway */
+.take{margin:0;font:600 clamp(18px,2vw,25px)/1.4 var(--f-display);border-left:5px solid var(--accent);padding:4px 0 4px 18px;max-width:62ch}
+.diagram{overflow-x:auto}
+.diagram svg{width:100%;height:auto;display:block;min-width:520px;max-height:56vh}
+.mini .diagram svg{min-width:400px;max-height:none}
+.box rect.frame{fill:var(--surface);stroke:var(--ink);stroke-width:1.3}
+.box rect.head{fill:var(--surface-2)}
+.box[data-kind="interface"] rect.head{fill:var(--iface-soft)}
+.box[data-kind="abstract"] rect.head{fill:var(--abs-soft)}
+.box text{font-family:var(--f-mono);font-size:11.5px;fill:var(--ink)}
+.box .nm{font-family:var(--f-display);font-weight:700;font-size:14px}
+.box .st{font-size:10px;fill:var(--muted)}
+.box[data-kind="abstract"] .nm,.box .it{font-style:italic}
+.box[data-kind="abstract"] .nm{fill:var(--abs)}
+.box[data-kind="interface"] .nm{fill:var(--iface)}
+.box.new rect.frame{stroke:var(--accent);stroke-width:2.4}
+.box.headchg rect.frame{stroke:var(--accent);stroke-width:2.4}
+.box.new rect.head,.box.headchg rect.head{fill:var(--accent-soft)}
+.box .hl-line{fill:var(--accent-soft)}
+.box text.chg{fill:var(--accent);font-weight:700}
+.box text.dimt{opacity:.45}
+.box.faded,.edge.faded,.arrow.faded{opacity:.35}
+.edge.new-edge{stroke:var(--accent);stroke-width:2.4}
+.arrow.new-edge{stroke:var(--accent);stroke-width:2}
+.hl-key{background:var(--accent-soft);color:var(--accent);padding:0 5px;border-radius:3px}
+.design-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:24px;align-items:start}
+@media (max-width:900px){.design-grid{grid-template-columns:minmax(0,1fr)}}
+.changes ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.before-after{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:stretch}
+@media (max-width:950px){.before-after{grid-template-columns:minmax(0,1fr)}.ba-arrow{transform:rotate(90deg);justify-self:center}}
+.ba-col{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ba-after{border:2px solid var(--accent)}
+.ba-before .diagram{opacity:.8}
+.ba-h{font:700 14px var(--f-display);color:var(--muted);display:flex;gap:10px;align-items:center}
+.ba-tag{font:800 11px var(--f-body);letter-spacing:.08em;text-transform:uppercase;background:var(--surface-2);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:2px 10px}
+.ba-tag.now{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.ba-arrow{align-self:center;font:800 30px var(--f-display);color:var(--accent)}
+.before-after .diagram{flex:1;display:flex;align-items:center;justify-content:center}
+.before-after .diagram svg{min-width:0;max-height:52vh}
+.ba-empty{flex:1;display:grid;place-items:center;border:2px dashed var(--line);border-radius:8px;padding:20px;color:var(--muted);text-align:center;font-size:16px}
+.ba-empty p{margin:0;max-width:30ch}
+.changes li{background:var(--accent-soft);border-left:4px solid var(--accent);padding:9px 12px;border-radius:0 8px 8px 0;font-size:16px}
+.box .newtag{font:700 10px var(--f-body);fill:var(--accent);letter-spacing:.08em}
+.box.hot rect.frame{stroke:var(--exc);stroke-width:3}
+.box.hot rect.head{fill:var(--exc-soft)}
+.edge{fill:none;stroke:var(--ink);stroke-width:1.3}
+.edge.dash{stroke:var(--iface);stroke-dasharray:6 4}
+.arrow{fill:var(--surface);stroke:var(--ink);stroke-width:1.3}
+.arrow.i{stroke:var(--iface)}
+.dlegend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:var(--muted);margin-top:6px}
+.dlegend svg{vertical-align:middle;margin-right:5px}
+
+/* lab */
+.s-lab>.inner{gap:14px;padding-block:18px 24px}
+.s-lab h2{font-size:clamp(22px,2.4vw,32px)}
+.lab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px;align-items:start;font-size:15px}
+@media (max-width:950px){.lab{grid-template-columns:minmax(0,1fr)}}
+.lab-left,.lab-right{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.sec-h{font-family:var(--f-display);font-size:12px;letter-spacing:.09em;text-transform:uppercase;margin:0 0 8px;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tries{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.try{display:flex;flex-direction:column;gap:3px;text-align:left;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:8px;padding:8px 11px;cursor:pointer;font:600 14px var(--f-body);min-width:0}
+.try code{font-size:11.5px;color:var(--muted);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.try:hover{border-color:var(--accent)} .try:hover code{color:var(--accent)}
+.try:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.try:disabled{opacity:.5;cursor:not-allowed}
+.free{margin:0;color:var(--muted)}
+.explain{border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;padding:11px 15px}
+.explain .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.explain h3{font-family:var(--f-display);font-size:18px;margin:2px 0 5px;text-wrap:balance}
+.explain p{margin:0;max-width:68ch}
+.explain p+p{margin-top:6px}
+.console{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;height:220px;overflow:auto;padding:8px 0;font-family:var(--f-mono);font-size:12.5px;line-height:1.55}
+.ln-c{padding:1px 12px;white-space:pre-wrap;word-break:break-word}
+.ln-c.cmd{color:var(--ink);font-weight:600;margin-top:6px;border-top:1px solid var(--line);padding-top:6px}
+.ln-c.cmd:first-child{border-top:0;margin-top:0;padding-top:1px}
+.ln-c.ok{color:var(--ok)} .ln-c.err{color:var(--err);background:var(--err-soft)} .ln-c.exc{color:var(--exc);background:var(--exc-soft)}
+.ln-c.out{color:var(--ink)} .ln-c.trace{color:var(--muted)} .ln-c.info{color:var(--muted);font-style:italic}
+.badge{display:inline-block;font:700 10px var(--f-body);letter-spacing:.08em;text-transform:uppercase;padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:1px;border:1px solid currentColor}
+.stage{overflow-x:auto}
+.stage svg{width:100%;height:auto;display:block;min-width:320px;max-height:330px}
+.stage .sky{fill:var(--sky)}
+.stage .floor{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 4}
+.stage .lane{stroke:var(--line);stroke-dasharray:2 6}
+.stage .item{cursor:pointer;outline:none}
+.stage .item:hover .shape,.stage .item:focus-visible .shape{stroke:var(--accent);stroke-width:3}
+.stage .item.hot .shape{stroke:var(--exc);stroke-width:3.2}
+.stage .shine{fill:var(--on-av);opacity:.55;pointer-events:none}
+.stage .ring{fill:none;stroke:var(--c-gold);stroke-width:2.2;stroke-dasharray:3 3}
+.stage .fuse{fill:var(--ink)} .stage .spark{fill:var(--c-amber)}
+.stage .pts{font:700 12px var(--f-mono);fill:var(--ok)} .stage .pts.neg{fill:var(--err)}
+.scorebox{font:600 13px var(--f-body);color:var(--ink);text-transform:none;letter-spacing:0}
+.scorebox b{font:700 15px var(--f-mono);color:var(--accent);font-variant-numeric:tabular-nums}
+.title-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:center}
+@media (max-width:900px){.title-grid{grid-template-columns:minmax(0,1fr)}}
+.demo{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.demo figcaption{display:flex;justify-content:space-between;font:700 12.5px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.demo figcaption b{font:700 16px var(--f-mono);color:var(--accent);letter-spacing:0}
+.demo canvas{width:100%;height:280px;display:block;background:var(--sky);border-radius:8px;cursor:pointer;touch-action:manipulation}
+.demo-key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--muted)}
+.demo-key i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.k-b{background:var(--c-teal)} .k-s{background:var(--c-amber);border-radius:2px!important;transform:rotate(45deg)} .k-x{background:var(--c-slate)}
+.stage .lbl{font-family:var(--f-mono);font-size:12px;fill:var(--ink)}
+.stage .lbl2{font-family:var(--f-mono);font-size:11.5px;fill:var(--muted)}
+.stage .cell{fill:var(--surface-2);stroke:var(--line)}
+.stage .cell.hot{stroke:var(--exc);stroke-width:2.5;stroke-dasharray:6 4}
+.stage .shape{stroke:var(--ink);stroke-width:1.5;fill-opacity:.9}
+.tbl-wrap{overflow-x:auto}
+.vars{width:100%;border-collapse:collapse;font-size:13px}
+.vars th{text-align:left;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:4px 8px;border-bottom:1px solid var(--line)}
+.vars td{padding:4px 8px;border-bottom:1px solid var(--line);font-family:var(--f-mono);font-size:12.5px}
+.vars .st-ty{color:var(--ty);font-weight:600} .vars .rt-ty{color:var(--accent);font-weight:600}
+details.builder>summary{cursor:pointer;font:700 12px var(--f-display);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);list-style:none;display:flex;justify-content:space-between;gap:10px}
+details.builder>summary::-webkit-details-marker{display:none}
+details.builder>summary::after{content:"+";font:700 16px var(--f-mono);color:var(--accent)}
+details.builder[open]>summary::after{content:"−"}
+details.builder[open]>summary{margin-bottom:12px}
+.mode{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:12px}
+.mode button{font:600 13px var(--f-body);border:0;background:var(--surface);color:var(--muted);padding:7px 12px;cursor:pointer}
+.mode button[aria-selected="true"]{background:var(--accent);color:var(--surface)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px}
+.row label{display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:600;color:var(--muted);min-width:0}
+select,input{font:13.5px var(--f-mono);color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:0;max-width:100%}
+input{width:8.5em}
+select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.preview{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+.preview code{flex:1 1 220px;min-width:0;background:var(--surface-2);border:1px dashed var(--line);border-radius:6px;padding:9px 12px;font-size:13.5px;overflow-x:auto;white-space:pre}
+.btn{font:700 14px var(--f-body);background:var(--accent);color:var(--surface);border:0;border-radius:6px;padding:8px 16px;cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:600}
+.btn.sm{font-size:12px;padding:4px 10px}
+
+/* recap + source */
+.tabs{display:flex;flex-wrap:wrap;gap:4px}
+.tabs button{font:600 12.5px var(--f-mono);border:1px solid var(--line);background:var(--surface-2);color:var(--muted);padding:5px 10px;border-radius:6px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.cmp{width:100%;border-collapse:collapse;font-size:16px;min-width:640px}
+.cmp th,.cmp td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+.cmp thead th{font-family:var(--f-display);font-size:15px}
+.cmp tbody th{font-weight:600;color:var(--muted)}
+.cmp td.num{font-family:var(--f-mono);color:var(--muted);width:2.5em}
+.qs{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:14px;font-size:clamp(18px,1.9vw,23px);max-width:62ch}
+
+
+/* per-wish playable game */
+.wish-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:28px;align-items:start}
+@media (max-width:950px){.wish-grid{grid-template-columns:minmax(0,1fr)}}
+.wish-left{display:flex;flex-direction:column;gap:20px;min-width:0}
+.wish-grid .bubble{font-size:clamp(19px,2vw,27px);padding:20px 24px;max-width:none}
+.wish-grid .av.big{width:64px;height:64px;font-size:26px}
+.mini{margin:0;background:var(--surface);border:2px solid var(--err);border-radius:12px;padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.mini.is-fix{border-color:var(--ok)}
+.mini figcaption{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.mini-t{font:700 12.5px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.mini-badge{font:700 11.5px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--surface);background:var(--err);border-radius:999px;padding:3px 10px}
+.mini.is-fix .mini-badge{background:var(--ok)}
+.try-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px 26px;align-items:start}
+.trydiag{display:flex;flex-direction:column;gap:8px;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.trydiag .codelabel{margin:0}
+.try-grid .try-why{grid-column:1/-1}
+.try-left{display:flex;flex-direction:column;gap:18px;min-width:0}
+.try-right{min-width:0;position:sticky;top:0}
+@media (max-width:950px){.try-right{position:static}}
+.try-grid .whybox ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.trydiag .diagram svg{min-width:420px;max-height:360px}
+.trynote{margin:0;font-size:15px;padding:8px 12px;border-left:4px solid var(--err);background:var(--err-soft);border-radius:0 8px 8px 0}
+.tbox .bad-line{fill:var(--err-soft)}
+.tbox text.badt{fill:var(--err);font-weight:700}
+.tbox.badbox rect.frame{stroke:var(--err);stroke-width:2.6}
+.tbox.badhead rect.head{fill:var(--err-soft)}
+.tbox.badhead .nm{fill:var(--err)}
+.tbox .good-line{fill:var(--ok-soft)}
+.tbox text.goodt{fill:var(--ok);font-weight:700}
+.tbox.goodbox rect.frame{stroke:var(--ok);stroke-width:2.6}
+.tbox.goodbox .nm{fill:var(--ok)}
+.tbox text.goodtag,.diagram text.goodtag{font:800 11px var(--f-body);letter-spacing:.05em;fill:var(--ok)}
+.diagram text.badtag{font:800 11px var(--f-body);letter-spacing:.05em;fill:var(--err)}
+.edge.good-edge{stroke:var(--ok);stroke-width:2.4} .arrow.good-edge{stroke:var(--ok);stroke-width:2}
+.qa{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px}
+.qa-q{margin:0;font:600 clamp(18px,1.9vw,23px)/1.4 var(--f-display);display:flex;gap:12px;align-items:baseline;max-width:70ch}
+.qa-n{font:800 14px var(--f-mono);color:var(--surface);background:var(--accent);border-radius:6px;padding:2px 8px;flex:none}
+.tbox .prop-line{fill:var(--exc-soft)}
+.tbox text.propt{fill:var(--exc);font-weight:700}
+.tbox.propbox rect.frame{stroke:var(--exc);stroke-width:2.6;stroke-dasharray:7 4}
+.tbox.propbox .nm{fill:var(--exc)}
+.diagram text.proptag{font:800 11px var(--f-body);letter-spacing:.05em;fill:var(--exc)}
+.edge.prop-edge{stroke:var(--exc);stroke-width:2.4} .arrow.prop-edge{stroke:var(--exc);stroke-width:2}
+.codelabel.prop{color:var(--exc)}
+.qa-qrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--exc);border-radius:0 10px 10px 0;padding:14px 18px}
+@media (max-width:950px){.qa-qrow{grid-template-columns:minmax(0,1fr)}}
+.qa-qd{display:flex;flex-direction:column;gap:6px;min-width:0}
+.qa-qd svg{min-width:0}
+.qa-a{margin:10px 0 0 0;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--ok);border-radius:0 10px 10px 0;padding:14px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:center}
+.qa-a.has-d{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}
+@media (max-width:950px){.qa-a.has-d{grid-template-columns:minmax(0,1fr)}}
+.qa-txt{font-size:16.5px}
+.qa-txt p{margin:6px 0 0;max-width:62ch}
+.qa-d svg{min-width:420px}
+.tbox text.badtag,.trydiag text.badtag{font:800 11px var(--f-body);letter-spacing:.05em;fill:var(--err)}
+.try-grid pre.code{max-height:400px}
+@media (max-width:950px){.try-grid{grid-template-columns:minmax(0,1fr)}}
+.mini canvas{width:100%;height:300px;display:block;background:var(--sky);border-radius:8px;cursor:pointer;touch-action:manipulation}
+.mini-ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.mini-tip{font-size:12.5px;color:var(--muted);margin-left:auto}
+.mini-cap{margin:0;font-size:15px;line-height:1.45;padding:8px 12px;border-radius:0 8px 8px 0;border-left:4px solid var(--err);background:var(--err-soft)}
+.mini.is-fix .mini-cap{border-left-color:var(--ok);background:var(--ok-soft)}
+label[for=d-cast],label[for=c-cast]{display:none!important}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="deck">
+  <header class="topbar">
+    <div class="brand">Shahd’s Bubble Pop <span>· OOP in Java</span></div>
+    <span class="sp"></span>
+    <label for="jump" class="keys" style="display:flex;gap:6px;align-items:center">Go to<select id="jump"></select></label>
+    <span id="counter"></span>
+    <button class="btn ghost sm" id="fs">Full screen</button>
+  </header>
+  <main id="viewport"><div id="slides"></div></main>
+  <footer class="bottombar">
+    <button class="btn ghost" id="prev">← Back</button>
+    <div class="progress" aria-hidden="true"><i id="prog"></i></div>
+    <span class="keys"><kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd></span>
+    <button class="btn" id="next">Next →</button>
+  </footer>
+</div>
+
+<div id="labHolder" hidden>
+  <div class="lab" id="lab">
+    <div class="lab-left">
+      <div class="card"><div class="sec-h">Try it <span style="text-transform:none;letter-spacing:0;font-weight:500">predict, then click</span></div><div class="tries" id="lab-tries"></div></div>
+      <div class="card mini"><div class="sec-h">Design · classes that run light up</div><div class="diagram" id="lab-diagram"></div></div>
+      <div class="card"><div class="sec-h">Variables</div><div class="tbl-wrap"><table class="vars">
+        <thead><tr><th>Name</th><th>Declared type · what compiles</th><th>Object · what runs</th></tr></thead>
+        <tbody id="vars"></tbody></table></div></div>
+      <div class="card">
+        <details class="builder" id="builder">
+          <summary>Write your own statement</summary>
+          <div class="mode" role="tablist">
+            <button id="m-decl" role="tab" aria-selected="true">Declare a variable</button>
+            <button id="m-call" role="tab" aria-selected="false">Use a variable</button>
+          </div>
+          <div id="f-decl">
+            <div class="row">
+              <label for="d-type">Declared type<select id="d-type"></select></label>
+              <label for="d-name">Name<input id="d-name" value="x" autocomplete="off" spellcheck="false"></label>
+              <label for="d-rhs">Assign<select id="d-rhs"><option value="new">a new object</option><option value="var">an existing variable</option></select></label>
+            </div>
+            <div class="row" id="d-new">
+              <label for="d-cls">new<select id="d-cls"></select></label>
+              <div class="row" id="d-args" style="margin:0"></div>
+            </div>
+            <div class="row" id="d-var" hidden>
+              <label for="d-cast">Cast<select id="d-cast"></select></label>
+              <label for="d-src">Variable<select id="d-src"></select></label>
+            </div>
+          </div>
+          <div id="f-call" hidden>
+            <div class="row">
+              <label for="c-cast">Cast<select id="c-cast"></select></label>
+              <label for="c-var">Variable<select id="c-var"></select></label>
+              <label for="c-mem">Member<select id="c-mem"></select></label>
+              <label for="c-arg" id="c-arg-wrap"><span id="c-arg-lbl">Argument</span><input id="c-arg" autocomplete="off" spellcheck="false"></label>
+            </div>
+          </div>
+          <div class="preview">
+            <code id="preview"></code>
+            <button class="btn" id="run">Compile &amp; run</button>
+          </div>
+          <p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">Only the classes and members introduced so far are offered.</p>
+        </details>
+      </div>
+    </div>
+    <div class="lab-right">
+      <section class="explain" id="explain" aria-live="polite"></section>
+      <div class="card"><div class="sec-h">Console <button class="btn ghost sm" id="clear">Clear</button></div><div class="console" id="console" aria-live="polite"></div></div>
+      <div class="card"><div class="sec-h">Game board · tap an item to pop it <span style="display:flex;gap:8px;align-items:center"><span class="scorebox">Score <b id="score">0</b></span><button class="btn sm" id="tick">Next frame ↓</button><button class="btn ghost sm" id="reset">Reset</button></span></div><div class="stage" id="stage"></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const M=(r,...p)=>({p,r});
+
+/* ================= final type model (mirrors Dad's final Java code) ================= */
+const T={
+  FallingItem:{kind:'abstract',sup:null,ifs:[],ctor:[['String','name'],['String','color'],['double','speed']],fields:{name:'protected',color:'private',y:'private',speed:'private'},
+    methods:{points:{...M('int'),abs:true},describe:M('String'),fall:M('void'),getY:M('double'),getSpeed:M('double'),setSpeed:M('void',['double','speed']),getColor:M('String'),setColor:M('void',['String','color'])}},
+  Resizable:{kind:'interface',sup:null,ifs:[],ctor:[],fields:{},methods:{scale:{...M('void',['double','factor']),abs:true}}},
+  Rotatable:{kind:'interface',sup:null,ifs:[],ctor:[],fields:{},methods:{rotate:{...M('void',['double','degrees']),abs:true},flip:{...M('void'),def:true}}},
+  Bubble:{kind:'class',sup:'FallingItem',ifs:['Resizable'],ctor:[['String','color'],['double','radius'],['double','speed']],fields:{radius:'private'},
+    methods:{points:M('int'),scale:M('void',['double','factor']),getRadius:M('double'),setRadius:M('void',['double','radius'])}},
+  Star:{kind:'class',sup:'FallingItem',ifs:['Rotatable'],ctor:[['String','color'],['double','speed']],fields:{angle:'private'},
+    methods:{points:M('int'),rotate:M('void',['double','degrees'])}},
+  Bomb:{kind:'class',sup:'FallingItem',ifs:['Resizable','Rotatable'],ctor:[['String','color'],['double','radius'],['double','speed']],fields:{radius:'private',angle:'private'},
+    methods:{points:M('int'),scale:M('void',['double','factor']),rotate:M('void',['double','degrees']),getRadius:M('double'),setRadius:M('void',['double','radius'])}},
+  GoldenBubble:{kind:'class',sup:'Bubble',ifs:[],ctor:[['double','radius'],['double','speed']],fields:{},
+    methods:{points:M('int'),describe:M('String')}}
+};
+const ALLTYPES=['FallingItem','Resizable','Rotatable','Bubble','Star','Bomb','GoldenBubble'];
+const PALETTE=['teal','amber','rose','indigo','green','violet','slate','gold'];
+function ancestors(t){const s=new Set();(function v(x){if(!x||s.has(x))return;s.add(x);v(T[x].sup);T[x].ifs.forEach(v);})(t);return s;}
+const isSub=(a,b)=>ancestors(a).has(b);
+const isIface=t=>T[t].kind==='interface';
+function staticLookup(t,m){for(let c=t;c;c=T[c].sup)if(T[c].methods[m])return c;for(const a of ancestors(t))if(isIface(a)&&T[a].methods[m])return a;return null;}
+function fieldLookup(t,f){for(let c=t;c;c=T[c].sup)if(T[c].fields[f])return c;return null;}
+function resolve(cls,m){for(let c=cls;c;c=T[c].sup)if(IMPL[c+'.'+m])return c;for(const a of ancestors(cls))if(isIface(a)&&IMPL[a+'.'+m])return a;return null;}
+const castCompiles=(S,K)=>isSub(S,K)||isSub(K,S)||isIface(S)||isIface(K);
+const jd=v=>Number.isInteger(v)?v.toFixed(1):String(+v.toPrecision(15));
+const jex=(type,msg)=>({jex:true,type,msg});
+/* before chapter 3 there is no FallingItem yet: its members belong to Bubble */
+let labCh=-1;
+const dn=c=>labCh<2&&c==='FallingItem'?'Bubble':c;
+
+const IMPL={
+ 'FallingItem.describe':(o,a,cx,d)=>{const p=cx.call(o,'points',[],d,'this.points()');return `${o.color} ${o.name}, ${p} pts`;},
+ 'FallingItem.fall':o=>{o.y+=o.speed;},
+ 'FallingItem.getY':o=>o.y,
+ 'FallingItem.getSpeed':o=>o.speed,
+ 'FallingItem.setSpeed':(o,[s])=>{if(!(s>0))throw jex('IllegalArgumentException','speed must be > 0');o.speed=s;},
+ 'FallingItem.getColor':o=>o.color,
+ 'FallingItem.setColor':(o,[c])=>{if(!c||!String(c).trim())throw jex('IllegalArgumentException','color required');o.color=c;},
+ 'Bubble.points':o=>Math.ceil(30/o.radius),
+ 'Bubble.scale':(o,[f],cx,d)=>cx.call(o,'setRadius',[o.radius*f],d,'setRadius(radius * factor)'),
+ 'Bubble.getRadius':o=>o.radius,
+ 'Bubble.setRadius':(o,[r])=>{if(!(r>0))throw jex('IllegalArgumentException','radius must be > 0');o.radius=r;},
+ 'Star.points':()=>50,
+ 'Star.rotate':(o,[g])=>{o.angle=(o.angle+g)%360;},
+ 'Bomb.points':()=>-30,
+ 'Bomb.scale':(o,[f])=>{if(!(f>0))throw jex('IllegalArgumentException','factor must be > 0');o.radius*=f;},
+ 'Bomb.rotate':(o,[g])=>{o.angle=(o.angle+g)%360;},
+ 'Bomb.getRadius':o=>o.radius,
+ 'Bomb.setRadius':(o,[r])=>{if(!(r>0))throw jex('IllegalArgumentException','radius must be > 0');o.radius=r;},
+ 'GoldenBubble.points':(o,a,cx,d)=>3*cx.sup(o,'GoldenBubble','points',[],d),
+ 'GoldenBubble.describe':(o,a,cx,d)=>'GOLDEN! '+cx.sup(o,'GoldenBubble','describe',[],d),
+ 'Rotatable.flip':(o,a,cx,d)=>cx.call(o,'rotate',[180],d,'rotate(180)')
+};
+function itemInit(o,name,col,sp,cx){o.name=name;o.y=0;o.angle=0;cx.call(o,'setColor',[col],1,'');cx.call(o,'setSpeed',[sp],1,'');}
+const CTOR={
+ Bubble:(o,[col,r,sp],cx)=>{itemInit(o,'Bubble',col,sp,cx);cx.call(o,'setRadius',[r],1,'');},
+ Star:(o,[col,sp],cx)=>{itemInit(o,'Star',col,sp,cx);},
+ Bomb:(o,[col,r,sp],cx)=>{itemInit(o,'Bomb',col,sp,cx);cx.call(o,'setRadius',[r],1,'');},
+ GoldenBubble:(o,[r,sp],cx)=>{CTOR.Bubble(o,['gold',r,sp],cx);o.name='GoldenBubble';}
+};
+function makeCtx(){
+  const cx={trace:[],hot:new Set(),quiet:false};
+  cx.call=(o,m,args,d,label)=>{const c=resolve(o.cls,m);if(!cx.quiet)cx.trace.push([d,`${label}  → runs ${dn(c)}.${m}()`]);cx.hot.add(dn(c));return IMPL[c+'.'+m](o,args,cx,d+1);};
+  cx.sup=(o,from,m,args,d)=>{const c=resolve(T[from].sup,m);if(!cx.quiet)cx.trace.push([d,`super.${m}()  → runs ${dn(c)}.${m}()`]);cx.hot.add(dn(c));return IMPL[c+'.'+m](o,args,cx,d+1);};
+  return cx;
+}
+
+/* ================= the story ================= */
+const S={
+ b:{decl:'Bubble',name:'b',rhs:'new',cls:'Bubble',args:['teal','3','2']},
+ b2:{decl:'Bubble',name:'b2',rhs:'new',cls:'Bubble',args:['rose','1.5','4']},
+ star:{decl:'Star',name:'star',rhs:'new',cls:'Star',args:['amber','3']},
+ bomb:{decl:'Bomb',name:'bomb',rhs:'new',cls:'Bomb',args:['slate','4','2']},
+ itemStar:{decl:'FallingItem',name:'item',rhs:'new',cls:'Star',args:['amber','3']},
+ itemBomb:{decl:'FallingItem',name:'bomb',rhs:'new',cls:'Bomb',args:['slate','4','2']},
+ r:{decl:'Rotatable',name:'r',rhs:'new',cls:'Star',args:['amber','3']},
+ gold:{decl:'Bubble',name:'gold',rhs:'new',cls:'GoldenBubble',args:['3','2']}
+};
+const M1=['fall','points'],M2=[...M1,'getY','getSpeed','setSpeed','getRadius','setRadius','getColor','setColor'],
+      M4=[...M2,'describe'],M6=[...M4,'scale','rotate'],M7=[...M6,'flip'];
+const F2=['speed','radius','y','color'],F3=[...F2,'name'],F6=[...F3,'angle'];
+const TY1=['Bubble'],TY3=['FallingItem','Bubble','Star','Bomb'],TY6=['FallingItem','Resizable','Rotatable','Bubble','Star','Bomb'],TY8=ALLTYPES;
+const D=o=>({decl:o}),Cl=o=>({call:o});
+
+const CH=[
+{concept:'Class & object',kind:'wish',from:'Shahd, age 9',title:'Bubbles that fall',
+ req:'Daddy, make me a game for my tablet! Bubbles fall from the top and I tap them to pop them. Small bubbles are harder, so they give more points!',
+ attempt:`// Dad's first try: parallel arrays, data and behavior apart
+String[] colors = new String[50];
+double[] radii  = new double[50];
+double[] ys     = new double[50];
+double[] speeds = new double[50];
+
+static void fall(int i)   { ys[i] += speeds[i]; }
+static int  points(int i) { return (int) Math.ceil(30 / radii[i]); }
+
+// popping bubble 7 means shifting FOUR arrays the same way...`,
+ why:['Nothing ties <code>colors[i]</code>, <code>radii[i]</code>, <code>ys[i]</code> and <code>speeds[i]</code> together. Pop one bubble, forget to shift one array, and every bubble after it gets someone else’s speed.','<code>fall(i)</code> takes an index; any code can pass the wrong number.','“A bubble” is not a thing in this program, only a position in four arrays.'],
+ sol:'<p>Bundle a bubble’s data and the things a bubble can do into a <b>class</b>. A class is a blueprint; <code>new</code> builds an <b>object</b> from it, with its own copy of the fields. Each bubble falls and scores <em>itself</em>.</p>',
+ code:`public class Bubble {
+    String color;                    // fields: the object's state
+    double radius, y, speed;
+
+    public Bubble(String color, double radius, double speed) {   // constructor
+        this.color = color;
+        this.radius = radius;
+        this.speed = speed;
+    }
+
+    public void fall()  { y += speed; }                     // one frame
+    public int points() { return (int) Math.ceil(30 / radius); }
+}
+
+Bubble b = new Bubble("teal", 3, 2);   // an object (instance)
+b.fall();                              // it moves itself
+int p = b.points();                    // 10 points when popped`,
+ tries:[['Drop a second bubble',D({decl:'Bubble',name:'b2',rhs:'new',cls:'Bubble',args:['rose','1.5','4']}),'class-object'],
+        ['Let b fall one frame',Cl({v:'b',mem:'m:fall'}),'class-object'],
+        ['How many points is b worth?',Cl({v:'b',mem:'m:points'}),'class-object']],
+ take:'A class groups state and behavior. Each object carries its own state: every bubble knows its own position, speed and points.',
+ types:TY1,members:M1,fields:[],setup:[S.b]},
+
+{concept:'Encapsulation',kind:'bug',from:'Omar, Shahd’s friend (playing her shared game)',title:'Omar’s bubble flew away',
+ req:'I set my bubble’s speed to −4. It flew UP off the screen, so nobody could pop it and the level never ended. I win forever!',
+ attempt:`b.speed = -4;              // anyone can write the field
+
+// "Fix": check everywhere a speed is set...
+if (s > 0) b.speed = s;    // in the level loader
+if (s > 0) b.speed = s;    // in the "speed up" power-up
+b.speed = s;               // ...forgot it in the shared-level importer`,
+ why:['Any code anywhere can put a bubble into an impossible state.','The rule “speed &gt; 0” is copied into every caller; miss one and Omar is back.'],
+ sol:'<p><b>Encapsulation</b>: make the fields <code>private</code> so only the class itself can touch them, and expose public methods (getters and setters) that enforce the rules in one place.</p>',
+ code:`public class Bubble {
+    private String color;
+    private double radius, y, speed;     // hidden from outside code
+
+    public Bubble(String color, double radius, double speed) {
+        this.color = color;
+        setRadius(radius);               // the constructor reuses the checks
+        setSpeed(speed);
+    }
+
+    public double getSpeed() { return speed; }
+
+    public void setSpeed(double speed) {
+        if (speed <= 0)
+            throw new IllegalArgumentException("speed must be > 0");
+        this.speed = speed;
+    }
+    // getRadius()/setRadius(...) and getColor()/setColor(...) work the same way
+}`,
+ tries:[['Omar’s trick: write the field',Cl({v:'b',mem:'f:speed',arg:'-4'}),'private-field'],
+        ['Use the setter with −4',Cl({v:'b',mem:'m:setSpeed',arg:'-4'}),'setter-guard'],
+        ['Use the setter with 5',Cl({v:'b',mem:'m:setSpeed',arg:'5'}),'encap-ok'],
+        ['Create a bubble with speed −1',D({decl:'Bubble',name:'bad',rhs:'new',cls:'Bubble',args:['teal','3','-1']}),'setter-guard']],
+ take:'Private fields plus validating methods mean the object guards its own rules. Nobody can break it, not even Omar.',
+ types:TY1,members:M2,fields:F2,setup:[S.b]},
+
+{concept:'Inheritance',kind:'wish',from:'Shahd, age 9',title:'Stars and bombs',
+ req:'Bubbles are getting boring. Can stars fall too, worth 50 points? And bombs: if you tap a bomb you LOSE 30 points!',
+ attempt:`public class Star {
+    private String color;                  // copied from Bubble
+    private double y, speed;               // copied
+    public void fall() { y += speed; }     // copied
+    public void setSpeed(double s) {       // copied, with its check
+        if (s <= 0) throw ...;
+        speed = s;
+    }
+    public int points() { return 50; }
+}
+public class Bomb {
+    private String color;                  // copied again
+    private double y, speed;               // copied again
+    public void fall() { y += speed; }     // copied again
+    ...
+}`,
+ why:['The falling code now exists three times. Fix a bug in one copy and the other two keep it.','Nothing in the code says that bubbles, stars and bombs are all things that fall.'],
+ sol:'<p><b>Inheritance</b>: move what every falling thing shares into a superclass <code>FallingItem</code>. Each kind of item <code>extends FallingItem</code>, inherits its fields and methods, and calls the parent constructor with <code>super(...)</code>.</p>',
+ code:`public class FallingItem {
+    protected String name;           // subclasses may use it
+    private String color;
+    private double y, speed;         // only FallingItem touches these
+
+    public FallingItem(String name, String color, double speed) {
+        this.name = name;
+        setColor(color);
+        setSpeed(speed);
+    }
+    public void fall() { y += speed; }          // written once
+    public void setSpeed(double speed) { /* validated once, here */ }
+    ...
+}
+
+public class Bubble extends FallingItem {       // Bubble IS-A FallingItem
+    private double radius;
+    public Bubble(String color, double radius, double speed) {
+        super("Bubble", color, speed);           // FallingItem's constructor runs first
+        setRadius(radius);
+    }
+    public int points() { return (int) Math.ceil(30 / radius); }
+}
+public class Star extends FallingItem { ... public int points() { return 50; } }
+public class Bomb extends FallingItem { ... public int points() { return -30; } }`,
+ tries:[['Drop a new star (constructor chain)',D({decl:'Star',name:'star2',rhs:'new',cls:'Star',args:['amber','3']}),'construct-chain'],
+        ['bomb.fall(): inherited',Cl({v:'bomb',mem:'m:fall'}),'inherited'],
+        ['Speed 0 via inherited setter',Cl({v:'star',mem:'m:setSpeed',arg:'0'}),'setter-guard'],
+        ['Write FallingItem’s private speed',Cl({v:'bomb',mem:'f:speed',arg:'9'}),'private-field']],
+ take:'Inheritance removes duplication and models IS-A: falling is written once in FallingItem, and each item adds only what makes it different.',
+ types:TY3,members:M2,fields:F3,setup:[S.b,S.star,S.bomb]},
+
+{concept:'Abstract class',kind:'wish',from:'Shahd, age 9',title:'Show what I popped',
+ req:'When I pop something, show “teal Bubble, 10 pts” at the top. And Omar keeps making a “mystery item” that’s just… nothing. It gives zero points. Stop him!',
+ attempt:`public class FallingItem {
+    ...
+    public int points() {
+        return 0;          // ??? how many points is "an item" worth?
+    }
+    public String describe() {
+        return color + " " + name + ", " + points() + " pts";
+    }
+}
+
+// Omar's trick: compiles, falls, worth 0
+FallingItem mystery = new FallingItem("Mystery", "violet", 2);`,
+ why:['<code>FallingItem</code> can’t know how many points it’s worth, so <code>return 0</code> is a lie.','A new item class that forgets to override <code>points()</code> silently scores 0, and the compiler can’t help.','Nothing prevents <code>new FallingItem(...)</code>.'],
+ sol:'<p>Make <code>FallingItem</code> an <b>abstract class</b>, and declare <code>points()</code> as an <b>abstract method</b> with no body. Every concrete subclass is then forced to provide it, and <code>new FallingItem(...)</code> no longer compiles. Shared code like <code>describe()</code> and <code>fall()</code> stays concrete.</p>',
+ code:`public abstract class FallingItem {
+    ...
+    public abstract int points();     // no body: every subclass MUST decide
+
+    public String describe() {        // concrete and shared
+        return color + " " + name + ", " + points() + " pts";   // calls the subclass version
+    }
+}
+
+public class Bubble extends FallingItem {
+    @Override
+    public int points() { return (int) Math.ceil(30 / radius); }
+    ...
+}`,
+ tries:[['Make Omar’s mystery item',D({decl:'FallingItem',name:'mystery',rhs:'new',cls:'FallingItem',args:['Mystery','violet','2']}),'abstract-new'],
+        ['b.describe()',Cl({v:'b',mem:'m:describe'}),'template'],
+        ['star.describe()',Cl({v:'star',mem:'m:describe'}),'template'],
+        ['bomb.describe()',Cl({v:'bomb',mem:'m:describe'}),'template']],
+ take:'An abstract class is a partial design: shared state and code, plus abstract “holes” every subclass must fill. It can’t be instantiated on its own.',
+ types:TY3,members:M4,fields:F3,setup:[S.b,S.star,S.bomb]},
+
+{concept:'Polymorphism',kind:'wish',from:'Shahd, age 9',title:'A real game loop, and my score',
+ req:'Make it a real game! Everything falls a little every frame, and at the end add up my points so I can send my score to my friends. Maya is drawing snowflakes for level 2!',
+ attempt:`List<Bubble> bubbles = ...;
+List<Star>   stars   = ...;
+List<Bomb>   bombs   = ...;
+
+// every frame:
+for (Bubble b : bubbles) b.fall();
+for (Star s : stars)     s.fall();
+for (Bomb x : bombs)     x.fall();
+
+// end of level:
+int score = 0;
+for (Bubble b : bubbles) score += b.points();
+for (Star s : stars)     score += s.points();
+for (Bomb x : bombs)     score += x.points();
+// Maya's Snowflake → edit every one of these loops again`,
+ why:['One list and one loop per kind of item, repeated for every job.','Every new item class forces edits in every loop of the game.'],
+ sol:'<p><b>Polymorphism</b>: keep every item in one <code>FallingItem</code> list (<b>upcasting</b> is automatic, since a Bubble IS-A FallingItem). Call <code>points()</code> through the FallingItem type; at runtime the JVM runs the version of each object’s actual class (<b>dynamic dispatch</b>).</p>',
+ code:`List<FallingItem> items = List.of(b, item, bomb);   // upcast: no cast needed
+
+// every frame
+for (FallingItem it : items) it.fall();
+
+// end of level
+int score = 0;
+for (FallingItem it : items) {
+    System.out.println(it.describe());
+    score += it.points();      // Bubble.points(), Star.points(), Bomb.points()
+}
+// Maya's Snowflake extends FallingItem: these loops need no change.`,
+ tries:[['item.points() where item is a FallingItem',Cl({v:'item',mem:'m:points'}),'dispatch'],
+        ['Upcast a new Bubble',D({decl:'FallingItem',name:'item2',rhs:'new',cls:'Bubble',args:['green','2','3']}),'upcast'],
+        ['One frame of the game loop','tick','tick'],
+        ['End of level: add up the score','loop','loop']],
+ take:'Program to the general type and let each object supply its own behavior. New item classes plug in without changing the game loop.',
+ types:TY3,members:M4,fields:F3,setup:[S.b,S.itemStar,S.itemBomb]},
+
+{concept:'Interface',kind:'wish',from:'Shahd, age 9',title:'Grow, shrink and spin',
+ req:'I want a pinch power-up that makes bubbles and bombs bigger or smaller, and stars and bombs should spin while they fall. A spinning bubble looks silly, so bubbles don’t spin.',
+ attempt:`// Attempt A: put both abilities in FallingItem
+public abstract class FallingItem {
+    public abstract void scale(double factor);   // Star forced to fake it
+    public abstract void rotate(double degrees); // Bubble forced to fake it
+}
+
+// Attempt B: separate "ability" base classes
+public class Bomb extends FallingItem, Shrinker, Spinner { }
+//                                 ^ compile error: only ONE superclass allowed`,
+ why:['Attempt A forces every item to implement every ability, even meaningless ones.','Attempt B is illegal: a Java class can extend only one class.','The pinch power-up shouldn’t care what an item is; it only needs “something resizable”.'],
+ sol:'<p>Describe each ability as an <b>interface</b>: a contract of methods with no state. A class <code>extends</code> one superclass but can <code>implements</code> as many interfaces as it needs. An interface is also a type, so the power-up can accept any <code>Resizable</code>.</p>',
+ code:`public interface Resizable { void scale(double factor); }
+public interface Rotatable { void rotate(double degrees); }
+
+public class Bubble extends FallingItem implements Resizable { ... }
+public class Star   extends FallingItem implements Rotatable { ... }
+public class Bomb   extends FallingItem implements Resizable, Rotatable { ... }
+
+// The pinch power-up depends only on the contract:
+void onPinch(Resizable target, double factor) { target.scale(factor); }`,
+ tries:[['Try new Resizable()',D({decl:'Resizable',name:'x',rhs:'new',cls:'Resizable',args:[]}),'iface-new'],
+        ['Hand b to the pinch tool',D({decl:'Resizable',name:'handle',rhs:'var',src:'b',cast:''}),'iface-ref'],
+        ['b.scale(1.5)',Cl({v:'b',mem:'m:scale',arg:'1.5'}),'iface-impl'],
+        ['r.rotate(45) on a Rotatable',Cl({v:'r',mem:'m:rotate',arg:'45'}),'iface-impl'],
+        ['r.points() through Rotatable',Cl({v:'r',mem:'m:points'}),'static-limit']],
+ take:'Abstract class = what a thing IS (one parent). Interface = what a thing CAN DO (many contracts). Code that depends on an interface works with any class that signs it.',
+ types:TY6,members:M6,fields:F6,setup:[S.b,S.itemBomb,S.r]},
+
+{concept:'Default method',kind:'wish',from:'Shahd, age 9',title:'An Upside-down power-up (don’t break Adam’s leaf!)',
+ req:'Add an Upside-down power-up that flips every spinning item. My friend Adam is learning Java and made his own spinning Leaf for our game, so don’t break it!',
+ attempt:`public interface Rotatable {
+    void rotate(double degrees);
+    void flip();            // new abstract method
+}
+// Star, Bomb AND Adam's Leaf no longer compile:
+// "Leaf is not abstract and does not override abstract method flip()"`,
+ why:['Adding an abstract method to an interface breaks every class that already implements it.','That includes Adam’s <code>Leaf</code>, which lives on his tablet; Dad can’t edit it.'],
+ sol:'<p>Give the new method a body inside the interface with <code>default</code> (Java 8+). Existing classes, Adam’s Leaf included, inherit it automatically and may still override it later.</p>',
+ code:`public interface Rotatable {
+    void rotate(double degrees);
+
+    default void flip() {     // implemented once, in the interface
+        rotate(180);          // calls each class's own rotate()
+    }
+}`,
+ tries:[['r.flip()',Cl({v:'r',mem:'m:flip'}),'default-method'],
+        ['r.rotate(30)',Cl({v:'r',mem:'m:rotate',arg:'30'}),'iface-impl']],
+ take:'Default methods let an interface grow without breaking the classes that already implement it.',
+ types:TY6,members:M7,fields:F6,setup:[S.b,S.itemBomb,S.r]},
+
+{concept:'Overriding & super',kind:'wish',from:'Shahd, age 9',title:'Golden bubbles',
+ req:'Golden bubbles! They act like normal bubbles but give TRIPLE points, and the top line should shout GOLDEN!',
+ attempt:`public class GoldenBubble extends Bubble {
+    public GoldenBubble(double radius, double speed) {
+        super("gold", radius, speed);
+    }
+}
+
+Bubble g = new GoldenBubble(3, 2);
+g.points();      // 10: same as a normal bubble, not triple!
+g.describe();    // "gold Bubble, 10 pts": no GOLDEN anywhere`,
+ why:['The inherited <code>points()</code> and <code>describe()</code> don’t know the bubble is golden.','Copying Bubble’s formula and multiplying by 3 would duplicate it; change the formula later and golden bubbles drift out of sync.'],
+ sol:'<p><b>Override</b> the inherited methods to change their behavior for GoldenBubble, and call <code>super.method()</code> to reuse the parent’s version instead of rewriting it.</p>',
+ code:`public class GoldenBubble extends Bubble {
+    public GoldenBubble(double radius, double speed) {
+        super("gold", radius, speed);
+        name = "GoldenBubble";            // protected field from FallingItem
+    }
+
+    @Override
+    public int points() {
+        return 3 * super.points();        // reuse Bubble's formula, then triple it
+    }
+
+    @Override
+    public String describe() {
+        return "GOLDEN! " + super.describe();
+    }
+}`,
+ tries:[['Constructor chain of a golden bubble',D({decl:'GoldenBubble',name:'g',rhs:'new',cls:'GoldenBubble',args:['2','3']}),'construct-chain'],
+        ['gold.points()',Cl({v:'gold',mem:'m:points'}),'override'],
+        ['gold.describe()',Cl({v:'gold',mem:'m:describe'}),'super-call'],
+        ['Rename it from outside',Cl({v:'gold',mem:'f:name',arg:'Fake'}),'protected-field']],
+ take:'Overriding specializes inherited behavior; super reuses the parent’s code instead of copying it.',
+ types:TY8,members:M7,fields:F6,setup:[S.b,S.itemBomb,S.r,S.gold]},
+
+{concept:'Recap',title:'Shahd’s game, piece by piece',recap:true,
+ types:TY8,members:M7,fields:F6,setup:[S.b,S.itemBomb,S.r,S.gold]}
+];
+
+/* ================= diagram versions ================= */
+function boxSpec(n,ch){
+  if(!CH[ch].types.includes(n))return null;
+  if(n==='Bubble'&&ch<=1){
+    return {x:40,y:16,w:200,kind:'class',lines:ch===0
+      ?[['+ color : String'],['+ radius : double'],['+ y, speed : double'],['+ fall()'],['+ points() : int']]
+      :[['- color : String'],['- radius : double'],['- y, speed : double'],['+ fall()'],['+ points() : int'],['+ get/setSpeed(…)'],['+ get/setRadius(…)']]};
+  }
+  const abs=ch>=3,ifs=ch>=5;
+  switch(n){
+    case 'FallingItem':return {x:40,y:16,w:200,kind:abs?'abstract':'class',st:abs?'«abstract»':'',lines:[['# name : String'],['- color : String'],['- y, speed : double'],['+ fall()'],...(abs?[['+ points() : int',1],['+ describe() : String']]:[]),['+ get/setSpeed(…)'],['+ get/setColor(…)']]};
+    case 'Resizable':return {x:330,y:16,w:180,kind:'interface',st:'«interface»',lines:[['+ scale(double)',1]]};
+    case 'Rotatable':return {x:550,y:16,w:180,kind:'interface',st:'«interface»',lines:[['+ rotate(double)',1],...(ch>=6?[['+ flip()  «default»']]:[])]};
+    case 'Bubble':return {x:20,y:240,w:170,kind:'class',lines:[['- radius : double'],['+ points() : int'],...(ifs?[['+ scale(double)']]:[]),['+ get/setRadius(…)']]};
+    case 'Bomb':return {x:230,y:240,w:190,kind:'class',lines:[['- radius : double'],...(ifs?[['- angle : double']]:[]),['+ points() : int'],...(ifs?[['+ scale(double)'],['+ rotate(double)']]:[]),['+ get/setRadius(…)']]};
+    case 'Star':return {x:560,y:240,w:170,kind:'class',lines:[...(ifs?[['- angle : double']]:[]),['+ points() : int'],...(ifs?[['+ rotate(double)']]:[])]};
+    case 'GoldenBubble':return {x:20,y:0,w:170,kind:'class',lines:[['+ points() : int'],['+ describe() : String']]};
+  }
+}
+function specsFor(ch){
+  const specs={};ALLTYPES.forEach(n=>{const b=boxSpec(n,ch);if(b){b.h=36+b.lines.length*16+8;specs[n]=b;}});
+  if(specs.GoldenBubble)specs.GoldenBubble.y=specs.Bubble.y+specs.Bubble.h+40;
+  return specs;
+}
+const edgeKeys=sp=>new Set([sp.FallingItem&&'ext',sp.Resizable&&'res',sp.Rotatable&&'rot',sp.GoldenBubble&&'gold'].filter(Boolean));
+/* markNew: highlight only what changed since the previous chapter, fade the rest */
+function diagramSVG(ch,markNew){
+  const specs=specsFor(ch);
+  const diff=markNew&&!CH[ch].recap;
+  const prev=diff&&ch>0?specsFor(ch-1):{},prevE=diff?edgeKeys(prev):new Set(),curE=edgeKeys(specs);
+  const info={};let any=false;
+  for(const [n,b] of Object.entries(specs)){
+    const p=prev[n],I={isNew:diff&&!p,head:false,moved:false,lines:new Set()};
+    if(diff&&p){
+      if(p.kind!==b.kind)I.head=true;
+      const old=new Set(p.lines.map(l=>l[0]+'|'+(l[1]||'')));
+      b.lines.forEach((l,i)=>{if(!old.has(l[0]+'|'+(l[1]||'')))I.lines.add(i);});
+      const cur=new Set(b.lines.map(l=>l[0]+'|'+(l[1]||'')));
+      if(!I.lines.size&&[...old].some(k=>!cur.has(k)))I.moved=true;
+    }
+    if(I.isNew||I.head||I.moved||I.lines.size)any=true;
+    info[n]=I;
+  }
+  const newE=new Set([...curE].filter(e=>diff&&!prevE.has(e)));if(newE.size)any=true;
+  const dimOn=diff&&any;
+  let H=0;Object.values(specs).forEach(b=>H=Math.max(H,b.y+b.h));
+  const W=ch<=1?280:760;
+  let s=`<svg viewBox="0 0 ${W} ${H+14}" style="max-width:${Math.round(W*1.3)}px;margin-inline:auto" role="img" aria-label="UML class diagram after chapter ${ch+1}"${dimOn?' class="diffing"':''}>`;
+  const ec=k=>newE.has(k)?' new-edge':(dimOn?' faded':'');
+  const tri=(x,y,i,k)=>`<polygon class="arrow${i?' i':''}${ec(k)}" points="${x},${y} ${x-8},${y+14} ${x+8},${y+14}"/>`;
+  if(specs.FallingItem){const sb=specs.FallingItem.y+specs.FallingItem.h;s+=`<path class="edge${ec('ext')}" d="M140 ${sb+14} V212 M105 212 H600 M105 212 V240 M325 212 V240 M600 212 V240"/>${tri(140,sb,0,'ext')}`;}
+  if(specs.Resizable){const rb=specs.Resizable.y+specs.Resizable.h;s+=`<path class="edge dash${ec('res')}" d="M380 240 V${rb+14} M170 240 V226 H380"/>${tri(380,rb,1,'res')}`;}
+  if(specs.Rotatable){const rb=specs.Rotatable.y+specs.Rotatable.h;s+=`<path class="edge dash${ec('rot')}" d="M690 240 V${rb+14} M410 240 V226 H690"/>${tri(690,rb,1,'rot')}`;}
+  if(specs.GoldenBubble){const bb=specs.Bubble.y+specs.Bubble.h;s+=`<path class="edge${ec('gold')}" d="M105 ${bb+14} V${specs.GoldenBubble.y}"/>${tri(105,bb,0,'gold')}`;}
+  for(const [n,b] of Object.entries(specs)){
+    const I=info[n],touched=I.isNew||I.head||I.moved||I.lines.size>0;
+    const cls=['box',I.isNew?'new':'',I.head||I.moved?'headchg':'',dimOn&&!touched?'faded':''].filter(Boolean).join(' ');
+    const tag=I.isNew?'NEW':I.head?(b.kind==='abstract'?'NOW ABSTRACT':'CHANGED'):I.moved?'MOVED UP':'';
+    s+=`<g class="${cls}" data-cls="${n}" data-kind="${b.kind}">
+      <rect class="frame" x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="4"/>
+      <rect class="head" x="${b.x+1}" y="${b.y+1}" width="${b.w-2}" height="34" rx="3"/>
+      <line x1="${b.x}" x2="${b.x+b.w}" y1="${b.y+36}" y2="${b.y+36}" stroke="currentColor" stroke-opacity=".35"/>
+      ${tag?`<text class="newtag" x="${b.x+b.w-6}" y="${b.y+13}" text-anchor="end">${tag}</text>`:''}
+      ${b.st?`<text class="st" x="${b.x+b.w/2}" y="${b.y+14}" text-anchor="middle">${esc(b.st)}</text><text class="nm" x="${b.x+b.w/2}" y="${b.y+30}" text-anchor="middle">${n}</text>`
+            :`<text class="nm" x="${b.x+b.w/2}" y="${b.y+24}" text-anchor="middle">${n}</text>`}
+      ${b.lines.map((l,i)=>{const chg=I.lines.has(i);const ty=b.y+36+16*i;
+        return `${chg?`<rect class="hl-line" x="${b.x+3}" y="${ty+3}" width="${b.w-6}" height="16" rx="3"/>`:''}<text x="${b.x+10}" y="${ty+15}" class="${[l[1]?'it':'',chg?'chg':'',dimOn&&touched&&!chg&&!I.isNew?'dimt':''].filter(Boolean).join(' ')}">${esc(l[0])}</text>`;}).join('')}
+    </g>`;
+  }
+  return s+'</svg>';
+}
+const CHANGES=[
+ ['New class <code>Bubble</code>: its data (<code>color</code>, <code>radius</code>, <code>y</code>, <code>speed</code>) and behavior (<code>fall()</code>, <code>points()</code>) live together.'],
+ ['Fields switched from <code>+</code> public to <code>-</code> private.','New getters and setters <code>get/setSpeed</code> and <code>get/setRadius</code> guard the rules.'],
+ ['New superclass <code>FallingItem</code> holds <code>name</code>, <code>color</code>, <code>y</code>, <code>speed</code> and <code>fall()</code>.','Those members moved up out of <code>Bubble</code>.','New <code>Star</code> and <code>Bomb</code>; all three <code>extends FallingItem</code>.'],
+ ['<code>FallingItem</code> is now <code>abstract</code>.','It gains abstract <code>points()</code> and concrete <code>describe()</code>.'],
+ ['No class changed. Polymorphism lives in the game code: one <code>List&lt;FallingItem&gt;</code> and one loop.'],
+ ['New interfaces <code>Resizable</code> and <code>Rotatable</code>.','<code>Bubble</code> and <code>Bomb</code> implement <code>Resizable</code>; <code>Star</code> and <code>Bomb</code> implement <code>Rotatable</code>.','<code>scale()</code>, <code>rotate()</code> and <code>angle</code> added to the implementing classes.'],
+ ['<code>Rotatable</code> gains a <code>default flip()</code>.','No implementing class had to change, not even Adam’s Leaf.'],
+ ['New class <code>GoldenBubble extends Bubble</code>.','It overrides <code>points()</code> and <code>describe()</code>.']
+];
+const LEGEND=`<div class="dlegend">
+  <span><svg width="40" height="14"><line x1="2" y1="7" x2="28" y2="7" stroke="currentColor" stroke-width="1.3"/><polygon points="38,7 28,2 28,12" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>extends</span>
+  <span style="color:var(--iface)"><svg width="40" height="14"><line x1="2" y1="7" x2="28" y2="7" stroke="currentColor" stroke-width="1.3" stroke-dasharray="5 3"/><polygon points="38,7 28,2 28,12" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>implements</span>
+  <span><i>italic</i> = abstract</span><span><b class="hl-key">highlighted</b> = changed in this chapter</span><span><code>-</code> private <code>#</code> protected <code>+</code> public</span></div>`;
+
+/* ================= final source ================= */
+const SRC={
+FallingItem:`package game;
+
+public abstract class FallingItem {
+    protected String name;        // visible to subclasses
+    private String color;         // only FallingItem can touch these
+    private double y, speed;
+
+    protected FallingItem(String name, String color, double speed) {
+        this.name = name;
+        setColor(color);
+        setSpeed(speed);
+    }
+
+    public abstract int points();           // every item decides its own
+
+    public void fall() { y += speed; }      // one frame of the game
+
+    public String describe() {
+        return color + " " + name + ", " + points() + " pts";
+    }
+
+    public double getY()     { return y; }
+    public double getSpeed() { return speed; }
+    public String getColor() { return color; }
+
+    public void setSpeed(double speed) {
+        if (speed <= 0)
+            throw new IllegalArgumentException("speed must be > 0");
+        this.speed = speed;
+    }
+
+    public void setColor(String color) {
+        if (color == null || color.isBlank())
+            throw new IllegalArgumentException("color required");
+        this.color = color;
+    }
+}`,
+Resizable:`package game;
+
+public interface Resizable {
+    void scale(double factor);    // implicitly public abstract
+}`,
+Rotatable:`package game;
+
+public interface Rotatable {
+    void rotate(double degrees);
+
+    default void flip() {
+        rotate(180);
+    }
+}`,
+Bubble:`package game;
+
+public class Bubble extends FallingItem implements Resizable {
+    private double radius;
+
+    public Bubble(String color, double radius, double speed) {
+        super("Bubble", color, speed);
+        setRadius(radius);
+    }
+
+    @Override
+    public int points() { return (int) Math.ceil(30 / radius); }   // smaller = more
+
+    @Override
+    public void scale(double factor) { setRadius(radius * factor); }
+
+    public double getRadius() { return radius; }
+
+    public void setRadius(double radius) {
+        if (radius <= 0)
+            throw new IllegalArgumentException("radius must be > 0");
+        this.radius = radius;
+    }
+}`,
+Star:`package game;
+
+public class Star extends FallingItem implements Rotatable {
+    private double angle;
+
+    public Star(String color, double speed) {
+        super("Star", color, speed);
+    }
+
+    @Override
+    public int points() { return 50; }
+
+    @Override
+    public void rotate(double degrees) { angle = (angle + degrees) % 360; }
+}`,
+Bomb:`package game;
+
+public class Bomb extends FallingItem implements Resizable, Rotatable {
+    private double radius;
+    private double angle;
+
+    public Bomb(String color, double radius, double speed) {
+        super("Bomb", color, speed);
+        setRadius(radius);
+    }
+
+    @Override
+    public int points() { return -30; }      // tapping a bomb costs points
+
+    @Override
+    public void scale(double factor) {
+        if (factor <= 0)
+            throw new IllegalArgumentException("factor must be > 0");
+        radius *= factor;
+    }
+
+    @Override
+    public void rotate(double degrees) { angle = (angle + degrees) % 360; }
+
+    public double getRadius() { return radius; }
+
+    public void setRadius(double radius) {
+        if (radius <= 0)
+            throw new IllegalArgumentException("radius must be > 0");
+        this.radius = radius;
+    }
+}`,
+GoldenBubble:`package game;
+
+public class GoldenBubble extends Bubble {
+
+    public GoldenBubble(double radius, double speed) {
+        super("gold", radius, speed);
+        name = "GoldenBubble";
+    }
+
+    @Override
+    public int points() { return 3 * super.points(); }
+
+    @Override
+    public String describe() { return "GOLDEN! " + super.describe(); }
+}`,
+Main:`package app;
+
+import game.*;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<FallingItem> items = List.of(
+            new Bubble("teal", 3, 2),
+            new Star("amber", 3),
+            new Bomb("slate", 4, 2),
+            new GoldenBubble(3, 2)
+        );
+
+        for (FallingItem it : items) it.fall();          // one frame
+
+        int score = 0;
+        for (FallingItem it : items) {                   // end of level
+            System.out.println(it.describe());
+            score += it.points();
+        }
+        System.out.println("Shahd's score: " + score);
+    }
+}`
+};
+function hl(src){
+  const re=/(\/\/[^\n]*)|("(?:[^"\\]|\\.)*")|(@\w+)|\b(package|import|public|private|protected|abstract|class|interface|extends|implements|return|if|throw|new|this|super|void|double|int|default|static|for|final|null|instanceof)\b|\b(\d+(?:\.\d+)?)\b|\b([A-Z]\w*)\b/g;
+  return src.split('\n').map(line=>{
+    let out='',last=0,m;re.lastIndex=0;
+    while((m=re.exec(line))){out+=esc(line.slice(last,m.index));const c=m[1]?'c':m[2]?'s':m[3]?'a':m[4]?'k':m[5]?'n':'t';out+=`<span class="${c}">${esc(m[0])}</span>`;last=re.lastIndex;}
+    out+=esc(line.slice(last));return `<span class="ln">${out||' '}</span>`;
+  }).join('');
+}
+function showSrc(n){
+  $('#srcTabs').innerHTML=[...ALLTYPES,'Main'].map(t=>`<button role="tab" aria-selected="${t===n}" data-t="${t}">${t}.java</button>`).join('');
+  $('#src').innerHTML=hl(SRC[n]);
+}
+
+/* ================= state & console ================= */
+let objs={},vars={},nextId=1,busy=false,score=0;
+const uniqueObjs=()=>Object.values(objs).sort((a,b)=>a.id-b.id);
+const fresh=b=>{if(!vars[b])return b;let i=2;while(vars[b+i])i++;return b+i;};
+const con=$('#console');
+function log(kind,text,badge){
+  const d=document.createElement('div');d.className='ln-c '+kind;
+  d.innerHTML=(badge?`<span class="badge">${esc(badge)}</span>`:'')+esc(text);
+  con.appendChild(d);while(con.children.length>400)con.removeChild(con.firstChild);con.scrollTop=con.scrollHeight;
+}
+const logTrace=cx=>cx.trace.forEach(([d,t])=>log('trace','  '.repeat(d+1)+t));
+
+/* ================= concept explanations ================= */
+const C={
+ 'class-object':['Class & object','A class is a blueprint; an object is one thing built from it',`<p><code>new Bubble(...)</code> builds an object on the heap with its own <code>color</code>, <code>radius</code>, <code>y</code> and <code>speed</code>. Calling <code>b.fall()</code> moves <em>that</em> bubble only. Every bubble shares the class’s code but never another bubble’s state.</p>`],
+ 'abstract-new':['Abstract class','Abstract classes cannot be instantiated',`<p><code>FallingItem</code> is <code>abstract</code> because <code>points()</code> has no body. A “plain item” would have nothing to run, so the compiler refuses <code>new FallingItem(...)</code>.</p><p>You can still declare variables of type <code>FallingItem</code>, and its constructor still runs when a subclass calls <code>super(...)</code>.</p>`],
+ 'iface-new':['Interface','Interfaces cannot be instantiated',`<p>An interface is a contract: a list of methods a class promises to provide. <code>new Resizable()</code> has no class behind it. Use a class that <code>implements</code> it instead.</p>`],
+ 'iface-ref':['Interface','An interface works as a type',`<p>The variable’s declared type is an interface, so through it you can call only what the interface declares. The object on the heap is still a complete Bubble; the reference just gives a narrower view. That’s how the pinch power-up accepts “anything resizable”.</p>`],
+ 'iface-impl':['Interface','The class keeps the contract',`<p>Because the class declares <code>implements Resizable</code> (or <code>Rotatable</code>), the compiler forced it to provide the method. Code holding only the interface type can call it without knowing which class it is talking to.</p>`],
+ 'upcast':['Polymorphism','Upcasting is automatic',`<p>A subclass object IS-A instance of its superclass, so it fits in a superclass variable with no cast. In the variables table, the <b>declared type</b> decides which methods compile, and the <b>object’s class</b> decides which code runs.</p>`],
+ 'alias':['References','Two variables, one object',`<p>Assigning a variable copies the <em>reference</em>, not the object. Both names now point at the same object, so a change through one is visible through the other.</p>`],
+ 'incompatible':['Type checking','Incompatible types',`<p>The value’s type is not a subtype of the declared type, so the compiler rejects the assignment.</p>`],
+ 'downcast-needed':['Casting','Going down the hierarchy needs a cast',`<p>The compiler only knows <code>bomb</code> as a <code>FallingItem</code>, and not every FallingItem is a Bomb. Upcasts are implicit; downcasts must be written: <code>Bomb bb = (Bomb) bomb;</code></p>`],
+ 'cast-ok':['Casting','The cast compiled and passed the runtime check',`<p>The compiler accepted the cast because the types are related. At runtime the JVM checked the actual object, confirmed it really is an instance of the target type, and continued with the wider view of the object.</p>`],
+ 'cast-fail':['Casting','ClassCastException at runtime',`<p>The cast compiled, since a class implementing one interface might implement another. At runtime the JVM found the object is a Star, which isn’t Resizable, and threw. Guard casts with <code>instanceof</code>.</p>`],
+ 'cast-compile':['Casting','Inconvertible types',`<p>Casting between two unrelated classes can never succeed, so the compiler rejects it before the program runs.</p>`],
+ 'dispatch':['Polymorphism','Dynamic dispatch',`<p>At compile time Java only checked that the declared type has this method. At runtime the JVM looked at the object’s actual class and ran <em>that class’s</em> version. Same line of code, different method body for each item.</p>`],
+ 'template':['Abstract class','Concrete code in an abstract class',`<p><code>describe()</code> is written once in <code>FallingItem</code>. Inside it, <code>this.points()</code> runs the subclass’s version (see the trace). Abstract classes can mix shared, finished code with abstract “holes” that subclasses fill in (the Template Method pattern).</p>`],
+ 'super-call':['Overriding & super','Override, then reuse the parent',`<p><code>GoldenBubble</code> overrides <code>describe()</code> and calls <code>super.describe()</code>, which starts the method lookup in the superclass. Inside FallingItem’s version, <code>this.points()</code> still dispatches on the real object, to <code>GoldenBubble.points()</code>, which in turn calls <code>super.points()</code> in Bubble.</p>`],
+ 'override':['Overriding & super','The subclass version runs',`<p>The variable is declared as a <code>Bubble</code>, but the object is a GoldenBubble, which overrides <code>points()</code>, so the triple-points version ran. It reused Bubble’s formula through <code>super.points()</code> instead of copying it.</p>`],
+ 'default-method':['Default method','Inherited from the interface',`<p><code>flip()</code> has a body inside <code>Rotatable</code>. Star never wrote <code>flip()</code> but inherits it, and the default calls <code>rotate()</code>, which runs Star’s own version. Adam’s Leaf gets it the same way.</p>`],
+ 'static-limit':['Type checking','The declared type limits what you can call',`<p>The object has this method, but the variable’s declared type doesn’t, and the compiler trusts only the declared type. Cast (after checking with <code>instanceof</code>) to reach it.</p>`],
+ 'unknown':['Type checking','Cannot find symbol',`<p>No method or field with that name exists on the declared type or its supertypes.</p>`],
+ 'private-field':['Encapsulation','Private fields are hidden',`<p>The field is <code>private</code>, so only code inside its own class can read or write it, not even subclasses. Outside code must go through the public methods, which enforce the rules.</p>`],
+ 'protected-field':['Encapsulation','Protected is not public',`<p><code>name</code> is <code>protected</code>: visible to subclasses (GoldenBubble sets it in its constructor) and to classes in package <code>game</code>. <code>Main</code> lives in package <code>app</code>, so it can’t see it.</p>`],
+ 'setter-guard':['Encapsulation','The object refused invalid data',`<p>The method rejected the value and threw <code>IllegalArgumentException</code>. Since every write goes through it, no item can ever hold an invalid value. The object kept its previous state (or was never created).</p>`],
+ 'construct-chain':['Inheritance','Constructor chaining',`<p>Every constructor first calls its superclass constructor with <code>super(...)</code>. The bodies run top-down: <code>Object</code>, then <code>FallingItem</code>, then each subclass. See the chain in the console.</p>`],
+ 'inherited':['Inheritance','Inherited, not rewritten',`<p>The variable’s class doesn’t declare this method; it inherits it from <code>FallingItem</code>. Written once in the superclass, available in every subclass.</p>`],
+ 'encap-ok':['Encapsulation','Access through public methods',`<p>The private state was read or changed through a public method that checked the value first.</p>`],
+ 'method-ok':['Methods','The call compiled and ran',`<p>The declared type has this method, so it compiled, and the object ran its own version.</p>`],
+ 'args':['Type checking','Wrong arguments',`<p>The arguments don’t match the parameters (count or type), so the compiler rejects the call.</p>`],
+ 'dup':['Type checking','Variable already defined',`<p>Each local variable name can be declared only once in a method. Pick another name.</p>`],
+ 'ident':['Syntax','Invalid name',`<p>Java identifiers start with a letter, <code>_</code> or <code>$</code>, contain no spaces, and can’t be keywords.</p>`],
+ 'tick':['Game loop','One frame: everything falls',`<p>The game calls <code>fall()</code> on every item once per frame. Each object moves by <em>its own</em> speed and updates only its own <code>y</code>. From chapter 5 on, a single <code>for (FallingItem it : items)</code> loop does this for every kind of item.</p>`],
+ 'tap':['Game loop','Shahd tapped an item',`<p>The tap handler calls <code>points()</code> on the tapped object and adds it to the score; the item then starts again at the top. Which <code>points()</code> ran depends on the object’s class: watch the trace and the diagram.</p>`],
+ 'loop':['Polymorphism','One loop, many behaviors',`<p><code>for (FallingItem it : items)</code> makes the same calls on every element, and each object answers with its own class’s code. Maya’s <code>Snowflake</code> will need no change to this loop (the Open/Closed Principle).</p>`],
+ 'recap':['Recap','Free play',`<p>Every class and member is unlocked. Tap items on the game board, use the builder, or replay any chapter from the menu.</p>`],
+ 'start':['Your turn','Predict, then click',`<p>Pick a <b>Try it</b> button, or tap an item on the game board. Before clicking, ask the class: will it compile? Will it run? Which class’s code executes? The console answers, the classes that ran light up in the diagram, and this panel explains why.</p>`]
+};
+function explain(key){const [tag,title,body]=C[key]||C['method-ok'];$('#explain').innerHTML=`<span class="tag">${esc(tag)}</span><h3>${esc(title)}</h3>${body}`;}
+
+/* ================= interpreter ================= */
+const NUM=/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i;
+const lit=(type,raw)=>type==='String'?`"${raw??''}"`:((raw??'')===''?'?':raw);
+const SIG={};ALLTYPES.forEach(t=>Object.entries(T[t].methods).forEach(([m,d])=>{if(!SIG[m])SIG[m]=d.p;}));
+const FIELDS={speed:'double',radius:'double',y:'double',angle:'double',name:'String',color:'String'};
+function declText(st){
+  const rhs=st.rhs==='new'?`new ${st.cls}(${T[st.cls].ctor.map((p,i)=>lit(p[0],st.args[i])).join(', ')})`:`${st.cast?`(${st.cast}) `:''}${st.src||'?'}`;
+  return `${st.decl} ${st.name||'?'} = ${rhs};`;
+}
+function callText(st){
+  const tgt=st.cast?`((${st.cast}) ${st.v||'?'})`:(st.v||'?');const [k,n]=st.mem.split(':');
+  if(k==='f')return `${tgt}.${n} = ${lit(FIELDS[n],st.arg)};`;
+  const p=SIG[n];return `${tgt}.${n}(${p.length?lit(p[0][0],st.arg):''});`;
+}
+const KW=new Set(['abstract','class','interface','new','public','private','protected','static','void','double','int','return','this','super','if','for','final','null','true','false','default','extends','implements','package','import','instanceof']);
+const compileErr=(msg,key)=>{log('err',msg,'compile error');return {concept:key,fail:1};};
+const runtimeErr=(e,key)=>{log('exc',`Exception in thread "main" java.lang.${e.type}: ${e.msg}`,'runtime');return {concept:key,fail:1};};
+function parseArgs(params,raw){
+  const out=[];
+  for(let i=0;i<params.length;i++){const ty=params[i][0],v=String(raw[i]??'').trim();
+    if(ty==='double'){if(!NUM.test(v))return {err:`incompatible types: ${v===''?'missing argument':`"${v}" cannot be converted to double`}`};out.push(parseFloat(v));}
+    else out.push(raw[i]??'');}
+  return {args:out};
+}
+function runDecl(st,quietSetup){
+  log('cmd','> '+declText(st));
+  if(!/^[A-Za-z_$][\w$]*$/.test(st.name)||KW.has(st.name))return compileErr(`<identifier> expected: "${st.name}" is not a valid variable name`,'ident');
+  if(vars[st.name])return compileErr(`variable ${st.name} is already defined in method main(String[])`,'dup');
+  if(st.rhs==='new'){
+    const c=st.cls;
+    if(T[c].kind!=='class')return compileErr(`${c} is abstract; cannot be instantiated`,isIface(c)?'iface-new':'abstract-new');
+    if(!isSub(c,st.decl))return compileErr(`incompatible types: ${c} cannot be converted to ${st.decl}`,'incompatible');
+    const pa=parseArgs(T[c].ctor,st.args);if(pa.err)return compileErr(pa.err,'args');
+    if(!quietSetup)log('ok','compiles'+(c===st.decl?'':`: a ${c} IS-A ${st.decl}`));
+    if(labCh>=2&&!quietSetup){const ch=[];for(let x=c;x;x=T[x].sup)ch.push(x+'()');ch.push('Object()');log('trace','  constructor chain: '+ch.join(' → super → '));}
+    const o={id:nextId,cls:c,angle:0,y:0},cx=makeCtx();cx.quiet=true;
+    try{CTOR[c](o,pa.args,cx);}catch(e){if(e.jex){log('trace','  the object was never created; nothing was added to the game');return runtimeErr(e,'setter-guard');}throw e;}
+    nextId++;objs[o.id]=o;vars[st.name]={type:st.decl,obj:o.id};
+    if(!quietSetup){log('out',`${st.name} → #${o.id} ${c}`);flash(o.id,new Set(labCh>=2?[...ancestors(c)].filter(a=>!isIface(a)):[c]));}
+    return {concept:c===st.decl?(labCh>=2?'construct-chain':'class-object'):isIface(st.decl)?'iface-ref':'upcast'};
+  }
+  const sv=vars[st.src];if(!sv)return compileErr(`cannot find symbol: variable ${st.src}`,'unknown');
+  const Sd=sv.type,K=st.cast||'';
+  if(K&&!castCompiles(Sd,K))return compileErr(`incompatible types: ${Sd} cannot be converted to ${K}`,'cast-compile');
+  const E=K||Sd;
+  if(!isSub(E,st.decl))return compileErr(`incompatible types: ${E} cannot be converted to ${st.decl}`,isSub(st.decl,E)?'downcast-needed':'incompatible');
+  log('ok','compiles'+(K?` (cast ${Sd} → ${K} allowed)`:''));
+  const o=objs[sv.obj];
+  if(K&&!isSub(o.cls,K))return runtimeErr({type:'ClassCastException',msg:`class game.${o.cls} cannot be cast to class game.${K}`},'cast-fail');
+  if(K)log('trace',`  runtime check: #${o.id} is a ${o.cls}, which IS-A ${K} ✓`);
+  vars[st.name]={type:st.decl,obj:o.id};
+  log('out',`${st.name} and ${st.src} now refer to the same object #${o.id} ${o.cls}`);flash(o.id,new Set([o.cls]));
+  return {concept:K?'cast-ok':st.decl===Sd?'alias':isIface(st.decl)?'iface-ref':'upcast'};
+}
+function stateOf(o){
+  const base=`y = ${jd(o.y)}, speed = ${jd(o.speed)}`;
+  if(o.cls==='Star')return `${base}, angle = ${jd(o.angle)}`;
+  if(o.cls==='Bomb')return `${base}, radius = ${jd(o.radius)}, angle = ${jd(o.angle)}`;
+  return `${base}, radius = ${jd(o.radius)}`;
+}
+const fmtRet=(r,v)=>r==='void'?'':r==='String'?`"${v}"`:r==='int'?String(v):jd(v);
+function runCall(st){
+  log('cmd','> '+callText(st));
+  const vr=vars[st.v];if(!vr)return compileErr(`cannot find symbol: variable ${st.v}`,'unknown');
+  const Sd=vr.type,K=st.cast||'';
+  if(K&&!castCompiles(Sd,K))return compileErr(`incompatible types: ${Sd} cannot be converted to ${K}`,'cast-compile');
+  const E=K||Sd,o=objs[vr.obj],[kind,n]=st.mem.split(':');
+  if(kind==='f'){
+    const owner=fieldLookup(E,n);
+    if(!owner)return compileErr(`cannot find symbol: variable ${n}\n  location: variable ${st.v} of type ${E}`,'unknown');
+    const acc=T[owner].fields[n];
+    return compileErr(`${n} has ${acc} access in game.${dn(owner)}`,acc==='private'?'private-field':'protected-field');
+  }
+  const owner=staticLookup(E,n);
+  if(!owner)return compileErr(`cannot find symbol\n  symbol:   method ${n}(${SIG[n].map(p=>p[0]).join(', ')})\n  location: variable ${st.v} of type ${E}`,resolve(o.cls,n)?'static-limit':'unknown');
+  const params=T[owner].methods[n].p;
+  if(!params.length&&String(st.arg||'').trim())return compileErr(`method ${n} in ${dn(owner)} cannot be applied to given types\n  required: no arguments`,'args');
+  const pa=parseArgs(params,params.length?[st.arg]:[]);if(pa.err)return compileErr(pa.err,'args');
+  const shown=dn(owner);
+  log('ok',`compiles: ${E}${shown!==E?` inherits ${n}() from ${shown}`:` declares ${n}()`}${T[owner].methods[n].abs&&labCh>=3?' (abstract)':''}`);
+  if(K&&!isSub(o.cls,K))return runtimeErr({type:'ClassCastException',msg:`class game.${o.cls} cannot be cast to class game.${K}`},'cast-fail');
+  if(K)log('trace',`  runtime check: #${o.id} is a ${o.cls}, which IS-A ${K} ✓`);
+  const cx=makeCtx();let ret;const res=resolve(o.cls,n);
+  try{ret=cx.call(o,n,pa.args,0,`${st.v}.${n}() on #${o.id} ${o.cls}`);}
+  catch(e){if(!e.jex)throw e;logTrace(cx);flash(o.id,cx.hot);return runtimeErr(e,'setter-guard');}
+  logTrace(cx);
+  const r=T[owner].methods[n].r;
+  log('out',r==='void'?`done · ${stateOf(o)}`:`returns ${fmtRet(r,ret)}`);
+  flash(o.id,cx.hot);
+  let key='method-ok';
+  if(K)key='cast-ok';
+  else if(isIface(res))key='default-method';
+  else if(n==='describe')key=o.cls==='GoldenBubble'?'super-call':'template';
+  else if(T[owner].methods[n].abs)key=isIface(owner)?'iface-impl':'dispatch';
+  else if(res!==owner)key='override';
+  else if(dn(owner)!==E)key='inherited';
+  else if(/^(get|set)/.test(n))key='encap-ok';
+  return {concept:key};
+}
+
+/* ================= game board (heap) ================= */
+let hotObj=null,hotTimer=null;
+function flash(id,classes){
+  hotObj=id;renderStage();
+  document.querySelectorAll('#lab .box').forEach(g=>g.classList.toggle('hot',classes.has(g.dataset.cls)));
+  clearTimeout(hotTimer);
+  hotTimer=setTimeout(()=>{hotObj=null;renderStage();document.querySelectorAll('#lab .box.hot').forEach(g=>g.classList.remove('hot'));},1800);
+}
+const fill=c=>PALETTE.includes(String(c).toLowerCase())?`var(--c-${String(c).toLowerCase()})`:'var(--c-slate)';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function starPts(r){let p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r;p.push(`${(rr*Math.cos(a)).toFixed(1)},${(rr*Math.sin(a)).toFixed(1)}`);}return p.join(' ');}
+function peekPoints(o){try{const cx=makeCtx();cx.quiet=true;return cx.call(o,'points',[],0,'');}catch(e){return null;}}
+const TOP=44,FLOOR=292;
+function renderStage(){
+  const list=uniqueObjs(),cw=130,cols=Math.max(4,list.length),W=cols*cw,H=310;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Game board: falling items">`;
+  s+=`<rect class="sky" x="0" y="0" width="${W}" height="${H}" rx="10"/>`;
+  s+=`<line class="floor" x1="8" x2="${W-8}" y1="${FLOOR}" y2="${FLOOR}"/><text class="lbl2" x="${W-12}" y="${FLOOR+14}" text-anchor="end">bottom of the screen</text>`;
+  if(!list.length)s+=`<text class="lbl2" x="${W/2}" y="150" text-anchor="middle">Nothing is falling yet.</text>`;
+  list.forEach((o,i)=>{
+    const cx=i*cw+cw/2,yy=clamp(TOP+18+o.y*12,TOP+18,FLOOR-24);
+    const names=Object.keys(vars).filter(v=>vars[v].obj===o.id).join(', ');
+    s+=`<text class="lbl" x="${cx}" y="16" text-anchor="middle">#${o.id} ${o.cls}</text><text class="lbl2" x="${cx}" y="31" text-anchor="middle">${esc(names)}</text>`;
+    s+=`<line class="lane" x1="${cx}" x2="${cx}" y1="${TOP}" y2="${FLOOR}"/>`;
+    s+=`<g class="item${hotObj===o.id?' hot':''}" data-id="${o.id}" tabindex="0" role="button" aria-label="Tap #${o.id} ${o.cls}" transform="translate(${cx} ${yy})">`;
+    if(o.cls==='Star'){s+=`<g transform="rotate(${o.angle||0})"><polygon class="shape" points="${starPts(20)}" fill="${fill(o.color)}"/></g>`;}
+    else if(o.cls==='Bomb'){const r=clamp(o.radius*5,6,34);s+=`<g transform="rotate(${o.angle||0})"><circle class="shape" r="${r}" fill="${fill(o.color)}"/><rect class="fuse" x="-3" y="${-r-9}" width="6" height="10" rx="2"/><circle class="spark" cx="0" cy="${-r-11}" r="3"/></g>`;}
+    else{const r=clamp(o.radius*7,5,40);s+=`<circle class="shape bub" r="${r}" fill="${fill(o.color)}"/><circle class="shine" cx="${-r*.35}" cy="${-r*.35}" r="${Math.max(2,r*.22)}"/>${o.cls==='GoldenBubble'?`<circle class="ring" r="${r+4}"/>`:''}`;}
+    s+=`</g>`;
+    const p=peekPoints(o);if(p!==null)s+=`<text class="pts${p<0?' neg':''}" x="${cx}" y="${Math.min(FLOOR-4,yy+(o.cls==='Star'?34:(o.radius||3)*7+18))}" text-anchor="middle">${p>0?'+':''}${p} pts</text>`;
+  });
+  $('#stage').innerHTML=s+'</svg>';
+  $('#score').textContent=score;
+}
+function renderVars(){
+  $('#vars').innerHTML=Object.entries(vars).map(([n,v])=>{const o=objs[v.obj];return `<tr><td>${esc(n)}</td><td class="st-ty">${v.type}</td><td class="rt-ty">#${o.id} ${o.cls}</td></tr>`;}).join('');
+}
+function tap(id){
+  if(busy)return;const o=objs[id];if(!o)return;
+  const ref=labCh>=3?'FallingItem':o.cls;
+  log('cmd',`> // Shahd taps #${o.id} ${o.cls}`);
+  log('trace',`  ${ref} tapped = (the #${o.id} ${o.cls} object);   score += tapped.points();`);
+  const cx=makeCtx();const p=cx.call(o,'points',[],0,`tapped.points() on #${o.id} ${o.cls}`);logTrace(cx);
+  score+=p;o.y=0;
+  log('out',`${p>0?'+':''}${p} points · score = ${score} · the item starts again at the top`);
+  flash(o.id,cx.hot);explain(labCh>=4?'dispatch':'tap');
+}
+$('#stage').addEventListener('click',e=>{const g=e.target.closest('.item');if(g)tap(+g.dataset.id);});
+$('#stage').addEventListener('keydown',e=>{const g=e.target.closest('.item');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();tap(+g.dataset.id);}});
+function tick(){
+  if(busy)return;
+  log('cmd',labCh>=4?'> for (FallingItem it : items) it.fall();   // one frame':'> // one frame: call fall() on every item');
+  const hot=new Set();
+  for(const o of uniqueObjs()){const cx=makeCtx();cx.call(o,'fall',[],0,'');cx.hot.forEach(h=>hot.add(h));log('trace',`  #${o.id} ${o.cls}.fall() → runs ${dn(resolve(o.cls,'fall'))}.fall()   y = ${jd(o.y)}`);}
+  hotObj=null;renderStage();
+  document.querySelectorAll('#lab .box').forEach(g=>g.classList.toggle('hot',hot.has(g.dataset.cls)));
+  clearTimeout(hotTimer);hotTimer=setTimeout(()=>document.querySelectorAll('#lab .box.hot').forEach(g=>g.classList.remove('hot')),1800);
+  explain('tick');
+}
+$('#tick').onclick=tick;
+
+/* ================= builder ================= */
+let mode='decl';
+const opt=(v,l,sel)=>`<option value="${esc(v)}"${sel?' selected':''}>${esc(l??v)}</option>`;
+function fillSelects(){
+  const C_=CH[labCh],tys=C_.types;
+  const keep=(id,def)=>{const v=$(id).value;return tys.includes(v)?v:def;};
+  const dt=keep('#d-type',tys.includes('FallingItem')?'FallingItem':tys[0]),dc=keep('#d-cls','Bubble');
+  $('#d-type').innerHTML=tys.map(t=>opt(t,t,t===dt)).join('');
+  $('#d-cls').innerHTML=tys.map(t=>opt(t,t,t===dc)).join('');
+  const castOpts=cu=>opt('','(no cast)',!cu)+tys.map(t=>opt(t,`(${t})`,t===cu)).join('');
+  $('#d-cast').innerHTML=castOpts($('#d-cast').value);$('#c-cast').innerHTML=castOpts($('#c-cast').value);
+  const vn=Object.keys(vars),vs=cu=>vn.map(v=>opt(v,`${v} : ${vars[v].type}`,v===cu)).join('');
+  $('#d-src').innerHTML=vs($('#d-src').value);$('#c-var').innerHTML=vs($('#c-var').value);
+  const mem=$('#c-mem').value;
+  $('#c-mem').innerHTML=`<optgroup label="Methods">${C_.members.map(m=>opt('m:'+m,`${m}(${SIG[m].map(p=>p[0]).join(', ')})`,'m:'+m===mem)).join('')}</optgroup>`
+    +(C_.fields.length?`<optgroup label="Fields (direct access)">${C_.fields.map(f=>opt('f:'+f,`${f} = …`,'f:'+f===mem)).join('')}</optgroup>`:'');
+}
+function buildArgs(vals){
+  const c=$('#d-cls').value;if(!c)return;const ps=T[c].ctor;
+  $('#d-args').innerHTML=ps.map((p,i)=>`<label for="d-arg-${i}">${p[0]} ${p[1]}<input id="d-arg-${i}" ${p[1]==='color'?'list="colors"':''} value="${esc(vals?.[i]??(p[1]==='color'?'teal':p[1]==='name'?'Mystery':'3'))}" autocomplete="off" spellcheck="false"></label>`).join('')
+    +`<datalist id="colors">${PALETTE.map(c=>`<option value="${c}">`).join('')}</datalist>`;
+}
+function readDecl(){const c=$('#d-cls').value;return {decl:$('#d-type').value,name:$('#d-name').value.trim(),rhs:$('#d-rhs').value,cls:c,args:(T[c]?.ctor||[]).map((p,i)=>$('#d-arg-'+i)?.value??''),cast:$('#d-cast').value,src:$('#d-src').value};}
+const readCall=()=>({cast:$('#c-cast').value,v:$('#c-var').value,mem:$('#c-mem').value||'m:points',arg:$('#c-arg').value});
+function updatePreview(){
+  $('#d-new').hidden=$('#d-rhs').value!=='new';$('#d-var').hidden=$('#d-rhs').value!=='var';
+  const [k,n]=($('#c-mem').value||'m:points').split(':'),need=k==='f'||SIG[n].length>0;
+  $('#c-arg-wrap').hidden=!need;$('#c-arg-lbl').textContent=k==='f'?'Value':need?`${SIG[n][0][0]} ${SIG[n][0][1]}`:'';
+  $('#preview').textContent=mode==='decl'?declText(readDecl()):callText(readCall());
+}
+function setMode(m){mode=m;$('#m-decl').setAttribute('aria-selected',m==='decl');$('#m-call').setAttribute('aria-selected',m==='call');$('#f-decl').hidden=m!=='decl';$('#f-call').hidden=m!=='call';updatePreview();}
+$('#m-decl').onclick=()=>setMode('decl');$('#m-call').onclick=()=>setMode('call');
+$('#d-cls').addEventListener('change',()=>{buildArgs();updatePreview();});
+document.querySelectorAll('#f-decl, #f-call').forEach(f=>{f.addEventListener('input',updatePreview);f.addEventListener('change',updatePreview);
+  f.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();runBuilder();}});});
+function settle(key){
+  if(labCh<4&&key==='dispatch')key='method-ok';
+  if(labCh===0&&key==='method-ok')key='class-object';
+  renderStage();renderVars();fillSelects();updatePreview();explain(key);
+}
+function runBuilder(){
+  if(busy)return;
+  const res=mode==='decl'?runDecl(readDecl()):runCall(readCall());
+  if(mode==='decl'&&!res.fail)$('#d-name').value=fresh($('#d-name').value||'x');
+  settle(res.concept);
+}
+$('#run').onclick=runBuilder;
+
+/* ================= special actions ================= */
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function setBusy(b){busy=b;document.querySelectorAll('.try,#run,#reset,#tick,#prev,#next,#jump').forEach(x=>x.disabled=b);if(!b){$('#prev').disabled=si===0;$('#next').disabled=si===SL.length-1;}}
+async function runLoop(){
+  setBusy(true);explain('loop');
+  log('cmd','> for (FallingItem it : items) { println(it.describe()); score += it.points(); }');
+  let total=0;
+  for(const o of uniqueObjs()){
+    const cx=makeCtx();
+    const d=cx.call(o,'describe',[],0,`it.describe() on #${o.id} ${o.cls}`);logTrace(cx);log('out',d);
+    total+=peekPoints(o);flash(o.id,cx.hot);await sleep(reduced?250:950);
+  }
+  log('out',`Shahd's score for the level: ${total}`);setBusy(false);
+}
+async function runResizeAll(){
+  setBusy(true);explain('resize-all');
+  log('cmd','> for (FallingItem it : items) if (it instanceof Resizable r) r.scale(0.75);');
+  for(const o of uniqueObjs()){
+    if(isSub(o.cls,'Resizable')){
+      const cx=makeCtx();cx.call(o,'scale',[0.75],0,`#${o.id} ${o.cls} instanceof Resizable ✓ → r.scale(0.75)`);logTrace(cx);
+      log('out',`#${o.id} ${o.cls} · ${stateOf(o)} · now worth ${peekPoints(o)} pts`);flash(o.id,cx.hot);
+    }else{log('trace',`  #${o.id} ${o.cls} instanceof Resizable ✗ → skipped`);flash(o.id,new Set([o.cls]));}
+    await sleep(reduced?250:800);
+  }
+  renderVars();setBusy(false);
+}
+
+/* ================= title-slide playable demo ================= */
+const demo={items:[],pops:[],score:0,raf:0,last:0,spawn:0,ctx:null,w:0,h:0,bound:false};
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#888';}
+function demoSize(){
+  const c=$('#demo');if(!c)return false;
+  const dpr=window.devicePixelRatio||1,w=c.clientWidth||400,h=c.clientHeight||260;
+  if(c.width!==Math.round(w*dpr)||c.height!==Math.round(h*dpr)){c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);}
+  demo.ctx=c.getContext('2d');if(!demo.ctx)return false;demo.ctx.setTransform(dpr,0,0,dpr,0,0);demo.w=w;demo.h=h;return true;
+}
+function demoSpawn(){
+  const k=Math.random(),cols=['--c-teal','--c-rose','--c-indigo','--c-green','--c-violet'];
+  const kind=k<.68?'bubble':k<.84?'star':'bomb';
+  const r=kind==='bubble'?[1.5,2,3,5][Math.floor(Math.random()*4)]:3;
+  demo.items.push({kind,r,x:24+Math.random()*(demo.w-48),y:-30,vy:(reduced?12:38)+Math.random()*(reduced?8:40),
+    a:0,color:kind==='bomb'?'--c-slate':kind==='star'?'--c-amber':cols[Math.floor(Math.random()*cols.length)]});
+}
+const dPts=it=>it.kind==='star'?50:it.kind==='bomb'?-30:Math.ceil(30/it.r);
+const dRad=it=>it.kind==='bubble'?it.r*7:16;
+function demoDraw(){
+  const g=demo.ctx;if(!g)return;
+  g.clearRect(0,0,demo.w,demo.h);
+  for(const it of demo.items){
+    g.save();g.translate(it.x,it.y);g.fillStyle=cssVar(it.color);g.strokeStyle=cssVar('--ink');g.lineWidth=1.5;
+    if(it.kind==='star'){g.rotate(it.a);g.beginPath();for(let i=0;i<10;i++){const an=-Math.PI/2+i*Math.PI/5,rr=i%2?8:18;g.lineTo(rr*Math.cos(an),rr*Math.sin(an));}g.closePath();g.fill();g.stroke();}
+    else if(it.kind==='bomb'){g.rotate(it.a);g.beginPath();g.arc(0,0,16,0,7);g.fill();g.stroke();g.fillStyle=cssVar('--ink');g.fillRect(-3,-25,6,10);g.fillStyle=cssVar('--c-amber');g.beginPath();g.arc(0,-27,3,0,7);g.fill();}
+    else{const r=dRad(it);g.globalAlpha=.9;g.beginPath();g.arc(0,0,r,0,7);g.fill();g.globalAlpha=1;g.stroke();g.fillStyle=cssVar('--on-av');g.globalAlpha=.55;g.beginPath();g.arc(-r*.35,-r*.35,Math.max(2,r*.22),0,7);g.fill();g.globalAlpha=1;}
+    g.restore();
+  }
+  g.font='700 15px '+cssVar('--f-mono');g.textAlign='center';
+  for(const p of demo.pops){g.globalAlpha=Math.max(0,p.t);g.fillStyle=cssVar(p.v<0?'--err':'--ok');g.fillText((p.v>0?'+':'')+p.v,p.x,p.y);}
+  g.globalAlpha=1;
+}
+function demoFrame(ts){
+  if(!demo.raf)return;
+  const dt=Math.min(.05,(ts-(demo.last||ts))/1000);demo.last=ts;
+  demo.spawn-=dt;if(demo.spawn<=0){demoSpawn();demo.spawn=reduced?1.6:.75;}
+  demo.items.forEach(it=>{it.y+=it.vy*dt;it.a+=dt*1.5;});
+  demo.items=demo.items.filter(it=>it.y<demo.h+40);
+  demo.pops.forEach(p=>{p.y-=30*dt;p.t-=dt*1.2;});demo.pops=demo.pops.filter(p=>p.t>0);
+  demoDraw();demo.raf=requestAnimationFrame(demoFrame);
+}
+function demoStart(){
+  if(!demoSize())return;
+  if(!demo.bound){
+    demo.bound=true;
+    $('#demo').addEventListener('pointerdown',e=>{
+      const r=e.currentTarget.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+      for(let i=demo.items.length-1;i>=0;i--){const it=demo.items[i];if(Math.hypot(it.x-x,it.y-y)<=dRad(it)+8){
+        const v=dPts(it);demo.score+=v;$('#demo-score').textContent=demo.score;demo.pops.push({x:it.x,y:it.y,v,t:1});demo.items.splice(i,1);demoDraw();break;}}
+    });
+    window.addEventListener('resize',()=>{if(demo.raf)demoSize();});
+  }
+  if(!demo.items.length)for(let i=0;i<4;i++){demoSpawn();demo.items[i].y=30+Math.random()*(demo.h-80);}
+  if(!demo.raf){demo.last=0;demo.raf=requestAnimationFrame(demoFrame);}
+}
+function demoStop(){if(demo.raf){cancelAnimationFrame(demo.raf);demo.raf=0;}}
+
+/* ================= per-chapter playable game: shows the issue, then the fix ================= */
+const MINI=[
+ {spawn:{bubble:1},btns:[],
+  bug:'Dad’s first try keeps colors, sizes, positions and speeds in four separate arrays. Pop a bubble: his pop code forgets to shift the speeds array, so every bubble after it suddenly gets another bubble’s speed (flashed in red).',
+  want:'Bubbles fall, each at its own speed. Tap one to pop it: smaller bubbles are worth more points.',
+  fix:'Each bubble is now an object that carries its own speed. Pop as many as you like: the others keep their own speeds.'},
+ {spawn:{bubble:1},btns:[['omar','Omar’s bubble (speed −4)']],
+  bug:'Press Omar’s button. A bubble with speed −4 flies up off the screen. Nobody can pop it, so the level can never end.',
+  want:'Try Omar’s trick: a bubble with speed −4 should simply be refused, so every level can end.',
+  fix:'Press Omar’s button again: setSpeed(−4) throws an exception, so the bad bubble is never created.'},
+ {spawn:{bubble:.6,star:.2,bomb:.2},btns:[['slow','Slow motion: off']],
+  bug:'Dad added Slow motion by editing Bubble.fall(). Star and Bomb each have their own copied fall(), so they ignore it. Press Slow motion and watch.',
+  want:'Stars (+50) and bombs (−30) fall with the bubbles, and Slow motion slows all of them.',
+  fix:'fall() now lives once, in FallingItem. Slow motion slows every item, because they all inherit the same method.'},
+ {spawn:{bubble:.6,star:.2,bomb:.2},btns:[['mystery','Omar adds a mystery item']],
+  bug:'Press Omar’s button: new FallingItem(…) compiles, so a grey mystery item falls. Pop it and the score line says “violet Mystery, 0 pts”.',
+  want:'Every popped item shows its own line, like “teal Bubble, 10 pts”, and Omar’s mystery item is impossible.',
+  fix:'FallingItem is abstract now: Omar’s code no longer compiles, and every real item scores its own points().'},
+ {spawn:{bubble:.45,star:.15,bomb:.15,snow:.25},btns:[],
+  bug:'Maya’s snowflakes are in the game, but Dad has one loop per item type and never wrote a Snowflake loop: they hang at the top and score nothing.',
+  want:'Everything falls frame by frame and adds up to Shahd’s score, including Maya’s new snowflakes (+20).',
+  fix:'One loop over List<FallingItem>: snowflakes fall and score (+20) with no extra code.'},
+ {spawn:{bubble:.5,star:.25,bomb:.25},btns:[['pinch','Pinch: grow']],
+  bug:'Attempt A forced every item to have both scale() and rotate(). Bubbles spin (watch the shine) and Pinch makes stars grow too.',
+  want:'Stars and bombs spin as they fall, Pinch grows bubbles and bombs, and bubbles never spin.',
+  fix:'Only Rotatable items (stars, bombs) spin, and only Resizable items (bubbles, bombs) grow.'},
+ {spawn:{bubble:.3,star:.25,bomb:.2,leaf:.25},btns:[['flip','Upside-down power-up']],
+  bug:'Press Upside-down. Adding flip() as an abstract method broke Adam’s Leaf class, so the game no longer builds.',
+  want:'The Upside-down power-up flips every spinning item, including Adam’s leaves.',
+  fix:'flip() is a default method in Rotatable: stars, bombs and Adam’s leaves all flip. Bubbles aren’t Rotatable, so they stay put.'},
+ {spawn:{bubble:.6,golden:.4},btns:[],
+  bug:'Golden bubbles inherit Bubble.points() unchanged. Pop one: you get normal points and no GOLDEN!',
+  want:'Golden bubbles give triple points and shout GOLDEN!',
+  fix:'GoldenBubble overrides points() and describe(): triple points and a GOLDEN! message.'}
+];
+const MG={raf:0,ch:-1,mode:'bug',root:null,cv:null,g:null,w:0,h:0,items:[],speeds:[],pops:[],score:0,spawnT:0,banner:null,frozen:null,slow:false,grown:false,last:'',nid:1,bound:new WeakSet()};
+const MG_COLORS=[['teal','--c-teal'],['rose','--c-rose'],['indigo','--c-indigo'],['green','--c-green'],['violet','--c-violet']];
+const KNAME={bubble:'Bubble',star:'Star',bomb:'Bomb',golden:'GoldenBubble',mystery:'Mystery',snow:'Snowflake',leaf:'Leaf'};
+const isRes=k=>k==='bubble'||k==='bomb'||k==='golden';
+const isRot=k=>k==='star'||k==='bomb'||k==='leaf';
+function miniHTML(i,mode){
+  const m=MINI[i],fix=mode==='fix';
+  return `<figure class="mini${fix?' is-fix':''}" data-ch="${i}" data-mode="${mode}">
+    <figcaption><span class="mini-t">${fix?'How Shahd wants it to work':'What Dad’s first try does'}</span><span class="mini-badge">${fix?'Try it':'Spot the problem'}</span></figcaption>
+    <canvas aria-label="Playable game: tap the falling items"></canvas>
+    <div class="mini-ctl">${m.btns.map(([a,l])=>`<button class="btn sm" data-act="${a}">${l}</button>`).join('')}<button class="btn ghost sm" data-act="restart">Restart</button><span class="mini-tip">Tap items to pop them</span></div>
+    <p class="mini-cap"></p></figure>`;
+}
+function mgRand(spawn){let r=Math.random(),acc=0;for(const [k,p] of Object.entries(spawn)){acc+=p;if(r<=acc)return k;}return 'bubble';}
+function mgMake(kind,extra){
+  const c=MG_COLORS[Math.floor(Math.random()*MG_COLORS.length)];
+  const it={id:MG.nid++,kind,x:24+Math.random()*Math.max(40,MG.w-48),y:-24,vy:(reduced?18:34)+Math.random()*(reduced?14:46),rU:3,a:0,scale:1,flipLeft:0,warn:0,cname:c[0],cvar:c[1]};
+  if(kind==='bubble')it.rU=[1.5,2,3,5][Math.floor(Math.random()*4)];
+  if(kind==='golden'){it.rU=3;it.cname='gold';it.cvar='--c-gold';}
+  if(kind==='star'){it.cname='amber';it.cvar='--c-amber';}
+  if(kind==='bomb'){it.cname='slate';it.cvar='--c-slate';}
+  if(kind==='mystery'){it.cname='violet';it.cvar='--c-slate';}
+  if(kind==='leaf'){it.cname='green';it.cvar='--c-green';}
+  if(kind==='snow'){it.cname='white';it.cvar='--c-indigo';if(MG.mode==='bug'&&MG.ch===4){it.vy=0;it.y=20+Math.random()*30;}}
+  return Object.assign(it,extra||{});
+}
+const mgR=it=>(it.kind==='bubble'||it.kind==='golden'||it.kind==='mystery'?it.rU*6:16)*it.scale;
+function mgPoints(it){
+  const bug=MG.mode==='bug';
+  switch(it.kind){
+    case 'bubble':return Math.ceil(30/it.rU);
+    case 'golden':return (bug?1:3)*Math.ceil(30/it.rU);
+    case 'star':return 50; case 'bomb':return -30; case 'leaf':return 15; case 'mystery':return 0;
+    case 'snow':return bug&&MG.ch===4?0:20;
+  }return 0;
+}
+function mgDescribe(it,p){
+  if(it.kind==='golden')return MG.mode==='bug'?`gold Bubble, ${p} pts`:`GOLDEN! gold GoldenBubble, ${p} pts`;
+  return `${it.cname} ${KNAME[it.kind]}, ${p} pts`;
+}
+function mgSize(){
+  const c=MG.cv;if(!c)return false;const dpr=window.devicePixelRatio||1,w=c.clientWidth||480,h=c.clientHeight||300;
+  if(c.width!==Math.round(w*dpr)||c.height!==Math.round(h*dpr)){c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);}
+  MG.g=c.getContext('2d');if(!MG.g)return false;MG.g.setTransform(dpr,0,0,dpr,0,0);MG.w=w;MG.h=h;return true;
+}
+function mgReset(){
+  MG.items=[];MG.speeds=[];MG.pops=[];MG.score=0;MG.spawnT=0;MG.banner=null;MG.frozen=null;MG.slow=false;MG.grown=false;MG.last='';
+  const SEED=[null,null,['bubble','star','bomb','bubble'],['bubble','star','bomb','bubble'],['bubble','snow','star','bomb'],['bubble','star','bomb','bubble'],['bubble','star','leaf','bomb'],['bubble','golden','bubble','golden'],['bubble','bomb','star','bubble']][MG.ch];
+  for(let i=0;i<4;i++){const it=mgMake(SEED?SEED[i]:mgRand(MINI[MG.ch].spawn));if(it.vy)it.y=30+Math.random()*(MG.h-110);MG.items.push(it);MG.speeds.push(it.vy);}
+  const r=MG.root;if(!r)return;
+  r.querySelector('.mini-cap').textContent=MINI[MG.ch][MG.mode==='fix'?'want':'bug'];
+  const sb=r.querySelector('[data-act=slow]');if(sb)sb.textContent='Slow motion: off';
+  const pb=r.querySelector('[data-act=pinch]');if(pb)pb.textContent='Pinch: grow';
+}
+function mgBanner(text,kind,ms){MG.banner={text,kind,until:performance.now()+(ms||2800)};}
+function mgAct(a){
+  const bug=MG.mode==='bug',r=MG.root;
+  if(a==='restart'){mgReset();return;}
+  if(MG.frozen)return;
+  if(a==='omar'){
+    if(bug){const it=mgMake('bubble',{y:MG.h-50,vy:-60,rU:3,omar:true,cname:'rose',cvar:'--c-rose'});MG.items.push(it);MG.speeds.push(it.vy);}
+    else mgBanner('IllegalArgumentException: speed must be > 0 · Omar’s bubble was never created','exc');
+  }
+  if(a==='slow'){MG.slow=!MG.slow;r.querySelector('[data-act=slow]').textContent='Slow motion: '+(MG.slow?'on':'off');}
+  if(a==='mystery'){
+    if(bug){const it=mgMake('mystery');MG.items.push(it);MG.speeds.push(it.vy);}
+    else mgBanner('Compile error: FallingItem is abstract; cannot be instantiated','err');
+  }
+  if(a==='pinch'){MG.grown=!MG.grown;r.querySelector('[data-act=pinch]').textContent=MG.grown?'Pinch: shrink':'Pinch: grow';
+    MG.items.forEach(it=>{if(isRes(it.kind)||(bug&&it.kind==='star'))it.scale=MG.grown?1.4:1;});}
+  if(a==='flip'){
+    if(bug){MG.frozen='Compile error, the game won’t build:\nLeaf is not abstract and does not override\nabstract method flip() in Rotatable';}
+    else MG.items.forEach(it=>{if(isRot(it.kind))it.flipLeft=Math.PI;});
+  }
+  if(a==='shrink'){
+    const list=[...MG.items].sort((x,y)=>x.id-y.id);
+    for(const it of list){
+      if(isRes(it.kind)){it.rU*=.75;if(it.kind==='bomb')it.scale*=.75;it.warn=.9;continue;}
+      if(bug){it.warn=99;MG.frozen=`ClassCastException:\nclass game.${KNAME[it.kind]} cannot be cast to\nclass game.Resizable`;break;}
+      MG.pops.push({x:it.x,y:it.y-22,v:'skipped',t:1,c:'--muted'});
+    }
+    if(!bug)mgBanner('Bubbles and bombs shrank; stars were skipped by instanceof','ok',2200);
+  }
+}
+function mgTap(x,y){
+  if(MG.frozen)return;
+  for(let i=MG.items.length-1;i>=0;i--){
+    const it=MG.items[i];if(Math.hypot(it.x-x,it.y-y)>mgR(it)+8)continue;
+    const p=mgPoints(it);MG.score+=p;
+    MG.pops.push({x:it.x,y:it.y,v:(p>0?'+':'')+p+(it.kind==='golden'&&MG.mode==='fix'?' GOLDEN!':''),t:1,c:p<0?'--err':p===0?'--muted':it.kind==='golden'&&MG.mode==='fix'?'--c-gold':'--ok'});
+    if(MG.ch>=3)MG.last=mgDescribe(it,p);
+    MG.items.splice(i,1);
+    if(MG.ch===0&&MG.mode==='bug'){
+      MG.items.forEach((o,j)=>{if(j>=i)o.warn=1.2;});
+      if(MG.items.length>i)mgBanner('speeds[] was not shifted: bubbles after this one now use the wrong speed','exc',2200);
+    }else MG.speeds.splice(i,1);
+    break;
+  }
+}
+function mgUpdate(dt){
+  const bug=MG.mode==='bug',ch=MG.ch;
+  MG.spawnT-=dt;
+  if(MG.spawnT<=0&&MG.items.filter(o=>!o.omar||o.y>-40).length<9){const it=mgMake(mgRand(MINI[ch].spawn));if(MG.grown&&(isRes(it.kind)||(bug&&it.kind==='star')))it.scale=1.4;MG.items.push(it);MG.speeds.push(it.vy);MG.spawnT=reduced?1.5:.85;}
+  MG.items.forEach((it,i)=>{
+    let vy=ch===0&&bug?(MG.speeds[i]??it.vy):it.vy;
+    if(ch===2&&MG.slow&&(!bug||it.kind==='bubble'))vy*=.25;
+    it.y+=vy*dt;
+    const spins=(ch===5&&(isRot(it.kind)||(bug&&(it.kind==='bubble'))))||(ch>=6&&isRot(it.kind));
+    if(spins)it.a+=dt*(reduced?.8:2.2);
+    if(it.flipLeft>0){const s=Math.min(it.flipLeft,dt*5);it.a+=s;it.flipLeft-=s;}
+    if(it.warn>0&&it.warn<50)it.warn=Math.max(0,it.warn-dt);
+  });
+  const keep=[],ks=[];
+  MG.items.forEach((it,i)=>{const gone=it.y>MG.h+40;if(!gone){keep.push(it);ks.push(MG.speeds[i]);}});
+  MG.items=keep;MG.speeds=ks;
+  MG.pops.forEach(p=>{p.y-=28*dt;p.t-=dt*.9;});MG.pops=MG.pops.filter(p=>p.t>0);
+}
+function mgStarPath(g,r){g.beginPath();for(let i=0;i<10;i++){const an=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r;g.lineTo(rr*Math.cos(an),rr*Math.sin(an));}g.closePath();}
+function mgDraw(){
+  const g=MG.g;if(!g)return;const ink=cssVar('--ink');
+  g.clearRect(0,0,MG.w,MG.h);
+  for(const it of MG.items){
+    if(it.y<-40)continue;
+    g.save();g.translate(it.x,it.y);g.rotate(it.a);g.scale(it.scale,it.scale);
+    g.strokeStyle=ink;g.lineWidth=1.5/it.scale;g.fillStyle=cssVar(it.cvar);
+    if(it.kind==='star'){mgStarPath(g,18);g.fill();g.stroke();}
+    else if(it.kind==='bomb'){g.beginPath();g.arc(0,0,16,0,7);g.fill();g.stroke();g.fillStyle=ink;g.fillRect(-3,-25,6,10);g.fillStyle=cssVar('--c-amber');g.beginPath();g.arc(0,-27,3,0,7);g.fill();}
+    else if(it.kind==='leaf'){g.beginPath();g.ellipse(0,0,9,17,0,0,7);g.fill();g.stroke();g.beginPath();g.moveTo(0,-15);g.lineTo(0,19);g.stroke();}
+    else if(it.kind==='snow'){g.strokeStyle=cssVar('--c-indigo');g.lineWidth=2.4;for(let k=0;k<3;k++){g.rotate(Math.PI/3);g.beginPath();g.moveTo(-15,0);g.lineTo(15,0);g.stroke();}g.fillStyle=cssVar('--surface');g.beginPath();g.arc(0,0,4,0,7);g.fill();g.stroke();}
+    else{
+      const r=it.rU*6;g.globalAlpha=it.kind==='mystery'?.75:.92;g.beginPath();g.arc(0,0,r,0,7);g.fill();g.globalAlpha=1;g.stroke();
+      g.fillStyle=cssVar('--on-av');g.globalAlpha=.6;g.beginPath();g.arc(-r*.38,-r*.38,Math.max(2,r*.22),0,7);g.fill();g.globalAlpha=1;
+      if(it.kind==='golden'){g.setLineDash([3,3]);g.strokeStyle=cssVar('--c-gold');g.lineWidth=2.2;g.beginPath();g.arc(0,0,r+5,0,7);g.stroke();g.setLineDash([]);}
+      if(it.kind==='mystery'){g.fillStyle=cssVar('--on-av');g.font='800 18px '+cssVar('--f-display');g.textAlign='center';g.textBaseline='middle';g.fillText('?',0,1);}
+    }
+    if(it.warn>0){g.strokeStyle=cssVar('--err');g.lineWidth=3/it.scale;g.beginPath();g.arc(0,0,(it.kind==='bubble'||it.kind==='golden'?it.rU*6:18)+7,0,7);g.stroke();}
+    g.restore();
+    if(it.omar){g.fillStyle=cssVar('--err');g.font='700 12px '+cssVar('--f-mono');g.textAlign='center';g.fillText('speed −4',it.x,it.y+mgR(it)+16);}
+  }
+  g.textAlign='center';g.textBaseline='alphabetic';
+  for(const p of MG.pops){g.globalAlpha=Math.max(0,p.t);g.fillStyle=cssVar(p.c);g.font='700 15px '+cssVar('--f-mono');g.fillText(p.v,p.x,p.y);}
+  g.globalAlpha=1;
+  /* HUD */
+  g.textAlign='left';g.fillStyle=ink;g.font='700 14px '+cssVar('--f-mono');g.fillText('Score '+MG.score,10,20);
+  if(MG.last){g.textAlign='center';g.fillStyle=cssVar('--muted');g.font='600 13px '+cssVar('--f-mono');g.fillText(MG.last,MG.w/2,20);}
+  const esc_=MG.items.filter(o=>o.omar&&o.y<-40).length;
+  if(esc_){g.textAlign='right';g.fillStyle=cssVar('--err');g.font='700 13px '+cssVar('--f-body');g.fillText(`${esc_} bubble${esc_>1?'s':''} flew off the top: the level can never end`,MG.w-10,20);}
+  if(MG.ch===4&&MG.mode==='bug'){const st=MG.items.filter(o=>o.kind==='snow').length;if(st){g.textAlign='right';g.fillStyle=cssVar('--exc');g.font='700 13px '+cssVar('--f-body');g.fillText(`${st} snowflake${st>1?'s':''} stuck: no loop for Snowflake`,MG.w-10,20);}}
+  if(MG.banner&&performance.now()<MG.banner.until)mgBox(MG.banner.text,MG.banner.kind,false);
+  if(MG.frozen)mgBox(MG.frozen,MG.ch===8?'exc':'err',true);
+}
+function mgBox(text,kind,full){
+  const g=MG.g,lines=text.split('\n');
+  if(full){g.fillStyle=cssVar('--bg');g.globalAlpha=.78;g.fillRect(0,0,MG.w,MG.h);g.globalAlpha=1;}
+  g.font='700 13px '+cssVar('--f-mono');
+  const lw=Math.min(MG.w-24,Math.max(...lines.map(l=>g.measureText(l).width))+28),lh=20,bh=lines.length*lh+(full?44:18);
+  const x=(MG.w-lw)/2,y=full?(MG.h-bh)/2:MG.h-bh-12;
+  g.fillStyle=cssVar(kind==='ok'?'--ok-soft':kind==='exc'?'--exc-soft':'--err-soft');g.strokeStyle=cssVar(kind==='ok'?'--ok':kind==='exc'?'--exc':'--err');g.lineWidth=2;
+  g.beginPath();g.roundRect?g.roundRect(x,y,lw,bh,8):g.rect(x,y,lw,bh);g.fill();g.stroke();
+  g.fillStyle=g.strokeStyle;g.textAlign='center';
+  lines.forEach((l,i)=>g.fillText(l,MG.w/2,y+(full?26:22)+i*lh,MG.w-40));
+  if(full){g.font='600 12px '+cssVar('--f-body');g.fillStyle=cssVar('--muted');g.fillText('The game stopped. Press Restart to play again.',MG.w/2,y+bh-12,MG.w-40);}
+}
+function mgFrame(ts){
+  if(!MG.raf)return;
+  const dt=Math.min(.05,(ts-(MG.lastTs||ts))/1000);MG.lastTs=ts;
+  if(!MG.frozen)mgUpdate(dt);
+  mgDraw();MG.raf=requestAnimationFrame(mgFrame);
+}
+function mgStart(ch,slideEl){
+  const root=slideEl.querySelector('.mini');if(!root)return;
+  mgStop();MG.root=root;MG.cv=root.querySelector('canvas');MG.ch=ch;
+  if(!mgSize())return;
+  if(!MG.bound.has(root)){
+    MG.bound.add(root);
+    MG.cv.addEventListener('pointerdown',e=>{const r=e.currentTarget.getBoundingClientRect();mgTap(e.clientX-r.left,e.clientY-r.top);});
+    root.querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click',()=>mgAct(b.dataset.act)));
+  }
+  MG.mode=root.dataset.mode||'bug';mgReset();
+  MG.lastTs=0;MG.raf=requestAnimationFrame(mgFrame);
+}
+function mgStop(){if(MG.raf){cancelAnimationFrame(MG.raf);MG.raf=0;}}
+window.addEventListener('resize',()=>{if(MG.raf)mgSize();});
+
+/* ================= class diagram of Dad's first try, with the problem highlighted ================= */
+/* line: [text, flags] flags: i=italic(abstract) b=bad(problem) ; box.bad = whole box is a problem; box.tag = red label */
+const TRY_DIAG=[
+ {note:'There is no <code>Bubble</code> class. A bubble is only an index <code>i</code> spread across four parallel arrays, and every method needs that index.',
+  boxes:[{n:'Game',x:150,y:20,w:300,lines:[['+ colors : String[]','b'],['+ radii : double[]','b'],['+ ys : double[]','b'],['+ speeds : double[]','b'],['+ fall(int i)','b'],['+ points(int i) : int','b']],tag:'NO BUBBLE CLASS'}],edges:[]},
+ {note:'Every field is <code>+</code> public, so any code can write <code>b.speed = -4</code>. Nothing in the class guards the rule “speed &gt; 0”.',
+  boxes:[{n:'Bubble',x:170,y:20,w:260,lines:[['+ color : String','b'],['+ radius : double','b'],['+ y : double','b'],['+ speed : double','b'],['+ fall()'],['+ points() : int']],tag:'PUBLIC FIELDS'}],edges:[]},
+ {note:'Three unrelated classes. The same fields and methods are copied into each one, and no common parent says they are all falling items.',
+  boxes:[
+   {n:'Bubble',x:10,y:20,w:190,lines:[['- color : String','b'],['- y, speed : double','b'],['- radius : double'],['+ fall()','b'],['+ get/setSpeed(…)','b'],['+ points() : int']]},
+   {n:'Star',x:215,y:20,w:190,lines:[['- color : String','b'],['- y, speed : double','b'],['+ fall()','b'],['+ get/setSpeed(…)','b'],['+ points() : int']]},
+   {n:'Bomb',x:420,y:20,w:190,lines:[['- color : String','b'],['- y, speed : double','b'],['+ fall()','b'],['+ get/setSpeed(…)','b'],['+ points() : int']]}],
+  edges:[],copies:true},
+ {note:'<code>FallingItem</code> is a normal class, so <code>new FallingItem(…)</code> compiles, and its <code>points()</code> has to invent an answer: <code>return 0</code>.',
+  boxes:[
+   {n:'FallingItem',x:200,y:16,w:240,lines:[['# name : String'],['- color, y, speed'],['+ fall()'],['+ points() : int  {return 0}','b'],['+ describe() : String']],headBad:true,tag:'NOT ABSTRACT'},
+   {n:'Bubble',x:20,y:220,w:180,lines:[['- radius : double'],['+ points() : int']]},
+   {n:'Star',x:230,y:220,w:180,lines:[['+ points() : int']]},
+   {n:'Bomb',x:440,y:220,w:180,lines:[['+ points() : int']]}],
+  edges:[['Bubble','FallingItem','extends'],['Star','FallingItem','extends'],['Bomb','FallingItem','extends']]},
+ {note:'The classes are fine. The problem is in <code>Game</code>: one list and one loop per item type, so Maya’s new <code>Snowflake</code> has no list and never falls.',
+  boxes:[
+   {n:'Game',x:10,y:16,w:250,lines:[['- bubbles : List<Bubble>','b'],['- stars : List<Star>','b'],['- bombs : List<Bomb>','b'],['+ tick()   // 3 loops','b'],['+ score() // 3 loops','b']],tag:'ONE LOOP PER TYPE'},
+   {n:'FallingItem',x:380,y:16,w:220,kind:'abstract',st:'«abstract»',lines:[['+ fall()'],['+ points() : int','i']]},
+   {n:'Bubble',x:280,y:220,w:110,lines:[['+ points()']]},
+   {n:'Star',x:400,y:220,w:100,lines:[['+ points()']]},
+   {n:'Bomb',x:510,y:220,w:100,lines:[['+ points()']]},
+   {n:'Snowflake',x:620,y:220,w:120,lines:[['+ points()']],bad:true,tag:'NO LIST'}],
+  edges:[['Bubble','FallingItem','extends'],['Star','FallingItem','extends'],['Bomb','FallingItem','extends'],['Snowflake','FallingItem','extends']]},
+ {note:'Attempt A puts both abilities in <code>FallingItem</code>, so every subclass is forced to implement both: a bubble must <code>rotate()</code> and a star must <code>scale()</code>.',
+  boxes:[
+   {n:'FallingItem',x:200,y:16,w:240,kind:'abstract',st:'«abstract»',lines:[['+ points() : int','i'],['+ scale(double)','ib'],['+ rotate(double)','ib']],tag:'FORCES BOTH'},
+   {n:'Bubble',x:20,y:200,w:180,lines:[['+ scale(double)'],['+ rotate(double)  // fake','b']]},
+   {n:'Star',x:230,y:200,w:180,lines:[['+ scale(double)  // fake','b'],['+ rotate(double)']]},
+   {n:'Bomb',x:440,y:200,w:180,lines:[['+ scale(double)'],['+ rotate(double)']]}],
+  edges:[['Bubble','FallingItem','extends'],['Star','FallingItem','extends'],['Bomb','FallingItem','extends']]},
+ {note:'<code>flip()</code> was added to <code>Rotatable</code> as an abstract method. Every implementing class must now write it, and Adam’s <code>Leaf</code> (which Dad can’t edit) no longer compiles.',
+  boxes:[
+   {n:'Rotatable',x:230,y:16,w:200,kind:'interface',st:'«interface»',lines:[['+ rotate(double)','i'],['+ flip()   // new, abstract','ib']],tag:'NEW ABSTRACT METHOD'},
+   {n:'Star',x:20,y:200,w:180,lines:[['+ rotate(double)'],['flip() missing','b']]},
+   {n:'Bomb',x:240,y:200,w:180,lines:[['+ rotate(double)'],['flip() missing','b']]},
+   {n:'Leaf',x:460,y:200,w:180,st:'Adam’s class',lines:[['+ rotate(double)'],['flip() missing','b']],bad:true,tag:'WON’T COMPILE'}],
+  edges:[['Star','Rotatable','implements'],['Bomb','Rotatable','implements'],['Leaf','Rotatable','implements']]},
+ {note:'<code>GoldenBubble</code> extends <code>Bubble</code> but overrides nothing, so it inherits the normal <code>points()</code> and <code>describe()</code> unchanged.',
+  boxes:[
+   {n:'Bubble',x:200,y:16,w:240,lines:[['- radius : double'],['+ points() : int'],['+ describe() : String']]},
+   {n:'GoldenBubble',x:200,y:200,w:240,lines:[['(no overrides)','b']],bad:true,tag:'OVERRIDES NOTHING'}],
+  edges:[['GoldenBubble','Bubble','extends']]}
+];
+function tryDiagSVG(i){return specSVG(TRY_DIAG[i]);}
+function specSVG(D){
+  const B={};
+  D.boxes.forEach(b=>{b.h=36+b.lines.length*16+8;B[b.n]=b;});
+  let W=0,H=0;D.boxes.forEach(b=>{W=Math.max(W,b.x+b.w);H=Math.max(H,b.y+b.h);});
+  W+=12;H+=14;if(D.copies)H+=20;if(D.boxes.some(b=>b.gtag||b.ptagB))H+=14;
+  let s=`<svg viewBox="0 0 ${W} ${H}" style="max-width:${Math.round(W*1.3)}px;margin-inline:auto" role="img" aria-label="Class diagram of Dad’s first try with the problem highlighted">`;
+  for(const [f,t,type] of D.edges){
+    const a=B[f],b=B[t],x1=a.x+a.w/2,y1=a.y,x2=b.x+b.w/2,y2=b.y+b.h;
+    const ang=Math.atan2(y2-y1,x2-x1),L=14,Wd=8,bx=x2-L*Math.cos(ang),by=y2-L*Math.sin(ang);
+    const p1=[bx+Wd*Math.sin(ang),by-Wd*Math.cos(ang)],p2=[bx-Wd*Math.sin(ang),by+Wd*Math.cos(ang)];
+    const im=type==='implements'?' dash':'',gd=D.goodEdges&&D.goodEdges.includes(f+'>'+t)?' good-edge':D.propEdges&&D.propEdges.includes(f+'>'+t)?' prop-edge':'';
+    s+=`<line class="edge${im}${gd}" x1="${x1}" y1="${y1}" x2="${bx}" y2="${by}"/><polygon class="arrow${im?' i':''}${gd}" points="${x2},${y2} ${p1[0]},${p1[1]} ${p2[0]},${p2[1]}"/>`;
+  }
+  for(const b of D.boxes){
+    const kind=b.kind||'class',hb=b.headBad||b.bad;
+    s+=`<g class="box tbox${b.bad?' badbox':''}${hb?' badhead':''}${b.good?' goodbox':''}${b.prop?' propbox':''}" data-kind="${kind}">
+      <rect class="frame" x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="4"/>
+      <rect class="head" x="${b.x+1}" y="${b.y+1}" width="${b.w-2}" height="34" rx="3"/>
+      <line x1="${b.x}" x2="${b.x+b.w}" y1="${b.y+36}" y2="${b.y+36}" stroke="currentColor" stroke-opacity=".35"/>
+      ${b.st?`<text class="st" x="${b.x+b.w/2}" y="${b.y+14}" text-anchor="middle">${esc(b.st)}</text><text class="nm" x="${b.x+b.w/2}" y="${b.y+30}" text-anchor="middle">${esc(b.n)}</text>`
+        :`<text class="nm" x="${b.x+b.w/2}" y="${b.y+24}" text-anchor="middle">${esc(b.n)}</text>`}
+      ${b.lines.map(([t,f],k)=>{f=f||'';const ty=b.y+36+16*k,bad=f.includes('b'),gd=f.includes('g'),pr=f.includes('p');
+        return `${bad||gd||pr?`<rect class="${bad?'bad-line':gd?'good-line':'prop-line'}" x="${b.x+3}" y="${ty+3}" width="${b.w-6}" height="16" rx="3"/>`:''}<text x="${b.x+10}" y="${ty+15}" class="${[f.includes('i')?'it':'',bad?'badt':'',gd?'goodt':'',pr?'propt':''].filter(Boolean).join(' ')}">${esc(t)}</text>`;}).join('')}
+      ${b.tag?`<text class="badtag" x="${b.x+b.w}" y="${b.y-5}" text-anchor="end">⚠ ${esc(b.tag)}</text>`:''}
+      ${b.ptag?`<text class="proptag" x="${b.x+b.w}" y="${b.y-5}" text-anchor="end">? ${esc(b.ptag)}</text>`:''}
+      ${b.ptagB?`<text class="proptag" x="${b.x+b.w/2}" y="${b.y+b.h+15}" text-anchor="middle">? ${esc(b.ptagB)}</text>`:''}
+      ${b.gtag?`<text class="goodtag" x="${b.x+b.w/2}" y="${b.y+b.h+15}" text-anchor="middle">✓ ${esc(b.gtag)}</text>`:''}
+    </g>`;
+  }
+  if(D.copies){
+    s+=`<text class="badtag" x="${W/2}" y="${H-2}" text-anchor="middle">⚠ the highlighted members are copied in all three classes</text>`;
+  }
+  return s+'</svg>';
+}
+function tryDiagHTML(i){
+  return `<div class="trydiag"><div class="codelabel bad">The design behind it</div><div class="diagram">${tryDiagSVG(i)}</div><p class="trynote">${TRY_DIAG[i].note}</p></div>`;
+}
+
+/* ================= class questions with answers ================= */
+const QA=[
+ {qd:{boxes:[
+   {n:'Rotatable',x:330,y:20,w:230,kind:'interface',st:'«interface»',lines:[['+ rotate(double)','i'],['+ flip()  «default»']]},
+   {n:'FallingItem',x:20,y:20,w:220,kind:'abstract',st:'«abstract»',lines:[['+ fall()'],['+ points() : int','i']]},
+   {n:'Bubble',x:110,y:200,w:260,lines:[['- radius : double'],['+ points() : int'],['+ rotate(double)  // must write','p']],prop:true,ptagB:'BUBBLE IMPLEMENTS ROTATABLE'}],
+   edges:[['Bubble','FallingItem','extends'],['Bubble','Rotatable','implements']],propEdges:['Bubble>Rotatable']},
+  q:'Why shouldn’t <code>Bubble</code> implement <code>Rotatable</code> just to get <code>flip()</code> for free?',
+  a:'<p>Implementing an interface is a <b>promise</b>, not a shortcut. To implement <code>Rotatable</code>, Bubble must write <code>rotate()</code> (and <code>flip()</code> calls it). Every loop that spins Rotatable items would then spin bubbles too: the silly spinning bubble from chapter 6.</p><p>Implement an interface only for an ability the class really has (CAN-DO).</p>'},
+ {qd:{boxes:[
+   {n:'FallingItem',x:200,y:20,w:240,kind:'interface',st:'«interface» (was «abstract»)',lines:[['+ fall()','pi'],['+ points() : int','i']],prop:true,ptag:'SUGGESTED: INTERFACE'},
+   {n:'Bubble',x:10,y:200,w:190,lines:[['+ points() : int']]},
+   {n:'Star',x:225,y:200,w:190,lines:[['+ points() : int']]},
+   {n:'Bomb',x:440,y:200,w:190,lines:[['+ points() : int']]}],
+   edges:[['Bubble','FallingItem','implements'],['Star','FallingItem','implements'],['Bomb','FallingItem','implements']],propEdges:['Bubble>FallingItem','Star>FallingItem','Bomb>FallingItem']},
+  q:'Replace <code>abstract class FallingItem</code> with an interface. What would you lose?',
+  a:'<p>An interface has <b>no instance fields and no constructors</b>. <code>color</code>, <code>y</code> and <code>speed</code>, plus the code of <code>fall()</code> and the checks in <code>setSpeed()</code>, would have to be copied back into every class: the chapter 3 problem returns.</p><p>Keep the abstract class for shared state (IS-A), and use interfaces for extra abilities.</p>',
+  d:{boxes:[
+   {n:'FallingItem',x:200,y:16,w:240,kind:'interface',st:'«interface»',lines:[['+ points() : int','i'],['no fields, no constructor','b']],tag:'INTERFACE NOW'},
+   {n:'Bubble',x:10,y:190,w:190,lines:[['- color, y, speed','b'],['+ fall()','b'],['+ setSpeed(…)','b']]},
+   {n:'Star',x:225,y:190,w:190,lines:[['- color, y, speed','b'],['+ fall()','b'],['+ setSpeed(…)','b']]},
+   {n:'Bomb',x:440,y:190,w:190,lines:[['- color, y, speed','b'],['+ fall()','b'],['+ setSpeed(…)','b']]}],
+   edges:[['Bubble','FallingItem','implements'],['Star','FallingItem','implements'],['Bomb','FallingItem','implements']],copies:true}},
+ {qd:{boxes:[
+   {n:'Resizable',x:360,y:20,w:220,kind:'interface',st:'«interface»',lines:[['+ scale(double)','i']]},
+   {n:'Bubble',x:40,y:20,w:220,lines:[['- radius : double'],['+ points() : int'],['+ scale(double)','p']]},
+   {n:'GoldenBubble',x:40,y:210,w:220,lines:[['+ points() : int'],['inherits scale(double)','p']],prop:true,ptagB:'MUST NEVER SHRINK'}],
+   edges:[['GoldenBubble','Bubble','extends'],['Bubble','Resizable','implements']],propEdges:['GoldenBubble>Bubble','Bubble>Resizable']},
+  q:'Golden bubbles must never shrink. Is <code>GoldenBubble extends Bubble</code> still the right design?',
+  a:'<p>Not any more. Bubble <code>implements Resizable</code>, so GoldenBubble inherits that: it IS-A Resizable, and the pinch power-up would shrink it. Overriding <code>scale()</code> to do nothing would break the promise the interface makes (the Liskov Substitution Principle).</p><p>Better: move the shared bubble code into an abstract <code>BubbleBase</code>. Only the normal <code>Bubble</code> implements Resizable.</p>',
+  d:{boxes:[
+   {n:'Resizable',x:10,y:16,w:200,kind:'interface',st:'«interface»',lines:[['+ scale(double)','i']]},
+   {n:'BubbleBase',x:330,y:16,w:240,kind:'abstract',st:'«abstract»',lines:[['- radius : double','g'],['+ points() : int','g']],good:true},
+   {n:'Bubble',x:10,y:200,w:200,lines:[['+ scale(double)']]},
+   {n:'GoldenBubble',x:340,y:200,w:220,lines:[['+ points() : int'],['not Resizable','g']],good:true,gtag:'CAN’T SHRINK'}],
+   edges:[['Bubble','BubbleBase','extends'],['GoldenBubble','BubbleBase','extends'],['Bubble','Resizable','implements']],goodEdges:['GoldenBubble>BubbleBase','Bubble>BubbleBase']}},
+ {qd:{boxes:[
+   {n:'FallingItem',x:220,y:20,w:220,kind:'abstract',st:'«abstract»',lines:[['+ fall()'],['+ points() : int','i']]},
+   {n:'Bubble',x:10,y:190,w:140,lines:[['+ points()']]},
+   {n:'Star',x:170,y:190,w:140,lines:[['+ points()']]},
+   {n:'Bomb',x:330,y:190,w:140,lines:[['+ points()']]},
+   {n:'Snowflake',x:490,y:190,w:150,st:'Maya’s new item',lines:[['+ points() : 20','p']],prop:true,ptagB:'NEW CLASS ARRIVES'}],
+   edges:[['Bubble','FallingItem','extends'],['Star','FallingItem','extends'],['Bomb','FallingItem','extends'],['Snowflake','FallingItem','extends']],propEdges:['Snowflake>FallingItem']},
+  q:'Maya’s <code>Snowflake</code> arrives. Which existing classes change?',
+  a:'<p><b>None.</b> Snowflake <code>extends FallingItem</code> and overrides <code>points()</code>. The game loops over <code>List&lt;FallingItem&gt;</code>, so the snowflake falls and scores through dynamic dispatch, with no edits to Dad’s code (the Open/Closed Principle).</p>',
+  d:{boxes:[
+   {n:'Game',x:10,y:16,w:200,lines:[['- items : List<FallingItem>','g'],['+ tick()   // unchanged','g'],['+ score()  // unchanged','g']],good:true},
+   {n:'FallingItem',x:300,y:16,w:220,kind:'abstract',st:'«abstract»',lines:[['+ fall()'],['+ points() : int','i']]},
+   {n:'Bubble',x:10,y:190,w:140,lines:[['+ points()']]},
+   {n:'Star',x:170,y:190,w:140,lines:[['+ points()']]},
+   {n:'Bomb',x:330,y:190,w:140,lines:[['+ points()']]},
+   {n:'Snowflake',x:490,y:190,w:150,lines:[['+ points() : 20','g']],good:true,gtag:'ONLY NEW CLASS'}],
+   edges:[['Bubble','FallingItem','extends'],['Star','FallingItem','extends'],['Bomb','FallingItem','extends'],['Snowflake','FallingItem','extends']],goodEdges:['Snowflake>FallingItem']}},
+ {qd:{boxes:[
+   {n:'Rotatable',x:20,y:20,w:200,kind:'interface',st:'«interface»',lines:[['+ rotate(double)','i']]},
+   {n:'Resizable',x:400,y:20,w:200,kind:'interface',st:'«interface»',lines:[['+ scale(double)','i']]},
+   {n:'Leaf',x:200,y:200,w:220,st:'Adam’s class',lines:[['+ rotate(double)'],['+ scale(double)  ???','p']],prop:true,ptagB:'LEAF SHOULD SHRINK TOO'}],
+   edges:[['Leaf','Rotatable','implements'],['Leaf','Resizable','implements']],propEdges:['Leaf>Resizable']},
+  q:'Adam wants his <code>Leaf</code> to shrink too. What does he add to his class, and what in Dad’s code must change?',
+  a:'<p>Adam adds <code>implements Resizable</code> to <code>Leaf</code> and writes its <code>scale()</code> method. <b>Nothing in Dad’s code changes</b>: the pinch power-up already accepts any <code>Resizable</code>, so leaves can be pinched automatically.</p>',
+  d:{boxes:[
+   {n:'Rotatable',x:20,y:16,w:200,kind:'interface',st:'«interface»',lines:[['+ rotate(double)','i']]},
+   {n:'Resizable',x:400,y:16,w:200,kind:'interface',st:'«interface»',lines:[['+ scale(double)','i']]},
+   {n:'Leaf',x:200,y:190,w:220,st:'Adam’s class',lines:[['+ rotate(double)'],['+ scale(double)','g']],good:true,gtag:'ADAM’S ONLY CHANGE'}],
+   edges:[['Leaf','Rotatable','implements'],['Leaf','Resizable','implements']],goodEdges:['Leaf>Resizable']}}
+];
+function qaHTML(only){
+  return `<ol class="qa">${QA.map((x,i)=>only!==undefined&&i!==only?'':`<li><div class="qa-qrow"><p class="qa-q"><span class="qa-n">Q${i+1}</span><span>${x.q}</span></p>${x.qd?`<div class="qa-qd"><div class="codelabel prop">What the question suggests</div><div class="diagram">${specSVG(x.qd)}</div></div>`:''}</div>
+    <div class="qa-a frag${x.d?' has-d':''}"><div class="qa-txt"><div class="codelabel good">Answer</div>${x.a}</div>${x.d?`<div class="diagram qa-d">${specSVG(x.d)}</div>`:''}</div></li>`).join('')}</ol>`;
+}
+
+/* ================= lab ================= */
+function tryCode(t){
+  if(t==='loop')return 'for (FallingItem it : items) score += it.points()';
+  if(t==='tick')return 'for (FallingItem it : items) it.fall()';
+  if(t==='resizeAll')return 'if (it instanceof Resizable r) r.scale(0.75)';
+  if(t.decl){const d={...t.decl};if(vars[d.name])d.name=fresh(d.name);return declText(d);}
+  return callText({cast:'',arg:'',...t.call});
+}
+function renderTries(){
+  const c=CH[labCh];
+  $('#lab-tries').innerHTML=c.recap
+    ?`<p class="free">Free play: every class and member is unlocked. Open <b>Write your own statement</b> below and experiment.</p>`
+    :c.tries.map((t,i)=>`<button class="try" data-i="${i}"><span>${esc(t[0])}</span><code>${esc(tryCode(t[1]))}</code></button>`).join('');
+  if(busy)setBusy(true);
+}
+$('#lab-tries').addEventListener('click',e=>{
+  const b=e.target.closest('.try');if(!b||busy)return;
+  const [,t,key]=CH[labCh].tries[+b.dataset.i];
+  if(t==='loop'){runLoop();return;}
+  if(t==='tick'){tick();return;}
+  if(t==='resizeAll'){runResizeAll();return;}
+  let res;
+  if(t.decl){const d={...t.decl};if(vars[d.name])d.name=fresh(d.name);loadDecl(d);res=runDecl(d);}
+  else{const c={cast:'',arg:'',...t.call};loadCall(c);res=runCall(c);}
+  settle(res.concept==='unknown'||res.concept==='dup'?res.concept:key);
+  renderTries();
+});
+function loadDecl(d){setMode('decl');fillSelects();$('#d-type').value=d.decl;$('#d-name').value=d.name;$('#d-rhs').value=d.rhs;
+  if(d.rhs==='new'){$('#d-cls').value=d.cls;buildArgs(d.args);}else{$('#d-cast').value=d.cast||'';$('#d-src').value=d.src;}}
+function loadCall(c){setMode('call');fillSelects();$('#c-cast').value=c.cast||'';$('#c-var').value=c.v;$('#c-mem').value=c.mem;$('#c-arg').value=c.arg||'';}
+function resetLab(){
+  objs={};vars={};nextId=1;score=0;con.innerHTML='';
+  log('info',`// Chapter ${labCh+1}: ${CH[labCh].concept}. Starting objects:`);
+  CH[labCh].setup.forEach(s=>runDecl(s,true));
+  hotObj=null;$('#lab-diagram').innerHTML=diagramSVG(labCh,false);
+  renderStage();renderVars();fillSelects();
+  $('#d-name').value='x';$('#d-rhs').value='new';buildArgs();setMode('decl');
+  explain(CH[labCh].recap?'recap':'start');
+}
+function enterLab(ch,slot){
+  slot.appendChild($('#lab'));
+  if(labCh!==ch){labCh=ch;resetLab();}
+  renderTries();
+  $('#builder').open=!!CH[ch].recap;
+}
+$('#reset').onclick=()=>{if(!busy)resetLab();renderTries();};
+$('#clear').onclick=()=>{con.innerHTML='';};
+
+/* ================= slides ================= */
+const PEOPLE={
+  Shahd:['S','rose','Shahd, 9','Wants a bubble-popping game on her tablet to share'],
+  Dad:['D','indigo','Dad','Software engineer, writes the Java'],
+  Omar:['O','amber','Omar','Shahd’s friend, finds the bugs'],
+  Maya:['M','teal','Maya','Shahd’s friend, designs new items'],
+  Adam:['A','green','Adam','Shahd’s friend, learning Java']
+};
+const av=(k,big)=>`<span class="av${big?' big':''}" style="background:var(--c-${PEOPLE[k][1]})" aria-hidden="true">${PEOPLE[k][0]}</span>`;
+const TOTAL_CH=CH.filter(c=>!c.recap).length;
+const SL=[],CHSTART=[];
+SL.push({kind:'title',label:'Start',html:`
+  <div class="title-grid"><div class="head" style="gap:14px"><div class="eyebrow">Object-oriented programming in Java · a story in ${TOTAL_CH} wishes</div>
+  <h1>Shahd’s <span>Bubble Pop</span></h1>
+  <p class="lede">Shahd is nine. Her dad is a software engineer. She asks him for a game she can play on her tablet and share with her friends: bubbles fall from the top of the screen and she taps them to pop them before they reach the bottom. Every new wish (and every bug her friends find) pushes Dad toward a new idea in object-oriented programming.</p></div>
+  <figure class="demo"><figcaption><span>Where we’re headed: try it</span><span>Score <b id="demo-score">0</b></span></figcaption><canvas id="demo" aria-label="Playable demo: tap falling bubbles and stars, avoid bombs"></canvas><div class="demo-key"><span><i class="k-b"></i>bubble: smaller = more points</span><span><i class="k-s"></i>star +50</span><span><i class="k-x"></i>bomb −30</span></div></figure></div>
+  <div class="cast">${Object.keys(PEOPLE).map(k=>`<div class="person">${av(k)}<div><b>${PEOPLE[k][2]}</b><span class="r">${PEOPLE[k][3]}</span></div></div>`).join('')}</div>
+  <div class="howto"><span>Each chapter: <b>the wish</b> → <b>Dad’s first try</b> → <b>the fix</b> → <b>try it live</b> → <b>design so far</b></span><span>Press <kbd>→</kbd> or <kbd>Space</kbd> to advance</span></div>`});
+const vbW=s=>+/viewBox="0 0 ([\d.]+)/.exec(s)[1];
+function baSVG(ch,mark,pair){
+  const s=diagramSVG(ch,mark),ref=Math.max(vbW(diagramSVG(pair,false)),pair>0?vbW(diagramSVG(pair-1,false)):0,520);
+  return s.replace(/style="[^"]*"/,`style="width:${(vbW(s)/ref*100).toFixed(1)}%;margin-inline:auto"`);
+}
+CH.forEach((c,i)=>{
+  if(c.recap)return;
+  const n=i+1,bug=c.kind==='bug',person=/^Omar/.test(c.from)?'Omar':'Shahd',ey=t=>`<div class="eyebrow">Chapter ${n} of ${TOTAL_CH} · ${t}</div>`;
+  CHSTART[i]=SL.length;
+  SL.push({kind:'wish',ch:i,label:`${n} · ${c.concept}`,html:`
+    <div class="head">${ey(bug?'A bug report':'A new wish')}<h2>${esc(c.title)}</h2></div>
+    <div class="wish-grid"><div class="wish-left"><div class="bubble-row">${av(person,true)}<div><div class="who">${esc(c.from)}${bug?'<span class="tag-bug">bug</span>':''} → Dad</div><blockquote class="bubble">“${esc(c.req)}”</blockquote></div></div>
+    <p class="prompt frag">Before Dad starts typing: how would <em>you</em> build this?</p></div>${miniHTML(i,'fix')}</div>`});
+  SL.push({kind:'try',ch:i,html:`
+    <div class="head">${ey('Dad’s first try')}<h2>The obvious way…</h2></div>
+    <div class="try-grid"><div class="try-left"><div class="try-code"><div class="codelabel bad">First attempt</div><pre class="code bad">${hl(c.attempt)}</pre></div>
+      ${tryDiagHTML(i)}</div>
+      <div class="try-right">${miniHTML(i,'bug')}</div>
+      <div class="whybox try-why"><div class="q">What goes wrong?</div><ul>${c.why.map(w=>`<li class="frag">${w}</li>`).join('')}</ul>
+      <p class="fraghint">Play the game to find the problem, then press <kbd>→</kbd> to reveal each cause.</p></div></div>`});
+  SL.push({kind:'fix',ch:i,html:`
+    <div class="head">${ey('The fix')}<h2><span class="concept">${esc(c.concept)}</span></h2></div>
+    <div class="two fix"><div class="prose">${c.sol}</div><div><div class="codelabel good">Dad’s new code</div><pre class="code good">${hl(c.code)}</pre></div></div>`});
+  SL.push({kind:'lab',ch:i,html:`
+    <div class="head">${ey('Try it live')}<h2>${esc(c.concept)} in action</h2></div>
+    <div class="lab-slot"></div>`});
+  SL.push({kind:'design',ch:i,html:`
+    <div class="head">${ey('Design so far')}<h2>The game after chapter ${n}</h2></div>
+    <div class="before-after">
+      <div class="ba-col ba-before"><div class="ba-h"><span class="ba-tag">Before</span>${i===0?'No classes yet':`After chapter ${i}`}</div>
+        ${i===0?`<div class="ba-empty"><p>Dad’s first try had no classes at all: just parallel arrays inside the game.</p></div>`:`<div class="diagram">${baSVG(i-1,false,i)}</div>`}</div>
+      <div class="ba-arrow" aria-hidden="true">→</div>
+      <div class="ba-col ba-after"><div class="ba-h"><span class="ba-tag now">Now</span>After chapter ${n}</div><div class="diagram">${baSVG(i,true,i)}</div></div>
+    </div>
+    ${LEGEND}
+    <div class="changes"><div class="codelabel good">What changed</div><ul>${CHANGES[i].map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    <blockquote class="take">${esc(c.take)}</blockquote>`});
+});
+const RECAP=CH.length-1;
+CHSTART[RECAP]=SL.length;
+SL.push({kind:'recap',label:'Recap',html:`
+  <div class="head"><div class="eyebrow">Recap</div><h2>Every wish, every concept</h2></div>
+  <div class="tbl-wrap"><table class="cmp"><thead><tr><th></th><th>Shahd’s wish</th><th>Dad’s first try broke because…</th><th>Concept</th></tr></thead><tbody>
+  ${CH.slice(0,-1).map((x,i)=>`<tr><td class="num">${i+1}</td><td>${esc(x.title)}</td><td>${x.why[0]}</td><td><b>${esc(x.concept)}</b></td></tr>`).join('')}
+  </tbody></table></div>`});
+const QSTART=SL.length;
+QA.forEach((x,qi)=>SL.push({kind:'recap',label:qi===0?'Questions':undefined,html:`
+  <div class="head"><div class="eyebrow">Questions for the class · ${qi+1} of ${QA.length}</div><h2>Think like Dad</h2></div>
+  ${qaHTML(qi)}
+  <p class="fraghint" style="margin:0">Discuss first, then press <kbd>→</kbd> to reveal the answer.</p>`}));
+SL.push({kind:'lab',ch:RECAP,html:`
+  <div class="head"><div class="eyebrow">Free play</div><h2>The whole game, unlocked</h2></div>
+  <div class="lab-slot"></div>`});
+SL.push({kind:'source',html:`
+  <div class="head"><div class="eyebrow">Appendix</div><h2>Dad’s final code</h2></div>
+  <div class="tabs" role="tablist" id="srcTabs"></div>
+  <pre class="code tall" id="src"></pre>`});
+
+$('#slides').innerHTML=SL.map((s,i)=>`<section class="slide s-${s.kind}" hidden aria-roledescription="slide" aria-label="Slide ${i+1} of ${SL.length}"><div class="inner">${s.html}</div></section>`).join('');
+const slideEls=[...document.querySelectorAll('#slides > .slide')];
+$('#srcTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)showSrc(b.dataset.t);});
+showSrc('FallingItem');
+
+$('#jump').innerHTML=`<option value="0">Start</option>`+CH.map((c,i)=>`<option value="${CHSTART[i]}">${c.recap?'Recap':`Ch ${i+1}`}</option>`).join('');
+$('#jump').insertAdjacentHTML('beforeend',`<option value="${QSTART}">Q&amp;A</option>`);
+let si=0,frag=0;
+const fragsOf=i=>[...slideEls[i].querySelectorAll('.frag')];
+function show(i,revealAll){
+  if(i<0||i>=SL.length)return;
+  slideEls[si].hidden=true;si=i;slideEls[si].hidden=false;
+  const fs=fragsOf(si);fs.forEach(f=>f.classList.toggle('shown',!!revealAll));frag=revealAll?fs.length:0;
+  $('#viewport').scrollTop=0;
+  const s=SL[si];
+  if(s.kind==='lab')enterLab(s.ch,slideEls[si].querySelector('.lab-slot'));
+  if(s.kind==='title')demoStart();else demoStop();
+  if(s.kind==='wish'||s.kind==='try')mgStart(s.ch,slideEls[si]);else mgStop();
+  $('#counter').textContent=`${si+1} / ${SL.length}`;
+  $('#prog').style.width=`${(si+1)/SL.length*100}%`;
+  let j=0;for(const v of [...$('#jump').options].map(o=>+o.value))if(v<=si)j=v;$('#jump').value=String(j);
+  $('#prev').disabled=busy||si===0;$('#next').disabled=busy||(si===SL.length-1&&frag>=fs.length);
+  try{localStorage.setItem('shahdDeckSlide',String(si));}catch(e){}
+  try{history.replaceState(null,'','#s'+(si+1));}catch(e){}
+}
+function next(){const fs=fragsOf(si);if(frag<fs.length){fs[frag++].classList.add('shown');$('#next').disabled=si===SL.length-1&&frag>=fs.length;return;}show(si+1);}
+function prev(){const fs=fragsOf(si);if(frag>0){fs[--frag].classList.remove('shown');$('#next').disabled=false;return;}show(si-1,true);}
+$('#next').onclick=()=>{if(!busy)next();};
+$('#prev').onclick=()=>{if(!busy)prev();};
+$('#jump').addEventListener('change',e=>{if(!busy)show(+e.target.value);});
+document.addEventListener('keydown',e=>{
+  const tag=document.activeElement?.tagName||'';
+  if(/INPUT|SELECT|TEXTAREA/.test(tag)||busy)return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||(e.key===' '&&!/BUTTON|SUMMARY|A/.test(tag))){e.preventDefault();next();}
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}
+  else if(e.key==='Home'){show(0);}else if(e.key==='End'){show(SL.length-1,true);}
+});
+const fsBtn=$('#fs');
+if(!document.documentElement.requestFullscreen)fsBtn.hidden=true;
+fsBtn.onclick=()=>{try{const p=document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();p&&p.catch&&p.catch(()=>{});}catch(e){}};
+document.addEventListener('fullscreenchange',()=>{fsBtn.textContent=document.fullscreenElement?'Exit full screen':'Full screen';});
+
+let startAt=0;
+const hm=/^#s(\d+)$/.exec(location.hash||'');
+if(hm)startAt=Math.min(SL.length-1,Math.max(0,+hm[1]-1));
+else{try{const v=parseInt(localStorage.getItem('shahdDeckSlide'),10);if(v>=0&&v<SL.length)startAt=v;}catch(e){}}
+slideEls[0].hidden=false;show(startAt);
+
+})();
+</script>
+
+</body></html>
